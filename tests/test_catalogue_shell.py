@@ -34,7 +34,9 @@ def test_catalogue_shell_renders(client):
     assert b"/nhrils/catalogue/search-guide" in res.data
     assert b"/nhrils/catalogue/about" in res.data
     assert b"/nhrils/catalogue/contact" in res.data
-    assert b"/search" in res.data
+    assert b"/api" not in res.data
+    assert b"NIMR health research discovery service" in res.data
+    assert b"Request support" in res.data
     assert b"nimr.svg" in res.data
     assert b"42" in res.data
     assert b"seed records" in res.data
@@ -71,7 +73,7 @@ def test_catalogue_help_page_renders(client):
     assert b"Recommended search patterns" in res.data
     assert b"malaria guidelines" in res.data
     assert b"Tanzania Journal of Health Research" in res.data
-    assert b'aria-current="page">Search guide' in res.data
+    assert b'aria-current="page">Help' in res.data
 
 
 def test_catalogue_contact_page_renders(client):
@@ -84,7 +86,7 @@ def test_catalogue_contact_page_renders(client):
     assert b"When to contact the library" in res.data
     assert b"Information to include" in res.data
     assert b"Support status" in res.data
-    assert b'aria-current="page">Contact' in res.data
+    assert b'aria-current="page">Request' in res.data
 
 
 def test_catalogue_terms_page_renders(client):
@@ -143,7 +145,7 @@ def test_catalogue_review_page_renders(client):
     assert b"Browse all seed records" in res.data
     assert b"Subjects needing vocabulary review" in res.data
     assert b"/nhrils/catalogue/search?availability=review" in res.data
-    assert b'aria-current="page">Seed review' in res.data
+    assert b'aria-current="page">Review' in res.data
     assert b"Database and OpenSearch writes remain approval-gated" not in res.data
 
 
@@ -953,6 +955,7 @@ def test_catalogue_shell_static_markup():
     assert "Search the catalogue" in shell
     assert "/nhrils/catalogue/search" in shell
     assert "/nhrils/catalogue/search-guide" in shell
+    assert "_catalogue_footer.html" in shell
     assert "/pages/search-guide" not in shell
     assert "seed records" in shell
     assert "Featured records" in shell
@@ -996,6 +999,7 @@ def test_catalogue_search_static_markup():
     assert "View online" in shell
     assert "/nhrils/catalogue/search" in shell
     assert "/nhrils/catalogue/search-guide" in shell
+    assert "_catalogue_footer.html" in shell
     assert "/pages/search-guide" not in shell
     assert "result.detail_url" in shell
 
@@ -1034,6 +1038,7 @@ def test_catalogue_record_static_markup():
     assert "Confirm access" in shell
     assert "Add holdings" in shell
     assert "_catalogue_topbar.html" in shell
+    assert "_catalogue_footer.html" in shell
 
 
 def test_catalogue_record_request_static_markup():
@@ -1062,6 +1067,7 @@ def test_catalogue_record_request_static_markup():
     assert "<form" not in shell
     assert "method=\"post\"" not in shell
     assert "_catalogue_topbar.html" in shell
+    assert "_catalogue_footer.html" in shell
 
 
 def test_catalogue_info_static_markup():
@@ -1092,7 +1098,30 @@ def test_catalogue_info_static_markup():
     assert "/nhrils/catalogue/contact" in nav
     assert "/nhrils/catalogue/terms" in nav
     assert "/nhrils/catalogue/privacy" in nav
+    assert 'href="/search"' not in nav
+    assert 'href="/api"' not in nav
     assert "/pages/search-guide" not in nav
+
+
+def test_catalogue_footer_static_markup():
+    """Test shared catalogue footer keeps MVP support/legal links together."""
+    footer = (
+        Path(__file__).resolve().parents[1]
+        / "invenio_app_ils"
+        / "templates"
+        / "invenio_app_ils"
+        / "_catalogue_footer.html"
+    ).read_text(encoding="utf-8")
+
+    assert "NHRILS Catalogue" in footer
+    assert "NIMR health research discovery service" in footer
+    assert 'aria-label="Catalogue footer navigation"' in footer
+    assert "/nhrils/catalogue/search" in footer
+    assert "/nhrils/catalogue/collections" in footer
+    assert "/nhrils/catalogue/contact" in footer
+    assert "/nhrils/catalogue/about" in footer
+    assert "/nhrils/catalogue/terms" in footer
+    assert "/nhrils/catalogue/privacy" in footer
 
 
 def test_catalogue_terms_and_privacy_static_definitions():

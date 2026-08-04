@@ -80,6 +80,18 @@
   gap: 8px;
 }
 
+.nhrils-nav-groups {
+  align-items: flex-end;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nhrils-nav-utility a {
+  color: var(--nhrils-muted);
+  font-size: 13px;
+}
+
 .nhrils-nav a {
   border-radius: var(--nhrils-radius-sm);
   color: var(--nhrils-blue-900);
@@ -93,6 +105,52 @@
 .nhrils-nav a[aria-current="page"] {
   background: var(--nhrils-blue-100);
   outline: none;
+}
+
+.nhrils-footer {
+  align-items: center;
+  border-top: 1px solid var(--nhrils-border);
+  color: var(--nhrils-muted);
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  margin: 28px auto 0;
+  max-width: 1180px;
+  padding: 18px 0 0;
+}
+
+.nhrils-footer strong,
+.nhrils-footer span {
+  display: block;
+  line-height: 1.35;
+}
+
+.nhrils-footer strong {
+  color: var(--nhrils-blue-900);
+  font-size: 14px;
+}
+
+.nhrils-footer span,
+.nhrils-footer-links a {
+  font-size: 13px;
+}
+
+.nhrils-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  justify-content: flex-end;
+}
+
+.nhrils-footer-links a {
+  color: var(--nhrils-blue-800);
+  text-decoration: none;
+}
+
+.nhrils-footer-links a:hover,
+.nhrils-footer-links a:focus {
+  color: var(--nhrils-blue-900);
+  text-decoration: underline;
 }
 
 .nhrils-hero {
@@ -1463,9 +1521,16 @@
 
   .nhrils-topbar,
   .nhrils-filter-context,
+  .nhrils-footer,
   .nhrils-status-strip {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .nhrils-nav-groups,
+  .nhrils-footer-links {
+    align-items: stretch;
+    justify-content: flex-start;
   }
 
   .nhrils-grid-four,

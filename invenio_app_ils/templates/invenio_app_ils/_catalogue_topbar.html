@@ -6,17 +6,19 @@
       <small>National Health Research Integrated Library System</small>
     </span>
   </a>
-  <nav class="nhrils-nav" aria-label="Catalogue navigation">
-    <a href="/nhrils/catalogue"{% if active_page == "catalogue" %} aria-current="page"{% endif %}>Catalogue</a>
-    <a href="/nhrils/catalogue/search"{% if active_page == "results" %} aria-current="page"{% endif %}>Results</a>
-    <a href="/nhrils/catalogue/collections"{% if active_page == "collections" %} aria-current="page"{% endif %}>Collections</a>
-    <a href="/nhrils/catalogue/seed-review"{% if active_page == "seed-review" %} aria-current="page"{% endif %}>Seed review</a>
-    <a href="/nhrils/catalogue/search-guide"{% if active_page == "search-guide" %} aria-current="page"{% endif %}>Search guide</a>
-    <a href="/nhrils/catalogue/about"{% if active_page == "about" %} aria-current="page"{% endif %}>About</a>
-    <a href="/nhrils/catalogue/contact"{% if active_page == "contact" %} aria-current="page"{% endif %}>Contact</a>
-    <a href="/nhrils/catalogue/terms"{% if active_page == "terms" %} aria-current="page"{% endif %}>Terms</a>
-    <a href="/nhrils/catalogue/privacy"{% if active_page == "privacy" %} aria-current="page"{% endif %}>Privacy</a>
-    <a href="/search">Advanced search</a>
-    <a href="/api">API</a>
-  </nav>
+  <div class="nhrils-nav-groups">
+    <nav class="nhrils-nav" aria-label="Catalogue navigation">
+      <a href="/nhrils/catalogue"{% if active_page == "catalogue" %} aria-current="page"{% endif %}>Catalogue</a>
+      <a href="/nhrils/catalogue/search"{% if active_page == "results" %} aria-current="page"{% endif %}>Search</a>
+      <a href="/nhrils/catalogue/collections"{% if active_page == "collections" %} aria-current="page"{% endif %}>Collections</a>
+      <a href="/nhrils/catalogue/seed-review"{% if active_page == "seed-review" %} aria-current="page"{% endif %}>Review</a>
+      <a href="/nhrils/catalogue/contact"{% if active_page == "contact" %} aria-current="page"{% endif %}>Request</a>
+    </nav>
+    <nav class="nhrils-nav nhrils-nav-utility" aria-label="Catalogue support navigation">
+      <a href="/nhrils/catalogue/about"{% if active_page == "about" %} aria-current="page"{% endif %}>About</a>
+      <a href="/nhrils/catalogue/search-guide"{% if active_page == "search-guide" %} aria-current="page"{% endif %}>Help</a>
+      <a href="/nhrils/catalogue/terms"{% if active_page == "terms" %} aria-current="page"{% endif %}>Terms</a>
+      <a href="/nhrils/catalogue/privacy"{% if active_page == "privacy" %} aria-current="page"{% endif %}>Privacy</a>
+    </nav>
+  </div>
 </header>
