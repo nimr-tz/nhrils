@@ -29,8 +29,9 @@ Commands:
   run-worker       Run the Celery worker
   validate-seed    Validate the provisional NIMR seed bundle
   seed-dry-run     Show the guarded NIMR seed import plan
+  seed-review     Render a reviewer-friendly seed bundle report
   test-local       Run no-service seed/static tests
-  test-services    Explain service-backed test isolation requirements
+  test-services    Run service-backed catalogue route tests with isolated Docker services
 
 Typical local loop:
   ./scripts/local-harness preflight
@@ -54,6 +55,17 @@ function warn() {
 function fail() {
   echo "fail: $*" >&2
   return 1
+}
+
+function stop_local_services_for_isolated_tests() {
+  if [[ "${STOP_LOCAL_SERVICES_FOR_TESTS:-1}" == "0" ]]; then
+    return 0
+  fi
+
+  if command_exists docker && docker compose -f "${COMPOSE_FILE}" ps -q >/dev/null 2>&1; then
+    warn "stopping local compose services before isolated service-backed tests"
+    docker compose -f "${COMPOSE_FILE}" stop cache db mq search >/dev/null
+  fi
 }
 
 function require_venv() {
@@ -203,6 +215,10 @@ case "${COMMAND}" in
     require_venv
     "${PYTHON_BIN}" scripts/import_seed_bundle.py
     ;;
+  seed-review)
+    require_venv
+    "${PYTHON_BIN}" scripts/render_seed_review.py
+    ;;
   test-local)
     require_venv
     COVERAGE_FILE=/tmp/nhrils_coverage PYTHONPYCACHEPREFIX=/tmp/nhrils_pycache \
@@ -211,21 +227,14 @@ case "${COMMAND}" in
       -p no:cacheprovider
     ;;
   test-services)
-    cat <<'EOF' >&2
-Service-backed pytest is intentionally not run from the seeded runtime harness.
-
-`setup-backend` creates local runtime database rows and OpenSearch indexes.
-The pytest service fixtures expect clean database/search state and will fail
-with duplicate indexes or records if they are pointed at the seeded runtime.
-
-Use one of these instead:
-  ./scripts/local-harness test-local
-  ./run-tests.sh ils
-
-`./run-tests.sh ils` is the upstream-style test path; it uses docker-services-cli
-to manage isolated service state for API tests.
-EOF
-    exit 2
+    require_venv
+    stop_local_services_for_isolated_tests
+    PATH="$(dirname "${PYTHON_BIN}"):${PATH}" \
+      DB="${DB:-postgresql14}" \
+      SEARCH="${SEARCH:-opensearch2}" \
+      CACHE="${CACHE:-redis}" \
+      MQ="${MQ:-rabbitmq}" \
+      ./run-tests.sh ../test_catalogue_shell.py -q
     ;;
   help|-h|--help)
     usage

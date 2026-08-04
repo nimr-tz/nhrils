@@ -1,0 +1,134 @@
+{% extends config.THEME_BASE_TEMPLATE %}
+
+{% macro filter_link(label, name, value, count, selected_filters, query) -%}
+  {% set is_selected = selected_filters.get(name) == value %}
+  <a class="nhrils-facet-link{% if is_selected %} nhrils-facet-link-active{% endif %}"
+     href="/nhrils/catalogue/search?q={{ query|urlencode }}{% for key, selected in selected_filters.items() if key != name and selected %}&{{ key }}={{ selected|urlencode }}{% endfor %}{% if not is_selected %}&{{ name }}={{ value|urlencode }}{% endif %}">
+    <span>{{ label }}</span>
+    <strong>{{ count }}</strong>
+  </a>
+{%- endmacro %}
+
+{% block page_body %}
+<link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
+
+<main class="nhrils-page-shell" aria-labelledby="nhrils-search-title">
+  <header class="nhrils-topbar" aria-label="NHRILS catalogue header">
+    <a class="nhrils-brand" href="/nhrils/catalogue" aria-label="NHRILS catalogue home">
+      <img src="{{ url_for('invenio_app_ils.static', filename='images/nimr.svg') }}" alt="NIMR">
+      <span>
+        <strong>NHRILS</strong>
+        <small>National Health Research Integrated Library System</small>
+      </span>
+    </a>
+    <nav class="nhrils-nav" aria-label="Catalogue navigation">
+      <a href="/nhrils/catalogue">Catalogue</a>
+      <a href="/nhrils/catalogue/search" aria-current="page">Results</a>
+      <a href="/search">Advanced search</a>
+      <a href="/pages/search-guide">Search guide</a>
+      <a href="/api">API</a>
+    </nav>
+  </header>
+
+  <section class="nhrils-search-header">
+    <div>
+      <p class="nhrils-eyebrow">Catalogue results</p>
+      <h1 id="nhrils-search-title">Search NIMR health research resources</h1>
+      <p>Browse the review seed catalogue before database import and indexed search are enabled.</p>
+    </div>
+    <form class="nhrils-search-panel nhrils-search-panel-compact" action="/nhrils/catalogue/search" method="get" role="search" aria-label="Search catalogue results">
+      <label for="nhrils-results-query">Search terms</label>
+      <div class="nhrils-search-control">
+        <input id="nhrils-results-query" name="q" type="search" value="{{ query }}" placeholder="malaria, journal, guideline, DOI, or year">
+        <button class="nhrils-button nhrils-button-primary" type="submit">Search</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="nhrils-results-layout" aria-label="Catalogue search results">
+    <aside class="nhrils-panel nhrils-results-filters" aria-label="Filter catalogue results">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
+        <p class="nhrils-eyebrow">Filters</p>
+        <h2>Refine results</h2>
+      </div>
+
+      <section aria-labelledby="nhrils-access-filter">
+        <h3 id="nhrils-access-filter">Access</h3>
+        <div class="nhrils-facet-list">
+          {% for facet in facets.availability %}
+            {{ filter_link(facet.label, "availability", facet.value, facet.count, selected_filters, query) }}
+          {% endfor %}
+        </div>
+      </section>
+
+      <section aria-labelledby="nhrils-type-filter">
+        <h3 id="nhrils-type-filter">Material type</h3>
+        <div class="nhrils-facet-list">
+          {% for facet in facets.type %}
+            {{ filter_link(facet.label, "type", facet.value, facet.count, selected_filters, query) }}
+          {% endfor %}
+        </div>
+      </section>
+
+      <section aria-labelledby="nhrils-year-filter">
+        <h3 id="nhrils-year-filter">Year</h3>
+        <div class="nhrils-facet-list">
+          {% for facet in facets.year %}
+            {{ filter_link(facet.label, "year", facet.value, facet.count, selected_filters, query) }}
+          {% endfor %}
+        </div>
+      </section>
+
+      {% if selected_filters.availability or selected_filters.type or selected_filters.year or query %}
+        <a class="nhrils-inline-action" href="/nhrils/catalogue/search">Clear filters</a>
+      {% endif %}
+    </aside>
+
+    <section class="nhrils-panel nhrils-results-panel" aria-live="polite">
+      <div class="nhrils-panel-header">
+        <div>
+          <p class="nhrils-eyebrow">Results</p>
+          <h2>{{ result_count }} review record{% if result_count != 1 %}s{% endif %}</h2>
+        </div>
+        <a class="nhrils-inline-action" href="/pages/search-guide">Search guide</a>
+      </div>
+
+      {% if results %}
+        <div class="nhrils-search-result-list">
+          {% for result in results %}
+            <article class="nhrils-search-result">
+              <div class="nhrils-result-main">
+                <span class="nhrils-record-type">{{ result.document_type }} · {{ result.publication_year }}</span>
+                <h3>{{ result.title }}</h3>
+                <p class="nhrils-result-authors">{{ result.authors }}</p>
+                <p>{{ result.abstract }}</p>
+                {% if result.keywords %}
+                  <div class="nhrils-result-tags" aria-label="Subjects">
+                    {% for keyword in result.keywords %}
+                      <span>{{ keyword }}</span>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+              <div class="nhrils-result-access">
+                {% if result.has_online_access %}
+                  <span class="nhrils-access-chip nhrils-access-chip-online">Digital access</span>
+                {% else %}
+                  <span class="nhrils-access-chip">Review record</span>
+                {% endif %}
+                <small>{{ result.pid }}</small>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="nhrils-empty-state">
+          <h3>No review records match this search</h3>
+          <p>Try a broader term such as malaria, public health, journal, report, or the publication year.</p>
+          <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/search">Reset search</a>
+        </div>
+      {% endif %}
+    </section>
+  </section>
+</main>
+{% endblock %}

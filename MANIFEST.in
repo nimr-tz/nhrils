@@ -14,15 +14,20 @@
 
 include .dockerignore
 include .editorconfig
+include .node-version
+include .nvmrc
+include .python-version
 include .tx/config
 include docker/backend/Dockerfile
 include docker/frontend/Dockerfile
 include docker/lb/Dockerfile
 include Dockerfile
+include README.md
 include scripts/bootstrap
 include scripts/build_assets
 include scripts/celery
 include scripts/console
+include scripts/local-harness
 include scripts/server
 include scripts/setup
 include scripts/setup-test-venv
@@ -42,11 +47,13 @@ include LICENSE
 include babel.ini
 include pytest.ini
 recursive-include docs *.bat
+recursive-include docs *.json
 recursive-include docs *.py
 recursive-include docs *.rst
 recursive-include docs *.txt
 recursive-include docs *.md
 recursive-include docs Makefile
+recursive-include scripts *.py
 recursive-include invenio_app_ils *.css
 recursive-include invenio_app_ils *.eot
 recursive-include invenio_app_ils *.eslintrc

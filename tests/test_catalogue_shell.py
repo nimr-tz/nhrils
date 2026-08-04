@@ -22,22 +22,57 @@ def test_catalogue_shell_renders(client):
     assert b"NHRILS" in res.data
     assert b"National Health Research Integrated Library System" in res.data
     assert b"Search the catalogue" in res.data
+    assert b"/nhrils/catalogue/search" in res.data
     assert b"/search" in res.data
     assert b"nimr.svg" in res.data
     assert b"42" in res.data
     assert b"seed records" in res.data
     assert b"Featured records" in res.data
-    assert b"Representative NIMR publication records" in res.data
-    assert b"Catalogue filters" in res.data
+    assert b"Representative NIMR catalogue records" in res.data
+    assert b"What needs confirmation" in res.data
     assert b"Artemisinin-resistant malaria" in res.data
     assert b"Tanzania Journal of Health Research" in res.data
+    assert b"Digital access" in res.data
+    assert b"Database import, indexing, and circulation remain gated" in res.data
+    assert b"Seed data is ready for NIMR review" in res.data
+
+
+def test_catalogue_search_results_shell_renders(client):
+    """Test the NHRILS public review search results shell."""
+    res = client.get(
+        url_for("nhrils_catalogue_shell.catalogue_search_view"),
+        query_string={"q": "malaria", "availability": "online"},
+    )
+
+    assert res.status_code == 200
+    assert b"Catalogue results" in res.data
+    assert b"Search NIMR health research resources" in res.data
+    assert b"review seed catalogue" in res.data
+    assert b"Refine results" in res.data
+    assert b"Digital access" in res.data
+    assert b"Material type" in res.data
+    assert b"Artemisinin-resistant malaria" in res.data
+    assert b"nimr-doc-0001" in res.data
+    assert b"Database import" not in res.data
+
+
+def test_catalogue_search_results_empty_state(client):
+    """Test that the review search results shell has a useful empty state."""
+    res = client.get(
+        url_for("nhrils_catalogue_shell.catalogue_search_view"),
+        query_string={"q": "nonexistent-catalogue-query"},
+    )
+
+    assert res.status_code == 200
+    assert b"0 review records" in res.data
+    assert b"No review records match this search" in res.data
+    assert b"Reset search" in res.data
 
 
 def test_logged_out_page_uses_nhrils_return_path(client, users):
     """Test that the logout page no longer points to local development URLs."""
     res = client.get(url_for("logged_out.logged_out_view"))
 
-    assert res.status_code == 200
     assert b"127.0.0.1" not in res.data
     assert b"/nhrils/catalogue" in res.data
 
@@ -54,12 +89,33 @@ def test_catalogue_shell_static_markup():
 
     assert "Find health research resources held by NIMR" in shell
     assert "Search the catalogue" in shell
+    assert "/nhrils/catalogue/search" in shell
     assert "seed records" in shell
     assert "Featured records" in shell
-    assert "Representative NIMR publication records" in shell
-    assert "Catalogue filters" in shell
+    assert "Representative NIMR catalogue records" in shell
+    assert "What needs confirmation" in shell
     assert "Artemisinin-resistant malaria" in shell
     assert "Tanzania Journal of Health Research" in shell
+    assert "Database and OpenSearch writes remain approval-gated" in shell
+    assert "Seed data is ready for NIMR review" in shell
+
+
+def test_catalogue_search_static_markup():
+    """Test catalogue search shell copy without requiring service-backed fixtures."""
+    shell = (
+        Path(__file__).resolve().parents[1]
+        / "invenio_app_ils"
+        / "templates"
+        / "invenio_app_ils"
+        / "catalogue_search.html"
+    ).read_text(encoding="utf-8")
+
+    assert "Search NIMR health research resources" in shell
+    assert "Refine results" in shell
+    assert "No review records match this search" in shell
+    assert "Browse the review seed catalogue" in shell
+    assert "/nhrils/catalogue/search" in shell
+    assert "Digital access" in shell
 
 
 def test_search_guide_uses_health_research_examples():
@@ -198,3 +254,32 @@ def test_nimr_publications_seed_import_plan_is_dry_run():
     assert plan["operations"][2]["entity"] == "Document"
     assert plan["operations"][2]["count"] == 42
     assert "database writes" in plan["blocked_operations"]
+
+
+def test_nimr_seed_review_renderer_outputs_markdown_and_csv():
+    """Test that the seed review report is deterministic and reviewer-friendly."""
+    repo_root = Path(__file__).resolve().parents[1]
+    renderer_path = repo_root / "scripts" / "render_seed_review.py"
+    seed_path = repo_root / "docs" / "seed-data" / "nimr-publications-seed.json"
+
+    sys_path = str(renderer_path.parent)
+    if sys_path not in sys.path:
+        sys.path.insert(0, sys_path)
+
+    spec = importlib.util.spec_from_file_location("render_seed_review", renderer_path)
+    renderer = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(renderer)
+
+    summary = renderer.build_review_summary(seed_path)
+    markdown = renderer.render_markdown(summary)
+    csv_output = renderer.render_csv(summary)
+
+    assert summary["validation"]["ok"], summary["validation"]["errors"]
+    assert summary["document_type_counts"]["ARTICLE"] >= 20
+    assert "# NHRILS Seed Review" in markdown
+    assert "Needs NIMR review" in markdown
+    assert "Artemisinin-resistant malaria" in markdown
+    assert "Mehul Dhorda; Akira Kaneko; Ryuichi Komatsu" in markdown
+    assert "{'full_name'" not in markdown
+    assert csv_output.startswith("pid,title,publication_year,document_type")
+    assert "digital_links" in csv_output
