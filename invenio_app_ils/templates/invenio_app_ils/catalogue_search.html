@@ -99,7 +99,7 @@
             <article class="nhrils-search-result">
               <div class="nhrils-result-main">
                 <span class="nhrils-record-type">{{ result.document_type }} · {{ result.publication_year }}</span>
-                <h3>{{ result.title }}</h3>
+                <h3><a href="{{ result.detail_url }}">{{ result.title }}</a></h3>
                 <p class="nhrils-result-authors">{{ result.authors }}</p>
                 <p>{{ result.abstract }}</p>
                 {% if result.keywords %}
@@ -117,6 +117,7 @@
                   <span class="nhrils-access-chip">Review record</span>
                 {% endif %}
                 <small>{{ result.pid }}</small>
+                <a class="nhrils-inline-action" href="{{ result.detail_url }}">Open record</a>
               </div>
             </article>
           {% endfor %}

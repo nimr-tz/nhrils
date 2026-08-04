@@ -53,7 +53,36 @@ def test_catalogue_search_results_shell_renders(client):
     assert b"Material type" in res.data
     assert b"Artemisinin-resistant malaria" in res.data
     assert b"nimr-doc-0001" in res.data
+    assert b"/nhrils/catalogue/records/nimr-doc-0001" in res.data
+    assert b"Open record" in res.data
     assert b"Database import" not in res.data
+
+
+def test_catalogue_record_detail_shell_renders(client):
+    """Test the NHRILS public review record detail shell."""
+    res = client.get(
+        url_for(
+            "nhrils_catalogue_shell.catalogue_record_view",
+            pid="nimr-doc-0001",
+        )
+    )
+
+    assert res.status_code == 200
+    assert b"Review record" in res.data
+    assert b"Artemisinin-resistant malaria in Africa demands urgent action" in res.data
+    assert b"Mehul Dhorda" in res.data
+    assert b"Digital access available" in res.data
+    assert b"Bibliographic metadata" in res.data
+    assert b"Before production import" in res.data
+    assert b"Confirm metadata" in res.data
+    assert b"NIMR source page" in res.data
+
+
+def test_catalogue_record_detail_unknown_pid_returns_404(client):
+    """Test that unknown review seed PIDs return not found."""
+    res = client.get("/nhrils/catalogue/records/not-a-seed-pid")
+
+    assert res.status_code == 404
 
 
 def test_catalogue_search_results_empty_state(client):
@@ -115,7 +144,26 @@ def test_catalogue_search_static_markup():
     assert "No review records match this search" in shell
     assert "Browse the review seed catalogue" in shell
     assert "/nhrils/catalogue/search" in shell
+    assert "result.detail_url" in shell
     assert "Digital access" in shell
+
+
+def test_catalogue_record_static_markup():
+    """Test catalogue record shell copy without requiring service-backed fixtures."""
+    shell = (
+        Path(__file__).resolve().parents[1]
+        / "invenio_app_ils"
+        / "templates"
+        / "invenio_app_ils"
+        / "catalogue_record.html"
+    ).read_text(encoding="utf-8")
+
+    assert "Bibliographic metadata" in shell
+    assert "Digital access available" in shell
+    assert "Before production import" in shell
+    assert "Confirm metadata" in shell
+    assert "Confirm access" in shell
+    assert "Add holdings" in shell
 
 
 def test_search_guide_uses_health_research_examples():

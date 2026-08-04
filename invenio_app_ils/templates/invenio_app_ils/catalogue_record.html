@@ -1,0 +1,120 @@
+{% extends config.THEME_BASE_TEMPLATE %}
+
+{% block page_body %}
+<link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
+
+<main class="nhrils-page-shell" aria-labelledby="nhrils-record-title">
+  <header class="nhrils-topbar" aria-label="NHRILS catalogue header">
+    <a class="nhrils-brand" href="/nhrils/catalogue" aria-label="NHRILS catalogue home">
+      <img src="{{ url_for('invenio_app_ils.static', filename='images/nimr.svg') }}" alt="NIMR">
+      <span>
+        <strong>NHRILS</strong>
+        <small>National Health Research Integrated Library System</small>
+      </span>
+    </a>
+    <nav class="nhrils-nav" aria-label="Catalogue navigation">
+      <a href="/nhrils/catalogue">Catalogue</a>
+      <a href="/nhrils/catalogue/search">Results</a>
+      <a href="/search">Advanced search</a>
+      <a href="/pages/search-guide">Search guide</a>
+      <a href="/api">API</a>
+    </nav>
+  </header>
+
+  <section class="nhrils-record-detail-layout">
+    <article class="nhrils-panel nhrils-record-detail-main">
+      <a class="nhrils-inline-action" href="/nhrils/catalogue/search">Back to results</a>
+      <p class="nhrils-eyebrow">Review record · {{ record.document_type }} · {{ record.publication_year }}</p>
+      <h1 id="nhrils-record-title">{{ record.title }}</h1>
+      {% if record.all_authors %}
+        <p class="nhrils-result-authors">{{ record.all_authors|join("; ") }}</p>
+      {% endif %}
+      <p>{{ record.abstract }}</p>
+
+      {% if record.keywords %}
+        <div class="nhrils-result-tags" aria-label="Subjects">
+          {% for keyword in record.keywords %}
+            <span>{{ keyword }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </article>
+
+    <aside class="nhrils-panel nhrils-record-summary" aria-labelledby="nhrils-record-summary-title">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
+        <p class="nhrils-eyebrow">Access</p>
+        <h2 id="nhrils-record-summary-title">Record status</h2>
+      </div>
+      {% if record.has_online_access %}
+        <span class="nhrils-access-chip nhrils-access-chip-online">Digital access available</span>
+      {% else %}
+        <span class="nhrils-access-chip">Review record only</span>
+      {% endif %}
+      <dl class="nhrils-metadata-list">
+        <div>
+          <dt>Local PID</dt>
+          <dd>{{ record.pid }}</dd>
+        </div>
+        <div>
+          <dt>Source</dt>
+          <dd>{{ record.source }}</dd>
+        </div>
+        <div>
+          <dt>Language</dt>
+          <dd>{{ record.languages|join(", ") if record.languages else "Not specified" }}</dd>
+        </div>
+      </dl>
+    </aside>
+  </section>
+
+  <section class="nhrils-content-grid">
+    <article class="nhrils-panel">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
+        <p class="nhrils-eyebrow">Bibliographic metadata</p>
+        <h2>Identifiers and access links</h2>
+      </div>
+      <dl class="nhrils-metadata-list nhrils-metadata-list-wide">
+        {% if record.identifiers %}
+          {% for identifier in record.identifiers %}
+            <div>
+              <dt>{{ identifier.scheme }}</dt>
+              <dd>{{ identifier.value }}</dd>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div>
+            <dt>Identifiers</dt>
+            <dd>Not captured in the review seed.</dd>
+          </div>
+        {% endif %}
+
+        {% if record.urls %}
+          {% for url in record.urls %}
+            <div>
+              <dt>{{ url.description or "Digital link" }}</dt>
+              <dd><a href="{{ url.value }}">{{ url.value }}</a></dd>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div>
+            <dt>Digital link</dt>
+            <dd>No public link is attached to this review record.</dd>
+          </div>
+        {% endif %}
+      </dl>
+    </article>
+
+    <aside class="nhrils-panel nhrils-panel-muted">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
+        <p class="nhrils-eyebrow">Review note</p>
+        <h2>Before production import</h2>
+      </div>
+      <ol class="nhrils-steps">
+        <li><strong>Confirm metadata</strong><span>Review authors, identifiers, source, and publication year.</span></li>
+        <li><strong>Confirm access</strong><span>Classify each link as public, licensed, internal, or restricted.</span></li>
+        <li><strong>Add holdings</strong><span>Attach physical items after locations, shelves, and barcodes are agreed.</span></li>
+      </ol>
+    </aside>
+  </section>
+</main>
+{% endblock %}

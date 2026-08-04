@@ -93,6 +93,7 @@ Future authenticated staff pages should use a denser app shell, but the public c
 | --- | --- | --- |
 | `/nhrils/catalogue` | NHRILS shell | First branded public catalogue landing/search route |
 | `/nhrils/catalogue/search` | NHRILS shell | Seed-backed review results, filters, and empty state before indexed import |
+| `/nhrils/catalogue/records/<pid>` | NHRILS shell | Seed-backed review record detail before native detail integration |
 | `/search` | InvenioILS frontend/API integration | Future indexed search results and facets |
 | `/pages/search-guide` | Static content | Search syntax help |
 | `/api` | Invenio REST API | Machine-readable access |

@@ -10,7 +10,7 @@
 import json
 from pathlib import Path
 
-from flask import Blueprint, g, jsonify, render_template, request
+from flask import Blueprint, abort, g, jsonify, render_template, request
 from invenio_accounts.views.rest import UserInfoView, default_user_payload
 from invenio_userprofiles import UserProfile
 
@@ -52,6 +52,10 @@ def create_catalogue_shell_blueprint(app):
     blueprint.add_url_rule(
         "/nhrils/catalogue/search",
         view_func=catalogue_search_view,
+    )
+    blueprint.add_url_rule(
+        "/nhrils/catalogue/records/<pid>",
+        view_func=catalogue_record_view,
     )
     return blueprint
 
@@ -98,6 +102,25 @@ def catalogue_search_view():
             "type": _build_count_facets(documents, "document_type"),
             "year": _build_count_facets(documents, "publication_year"),
         },
+    )
+
+
+def catalogue_record_view(pid):
+    """Render a NHRILS review record detail shell from seed data."""
+    seed = _load_nhrils_seed_bundle()
+    document = next(
+        (document for document in seed["documents"] if document["pid"] == pid),
+        None,
+    )
+    if document is None:
+        abort(404)
+
+    eitems = [
+        eitem for eitem in seed.get("eitems", []) if eitem.get("document_pid") == pid
+    ]
+    return render_template(
+        "invenio_app_ils/catalogue_record.html",
+        record=_present_seed_document_detail(document, eitems),
     )
 
 
@@ -171,7 +194,33 @@ def _present_seed_document(document, eitem_document_pids):
         "abstract": document.get("abstract", "No abstract available for review."),
         "keywords": keywords[:4],
         "has_online_access": document["pid"] in eitem_document_pids,
+        "detail_url": "/nhrils/catalogue/records/{}".format(document["pid"]),
     }
+
+
+def _present_seed_document_detail(document, eitems):
+    """Shape a seed document for the catalogue detail template."""
+    presented = _present_seed_document(
+        document,
+        {eitem["document_pid"] for eitem in eitems},
+    )
+    presented.update(
+        {
+            "all_authors": [
+                author.get("full_name", "") for author in document.get("authors", [])
+            ],
+            "identifiers": document.get("identifiers", []),
+            "languages": document.get("languages", []),
+            "source": document.get("source", "NIMR seed bundle"),
+            "urls": [
+                url
+                for eitem in eitems
+                for url in eitem.get("urls", [])
+                if url.get("value")
+            ],
+        }
+    )
+    return presented
 
 
 def _build_count_facets(documents, field):
