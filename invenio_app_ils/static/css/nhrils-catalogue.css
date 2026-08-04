@@ -311,6 +311,69 @@
   grid-template-columns: 280px minmax(0, 1fr);
 }
 
+.nhrils-filter-context {
+  align-items: center;
+  background: var(--nhrils-surface);
+  border: 1px solid var(--nhrils-border);
+  border-radius: var(--nhrils-radius-md);
+  box-shadow: var(--nhrils-shadow-sm);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  justify-content: space-between;
+  margin: 0 auto 24px;
+  max-width: 1180px;
+  padding: 14px 18px;
+}
+
+.nhrils-active-filter-list,
+.nhrils-quick-filter-list {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.nhrils-active-filter-list span,
+.nhrils-quick-filter-list span {
+  color: var(--nhrils-muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.nhrils-active-filter-list a,
+.nhrils-quick-filter-list a {
+  border: 1px solid var(--nhrils-border);
+  border-radius: 999px;
+  color: var(--nhrils-blue-900);
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 8px 10px;
+  text-decoration: none;
+}
+
+.nhrils-active-filter-list a {
+  background: var(--nhrils-blue-100);
+  border-color: #b9d6e8;
+}
+
+.nhrils-active-filter-list a::after {
+  content: "x";
+  margin-left: 8px;
+}
+
+.nhrils-quick-filter-list a:hover,
+.nhrils-quick-filter-list a:focus,
+.nhrils-quick-filter-active {
+  background: var(--nhrils-green-100);
+  border-color: #bfdfcc;
+  color: var(--nhrils-green-700);
+  outline: none;
+}
+
 .nhrils-results-filters {
   position: sticky;
   top: 24px;
@@ -1206,6 +1269,7 @@
   }
 
   .nhrils-topbar,
+  .nhrils-filter-context,
   .nhrils-status-strip {
     align-items: stretch;
     flex-direction: column;

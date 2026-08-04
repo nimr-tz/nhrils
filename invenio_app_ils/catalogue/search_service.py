@@ -20,6 +20,7 @@ from dataclasses import dataclass, field
 from math import ceil
 from pathlib import Path
 from typing import Any, Mapping, Sequence
+from urllib.parse import quote as _urlquote
 
 
 DEFAULT_SEED_PATH = (
@@ -83,6 +84,7 @@ class CatalogueSearchResult:
     result_count: int
     results: list[dict[str, Any]]
     facets: dict[str, list[dict[str, Any]]]
+    context: dict[str, Any]
     pagination: dict[str, Any]
     backend: str
 
@@ -191,6 +193,7 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
                 "language": self._build_language_facets(documents),
                 "subject": self._build_keyword_facets(documents),
             },
+            context=self._build_search_context(query),
             pagination=pagination,
             backend=self.name,
         )
@@ -708,6 +711,196 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
             1
             for document in documents
             if document.get("document_type") == material_type
+        )
+
+    def _build_search_context(
+        self,
+        query: CatalogueSearchQuery,
+    ) -> dict[str, Any]:
+        """Return plain-language search context for the results template."""
+        collection = self._collection_context_by_type(query.material_type)
+        active_filters = []
+        filter_labels = {
+            "availability": {
+                "online": "Digital access",
+                "review": "Needs metadata review",
+            },
+            "type": {
+                "ARTICLE": "Articles",
+                "BOOK": "Reports",
+                "SERIAL_ISSUE": "Journals",
+                "STANDARD": "Guidelines and standards",
+                "PROCEEDINGS": "Proceedings",
+            },
+        }
+        for name, value in query.selected_filters.items():
+            if not value:
+                continue
+            label = filter_labels.get(name, {}).get(
+                value,
+                str(value).replace("_", " ").title(),
+            )
+            active_filters.append(
+                {
+                    "name": name,
+                    "value": value,
+                    "label": label,
+                    "href": self._build_search_href(
+                        query,
+                        excluded_filter=name,
+                    ),
+                }
+            )
+
+        quick_filters = [
+            {
+                "label": "Digital access",
+                "name": "availability",
+                "value": "online",
+                "href": self._build_search_href(
+                    query,
+                    override_filter=("availability", "online"),
+                ),
+                "selected": query.availability == "online",
+            },
+            {
+                "label": "Needs review",
+                "name": "availability",
+                "value": "review",
+                "href": self._build_search_href(
+                    query,
+                    override_filter=("availability", "review"),
+                ),
+                "selected": query.availability == "review",
+            },
+            {
+                "label": "2026",
+                "name": "year",
+                "value": "2026",
+                "href": self._build_search_href(
+                    query,
+                    override_filter=("year", "2026"),
+                ),
+                "selected": query.year == "2026",
+            },
+            {
+                "label": "Peer-reviewed",
+                "name": "type",
+                "value": "ARTICLE",
+                "href": self._build_search_href(
+                    query,
+                    override_filter=("type", "ARTICLE"),
+                ),
+                "selected": query.material_type == "ARTICLE",
+            },
+        ]
+
+        return {
+            "eyebrow": collection["eyebrow"] if collection else "Catalogue results",
+            "title": collection["title"]
+            if collection
+            else "Search NIMR health research resources",
+            "lead": collection["lead"]
+            if collection
+            else "Browse the review seed catalogue before database import and indexed search are enabled.",
+            "collection": collection,
+            "active_filters": active_filters,
+            "quick_filters": quick_filters,
+            "empty_title": "No records found in this collection"
+            if collection
+            else "No review records match this search",
+            "empty_lead": (
+                "Try clearing filters or returning to Collections to choose another resource group."
+                if collection
+                else "Try a broader term such as malaria, public health, journal, report, or the publication year."
+            ),
+        }
+
+    def _collection_context_by_type(
+        self,
+        material_type: str,
+    ) -> dict[str, str] | None:
+        """Return display context for collection-filtered searches."""
+        contexts = {
+            "ARTICLE": {
+                "eyebrow": "Collection",
+                "title": "Peer-reviewed papers",
+                "lead": "Published NIMR research articles and collaborative papers for scientific discovery.",
+                "back_label": "Back to Collections",
+                "back_href": "/nhrils/catalogue/collections",
+            },
+            "BOOK": {
+                "eyebrow": "Collection",
+                "title": "Reports",
+                "lead": "Institutional reports and book-like records prepared for library review.",
+                "back_label": "Back to Collections",
+                "back_href": "/nhrils/catalogue/collections",
+            },
+            "SERIAL_ISSUE": {
+                "eyebrow": "Collection",
+                "title": "Journals",
+                "lead": "Journal issues and serial publications relevant to health research users.",
+                "back_label": "Back to Collections",
+                "back_href": "/nhrils/catalogue/collections",
+            },
+            "STANDARD": {
+                "eyebrow": "Collection",
+                "title": "Guidelines and standards",
+                "lead": "Guidelines, standards, and technical reference materials for applied health research.",
+                "back_label": "Back to Collections",
+                "back_href": "/nhrils/catalogue/collections",
+            },
+            "PROCEEDINGS": {
+                "eyebrow": "Collection",
+                "title": "Proceedings",
+                "lead": "Conference and meeting proceedings connected to NIMR research work.",
+                "back_label": "Back to Collections",
+                "back_href": "/nhrils/catalogue/collections",
+            },
+        }
+        return contexts.get(material_type)
+
+    def _build_search_href(
+        self,
+        query: CatalogueSearchQuery,
+        *,
+        excluded_filter: str = "",
+        override_filter: tuple[str, str] | None = None,
+    ) -> str:
+        """Build a stable catalogue search URL for filter chips."""
+        params = []
+        if query.query:
+            params.append(("q", query.query))
+
+        selected_filters = dict(query.selected_filters)
+        if excluded_filter:
+            selected_filters[excluded_filter] = ""
+        if override_filter:
+            selected_filters[override_filter[0]] = override_filter[1]
+
+        for name in (
+            "availability",
+            "type",
+            "year",
+            "source",
+            "language",
+            "subject",
+        ):
+            value = selected_filters.get(name)
+            if value:
+                params.append((name, value))
+
+        if query.size != DEFAULT_PAGE_SIZE:
+            params.append(("size", str(query.size)))
+
+        if not params:
+            return "/nhrils/catalogue/search"
+
+        return "/nhrils/catalogue/search?{}".format(
+            "&".join(
+                "{}={}".format(_urlquote(name), _urlquote(str(value)))
+                for name, value in params
+            )
         )
 
     def _build_count_facets(

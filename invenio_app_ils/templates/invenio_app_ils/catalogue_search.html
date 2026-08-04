@@ -29,18 +29,43 @@
 
   <section class="nhrils-search-header">
     <div>
-      <p class="nhrils-eyebrow">Catalogue results</p>
-      <h1 id="nhrils-search-title">Search NIMR health research resources</h1>
-      <p>Browse the review seed catalogue before database import and indexed search are enabled.</p>
+      <p class="nhrils-eyebrow">{{ search_context.eyebrow }}</p>
+      <h1 id="nhrils-search-title">{{ search_context.title }}</h1>
+      <p>{{ search_context.lead }}</p>
+      {% if search_context.collection %}
+        <a class="nhrils-inline-action" href="{{ search_context.collection.back_href }}">{{ search_context.collection.back_label }}</a>
+      {% endif %}
     </div>
     <form class="nhrils-search-panel nhrils-search-panel-compact" action="/nhrils/catalogue/search" method="get" role="search" aria-label="Search catalogue results">
       <label for="nhrils-results-query">Search terms</label>
+      {% for key, selected in selected_filters.items() if selected %}
+        <input type="hidden" name="{{ key }}" value="{{ selected }}">
+      {% endfor %}
       <div class="nhrils-search-control">
         <input id="nhrils-results-query" name="q" type="search" value="{{ query }}" placeholder="malaria, journal, guideline, DOI, or year">
         <button class="nhrils-button nhrils-button-primary" type="submit">Search</button>
       </div>
     </form>
   </section>
+
+  {% if search_context.active_filters or search_context.quick_filters %}
+    <section class="nhrils-filter-context" aria-label="Current search filters">
+      {% if search_context.active_filters %}
+        <div class="nhrils-active-filter-list" aria-label="Active filters">
+          <span>Active filters</span>
+          {% for filter in search_context.active_filters %}
+            <a href="{{ filter.href }}" aria-label="Remove {{ filter.label }} filter">{{ filter.label }}</a>
+          {% endfor %}
+        </div>
+      {% endif %}
+      <div class="nhrils-quick-filter-list" aria-label="Quick filters">
+        <span>Quick filters</span>
+        {% for filter in search_context.quick_filters %}
+          <a class="{% if filter.selected %}nhrils-quick-filter-active{% endif %}" href="{{ filter.href }}">{{ filter.label }}</a>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
 
   <section class="nhrils-results-layout" aria-label="Catalogue search results">
     <aside class="nhrils-panel nhrils-results-filters" aria-label="Filter catalogue results">
@@ -167,9 +192,13 @@
         {% endif %}
       {% else %}
         <div class="nhrils-empty-state">
-          <h3>No review records match this search</h3>
-          <p>Try a broader term such as malaria, public health, journal, report, or the publication year.</p>
-          <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/search">Reset search</a>
+          <h3>{{ search_context.empty_title }}</h3>
+          <p>{{ search_context.empty_lead }}</p>
+          {% if search_context.collection %}
+            <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/collections">Back to Collections</a>
+          {% else %}
+            <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/search">Reset search</a>
+          {% endif %}
         </div>
       {% endif %}
     </section>

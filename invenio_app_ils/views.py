@@ -208,6 +208,7 @@ def catalogue_search_view():
         result_count=response.result_count,
         results=response.results,
         facets=response.facets,
+        search_context=response.context,
         pagination=response.pagination,
         search_return_url=search_return_url,
         search_backend=response.backend,

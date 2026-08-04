@@ -156,6 +156,43 @@ def test_catalogue_search_results_shell_renders(client):
     assert b"Database import" not in res.data
 
 
+def test_catalogue_collection_search_context_renders(client):
+    """Test collection-filtered searches render collection context."""
+    res = client.get(
+        url_for("nhrils_catalogue_shell.catalogue_search_view"),
+        query_string={"type": "ARTICLE"},
+    )
+
+    assert res.status_code == 200
+    assert b"Collection" in res.data
+    assert b"Peer-reviewed papers" in res.data
+    assert b"Published NIMR research articles" in res.data
+    assert b"Back to Collections" in res.data
+    assert b"/nhrils/catalogue/collections" in res.data
+    assert b"Active filters" in res.data
+    assert b"Articles" in res.data
+    assert b"Quick filters" in res.data
+    assert b"Digital access" in res.data
+    assert b"Needs review" in res.data
+    assert b"Peer-reviewed" in res.data
+    assert b"name=\"type\" value=\"ARTICLE\"" in res.data
+
+
+def test_catalogue_collection_empty_state_renders(client):
+    """Test collection empty state sends users back to collection browsing."""
+    res = client.get(
+        url_for("nhrils_catalogue_shell.catalogue_search_view"),
+        query_string={"type": "STANDARD", "q": "nonexistent-catalogue-query"},
+    )
+
+    assert res.status_code == 200
+    assert b"Guidelines and standards" in res.data
+    assert b"No records found in this collection" in res.data
+    assert b"Try clearing filters or returning to Collections" in res.data
+    assert b"Back to Collections" in res.data
+    assert b"Reset search" not in res.data
+
+
 def test_catalogue_search_review_only_result_card_renders(client):
     """Test review-only result cards expose clear metadata and no online action."""
     res = client.get(
@@ -452,6 +489,43 @@ def test_seed_catalogue_search_backend_filters_by_source_language_and_subject():
     assert any(facet["value"] == "malaria" for facet in response.facets["subject"])
 
 
+def test_seed_catalogue_search_backend_builds_collection_search_context():
+    """Test collection-filtered searches expose template-ready context."""
+    response = SeedCatalogueSearchBackend().search(
+        CatalogueSearchQuery(material_type="ARTICLE", page=1)
+    )
+
+    assert response.context["eyebrow"] == "Collection"
+    assert response.context["title"] == "Peer-reviewed papers"
+    assert response.context["collection"] == {
+        "eyebrow": "Collection",
+        "title": "Peer-reviewed papers",
+        "lead": (
+            "Published NIMR research articles and collaborative papers for "
+            "scientific discovery."
+        ),
+        "back_label": "Back to Collections",
+        "back_href": "/nhrils/catalogue/collections",
+    }
+    assert response.context["active_filters"] == [
+        {
+            "name": "type",
+            "value": "ARTICLE",
+            "label": "Articles",
+            "href": "/nhrils/catalogue/search",
+        }
+    ]
+    assert response.context["quick_filters"][0] == {
+        "label": "Digital access",
+        "name": "availability",
+        "value": "online",
+        "href": "/nhrils/catalogue/search?availability=online&type=ARTICLE",
+        "selected": False,
+    }
+    assert response.context["quick_filters"][3]["selected"]
+    assert response.context["empty_title"] == "No records found in this collection"
+
+
 def test_seed_catalogue_search_backend_builds_seed_review_summary():
     """Test the read-only seed review summary behind the review page."""
     response = SeedCatalogueSearchBackend().seed_review()
@@ -699,13 +773,18 @@ def test_catalogue_search_static_markup():
         / "catalogue_search.html"
     ).read_text(encoding="utf-8")
 
-    assert "Search NIMR health research resources" in shell
+    assert "search_context.title" in shell
+    assert "nhrils-filter-context" in shell
+    assert "Active filters" in shell
+    assert "Quick filters" in shell
+    assert "search_context.empty_title" in shell
     assert "Refine results" in shell
     assert "Source" in shell
     assert "Language" in shell
     assert "Subject" in shell
-    assert "No review records match this search" in shell
-    assert "Browse the review seed catalogue" in shell
+    assert "search_context.empty_lead" in shell
+    assert "Back to Collections" in shell
+    assert "search_context.lead" in shell
     assert "Search results pages" in shell
     assert "Showing {{ pagination.first_item }}-{{ pagination.last_item }}" in shell
     assert "return_to={{ search_return_url|urlencode }}" in shell
