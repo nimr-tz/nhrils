@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2026 NIMR.
+#
+# invenio-app-ils is free software; you can redistribute it and/or modify it
+# under the terms of the MIT License; see LICENSE file for more details.
+
+set -euo pipefail
+
+COMMAND="${1:-help}"
+COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.yml}"
+PYTHON_BIN="${PYTHON_BIN:-.venv/bin/python}"
+
+function usage() {
+  cat <<'EOF'
+NHRILS local harness
+
+Commands:
+  start-services   Start PostgreSQL, OpenSearch, Redis, and RabbitMQ
+  stop-services    Stop local Docker services
+  status           Show local Docker service status
+  build-assets      Collect and build Invenio static assets
+  setup-backend    Run InvenioILS backend setup against local services
+  run-backend      Run the Invenio backend development server
+  run-worker       Run the Celery worker
+  test-local       Run no-service seed/static tests
+  test-services    Explain service-backed test isolation requirements
+
+Typical local loop:
+  ./scripts/local-harness start-services
+  ./scripts/local-harness setup-backend
+  ./scripts/local-harness run-backend
+
+In a second terminal:
+  ./scripts/local-harness run-worker
+EOF
+}
+
+function require_venv() {
+  if [[ ! -x "${PYTHON_BIN}" ]]; then
+    echo "Python venv not found at ${PYTHON_BIN}." >&2
+    echo "Run ./scripts/setup-test-venv first." >&2
+    exit 1
+  fi
+}
+
+case "${COMMAND}" in
+  start-services)
+    docker compose -f "${COMPOSE_FILE}" up -d cache db mq search
+    ;;
+  stop-services)
+    docker compose -f "${COMPOSE_FILE}" stop
+    ;;
+  status)
+    docker compose -f "${COMPOSE_FILE}" ps
+    ;;
+  setup-backend)
+    require_venv
+    "${PYTHON_BIN}" -m pip show invenio-app-ils >/dev/null
+    PATH="$(dirname "${PYTHON_BIN}"):${PATH}" ./scripts/build_assets
+    PATH="$(dirname "${PYTHON_BIN}"):${PATH}" ./scripts/setup
+    ;;
+  build-assets)
+    require_venv
+    "${PYTHON_BIN}" -m pip show invenio-app-ils >/dev/null
+    PATH="$(dirname "${PYTHON_BIN}"):${PATH}" ./scripts/build_assets
+    ;;
+  run-backend)
+    require_venv
+    PATH="$(dirname "${PYTHON_BIN}"):${PATH}" ./scripts/server
+    ;;
+  run-worker)
+    require_venv
+    PATH="$(dirname "${PYTHON_BIN}"):${PATH}" ./scripts/celery
+    ;;
+  test-local)
+    require_venv
+    COVERAGE_FILE=/tmp/nhrils_coverage PYTHONPYCACHEPREFIX=/tmp/nhrils_pycache \
+      "${PYTHON_BIN}" -m pytest tests/test_catalogue_shell.py -q \
+      -k 'seed or search_guide' -p no:cacheprovider
+    ;;
+  test-services)
+    cat <<'EOF' >&2
+Service-backed pytest is intentionally not run from the seeded runtime harness.
+
+`setup-backend` creates local runtime database rows and OpenSearch indexes.
+The pytest service fixtures expect clean database/search state and will fail
+with duplicate indexes or records if they are pointed at the seeded runtime.
+
+Use one of these instead:
+  ./scripts/local-harness test-local
+  ./run-tests.sh ils
+
+`./run-tests.sh ils` is the upstream-style test path; it uses docker-services-cli
+to manage isolated service state for API tests.
+EOF
+    exit 2
+    ;;
+  help|-h|--help)
+    usage
+    ;;
+  *)
+    echo "Unknown command: ${COMMAND}" >&2
+    usage >&2
+    exit 2
+    ;;
+esac
