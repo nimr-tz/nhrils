@@ -57,7 +57,9 @@ def test_catalogue_search_results_shell_renders(client):
     assert b"Search NIMR health research resources" in res.data
     assert b"review seed catalogue" in res.data
     assert b"Refine results" in res.data
-    assert b"Digital access" in res.data
+    assert b"Online access" in res.data
+    assert b"Public digital source attached" in res.data
+    assert b"View online" in res.data
     assert b"Material type" in res.data
     assert b"Source" in res.data
     assert b"Language" in res.data
@@ -68,6 +70,23 @@ def test_catalogue_search_results_shell_renders(client):
     assert b"Open record" in res.data
     assert b"Showing 1-" in res.data
     assert b"Database import" not in res.data
+
+
+def test_catalogue_search_review_only_result_card_renders(client):
+    """Test review-only result cards expose clear metadata and no online action."""
+    res = client.get(
+        url_for("nhrils_catalogue_shell.catalogue_search_view"),
+        query_string={"q": "schistosomiasis", "availability": "review"},
+    )
+
+    assert res.status_code == 200
+    assert b"Metadata review needed" in res.data
+    assert b"No digital source attached" in res.data
+    assert b"View online" not in res.data
+    assert b"Record summary" in res.data
+    assert b"ARTICLE" in res.data
+    assert b"ENG" in res.data
+    assert b"Open record" in res.data
 
 
 def test_catalogue_search_results_pagination_renders(client):
@@ -260,6 +279,10 @@ def test_seed_catalogue_search_backend_filters_and_paginates():
         "subject": "",
     }
     assert all(result["has_online_access"] for result in response.results)
+    assert all(result["access"]["label"] == "Online access" for result in response.results)
+    assert all(result["access"]["online_url"] for result in response.results)
+    assert all(result["source"] for result in response.results)
+    assert all(result["languages"] for result in response.results)
     assert any("malaria" in result["title"].lower() for result in response.results)
     assert {"availability", "type", "year", "source", "language", "subject"}.issubset(
         response.facets
@@ -277,6 +300,26 @@ def test_seed_catalogue_search_backend_filters_and_paginates():
         "next_page": 2 if response.pagination["total_pages"] > 1 else None,
     }
     assert response.facets["availability"][0]["label"] == "Digital access"
+
+
+def test_seed_catalogue_search_backend_shapes_review_only_result_access():
+    """Test result card access state for records without digital e-items."""
+    response = SeedCatalogueSearchBackend().search(
+        CatalogueSearchQuery(
+            query="schistosomiasis",
+            availability="review",
+            page=1,
+            size=5,
+        )
+    )
+
+    assert response.result_count >= 1
+    assert all(not result["has_online_access"] for result in response.results)
+    assert all(
+        result["access"]["label"] == "Metadata review needed"
+        for result in response.results
+    )
+    assert all(result["access"]["online_url"] is None for result in response.results)
 
 
 def test_seed_catalogue_search_backend_clamps_requested_page():
@@ -452,9 +495,13 @@ def test_catalogue_search_static_markup():
     assert "Search results pages" in shell
     assert "Showing {{ pagination.first_item }}-{{ pagination.last_item }}" in shell
     assert "return_to={{ search_return_url|urlencode }}" in shell
+    assert "nhrils-result-meta" in shell
+    assert "result.access.label" in shell
+    assert "result.access.summary" in shell
+    assert "result.access.online_url" in shell
+    assert "View online" in shell
     assert "/nhrils/catalogue/search" in shell
     assert "result.detail_url" in shell
-    assert "Digital access" in shell
 
 
 def test_catalogue_record_static_markup():

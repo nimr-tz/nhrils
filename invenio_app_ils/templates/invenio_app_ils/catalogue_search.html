@@ -139,7 +139,12 @@
           {% for result in results %}
             <article class="nhrils-search-result">
               <div class="nhrils-result-main">
-                <span class="nhrils-record-type">{{ result.document_type }} · {{ result.publication_year }}</span>
+                <div class="nhrils-result-meta" aria-label="Record summary">
+                  <span>{{ result.document_type }}</span>
+                  <span>{{ result.publication_year }}</span>
+                  <span>{{ result.source }}</span>
+                  <span>{{ result.languages|join(", ") if result.languages else "Language not specified" }}</span>
+                </div>
                 <h3><a href="{{ result.detail_url }}?return_to={{ search_return_url|urlencode }}">{{ result.title }}</a></h3>
                 <p class="nhrils-result-authors">{{ result.authors }}</p>
                 <p>{{ result.abstract }}</p>
@@ -152,13 +157,17 @@
                 {% endif %}
               </div>
               <div class="nhrils-result-access">
-                {% if result.has_online_access %}
-                  <span class="nhrils-access-chip nhrils-access-chip-online">Digital access</span>
-                {% else %}
-                  <span class="nhrils-access-chip">Review record</span>
-                {% endif %}
+                <span class="nhrils-access-chip{% if result.access.tone == 'online' %} nhrils-access-chip-online{% endif %}">
+                  {{ result.access.label }}
+                </span>
+                <span class="nhrils-result-access-note">{{ result.access.summary }}</span>
                 <small>{{ result.pid }}</small>
-                <a class="nhrils-inline-action" href="{{ result.detail_url }}?return_to={{ search_return_url|urlencode }}">Open record</a>
+                <div class="nhrils-result-actions">
+                  <a class="nhrils-button nhrils-button-secondary" href="{{ result.detail_url }}?return_to={{ search_return_url|urlencode }}">Open record</a>
+                  {% if result.access.online_url %}
+                    <a class="nhrils-inline-action" href="{{ result.access.online_url.value }}">View online</a>
+                  {% endif %}
+                </div>
               </div>
             </article>
           {% endfor %}

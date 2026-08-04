@@ -121,6 +121,7 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
         """Search the review seed bundle and return template-ready results."""
         seed = self._load_seed_bundle()
         documents = seed["documents"]
+        eitems_by_document_pid = self._eitems_by_document_pid(seed.get("eitems", []))
         eitem_document_pids = {
             eitem["document_pid"] for eitem in seed.get("eitems", [])
         }
@@ -141,7 +142,10 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
             query=query,
             result_count=len(filtered_documents),
             results=[
-                self._present_document(document, eitem_document_pids)
+                self._present_document(
+                    document,
+                    eitems_by_document_pid.get(document["pid"], []),
+                )
                 for document in page_documents
             ],
             facets={
@@ -255,7 +259,7 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
     def _present_document(
         self,
         document: Mapping[str, Any],
-        eitem_document_pids: set[str],
+        eitems: Sequence[Mapping[str, Any]],
     ) -> dict[str, Any]:
         """Shape a seed document for the catalogue results template."""
         authors = [
@@ -264,6 +268,7 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
         keywords = [
             keyword.get("value", "") for keyword in document.get("keywords", [])
         ]
+        access = self._present_result_access(eitems)
         return {
             "pid": document["pid"],
             "title": document["title"],
@@ -272,7 +277,10 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
             "document_type": document.get("document_type", "Document").replace("_", " "),
             "abstract": document.get("abstract", "No abstract available for review."),
             "keywords": keywords[:4],
-            "has_online_access": document["pid"] in eitem_document_pids,
+            "languages": self._document_languages(document),
+            "source": document.get("source", "NIMR seed bundle"),
+            "has_online_access": bool(access["online_url"]),
+            "access": access,
             "detail_url": "/nhrils/catalogue/records/{}".format(document["pid"]),
         }
 
@@ -284,7 +292,7 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
         """Shape a seed document for the catalogue detail template."""
         presented = self._present_document(
             document,
-            {eitem["document_pid"] for eitem in eitems},
+            eitems,
         )
         presented.update(
             {
@@ -305,6 +313,44 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
             }
         )
         return presented
+
+    def _eitems_by_document_pid(
+        self,
+        eitems: Sequence[Mapping[str, Any]],
+    ) -> dict[str, list[Mapping[str, Any]]]:
+        """Group review seed e-items by parent document PID."""
+        grouped: dict[str, list[Mapping[str, Any]]] = {}
+        for eitem in eitems:
+            document_pid = eitem.get("document_pid")
+            if document_pid:
+                grouped.setdefault(str(document_pid), []).append(eitem)
+        return grouped
+
+    def _present_result_access(
+        self,
+        eitems: Sequence[Mapping[str, Any]],
+    ) -> dict[str, Any]:
+        """Shape compact access state for search result cards."""
+        urls = [
+            url
+            for eitem in eitems
+            for url in eitem.get("urls", [])
+            if url.get("value")
+        ]
+        primary_url = urls[0] if urls else None
+        if primary_url:
+            return {
+                "tone": "online",
+                "label": "Online access",
+                "summary": "Public digital source attached",
+                "online_url": primary_url,
+            }
+        return {
+            "tone": "review",
+            "label": "Metadata review needed",
+            "summary": "No digital source attached",
+            "online_url": None,
+        }
 
     def _present_access(self, eitems: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         """Shape access and availability state for the catalogue detail page."""
