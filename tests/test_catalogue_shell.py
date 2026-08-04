@@ -23,6 +23,13 @@ def test_catalogue_shell_renders(client):
     assert b"Search the catalogue" in res.data
     assert b"/search" in res.data
     assert b"nimr.svg" in res.data
+    assert b"42" in res.data
+    assert b"seed records" in res.data
+    assert b"Featured records" in res.data
+    assert b"Representative NIMR publication records" in res.data
+    assert b"Catalogue filters" in res.data
+    assert b"Artemisinin-resistant malaria" in res.data
+    assert b"Tanzania Journal of Health Research" in res.data
 
 
 def test_logged_out_page_uses_nhrils_return_path(client, users):
@@ -32,6 +39,26 @@ def test_logged_out_page_uses_nhrils_return_path(client, users):
     assert res.status_code == 200
     assert b"127.0.0.1" not in res.data
     assert b"/nhrils/catalogue" in res.data
+
+
+def test_catalogue_shell_static_markup():
+    """Test catalogue shell copy without requiring service-backed fixtures."""
+    shell = (
+        Path(__file__).resolve().parents[1]
+        / "invenio_app_ils"
+        / "templates"
+        / "invenio_app_ils"
+        / "catalogue_shell.html"
+    ).read_text(encoding="utf-8")
+
+    assert "Find health research resources held by NIMR" in shell
+    assert "Search the catalogue" in shell
+    assert "seed records" in shell
+    assert "Featured records" in shell
+    assert "Representative NIMR publication records" in shell
+    assert "Catalogue filters" in shell
+    assert "Artemisinin-resistant malaria" in shell
+    assert "Tanzania Journal of Health Research" in shell
 
 
 def test_search_guide_uses_health_research_examples():

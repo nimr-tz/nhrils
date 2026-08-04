@@ -27,6 +27,20 @@
       <p>
         Search books, reports, guidelines, proceedings, journals, policy briefs, and digital resources that support health research in Tanzania.
       </p>
+      <dl class="nhrils-hero-stats" aria-label="Catalogue preview">
+        <div>
+          <dt>42</dt>
+          <dd>seed records</dd>
+        </div>
+        <div>
+          <dt>21</dt>
+          <dd>digital links</dd>
+        </div>
+        <div>
+          <dt>5</dt>
+          <dd>material types</dd>
+        </div>
+      </dl>
     </div>
     <form class="nhrils-search-panel" action="/search" method="get" role="search" aria-label="Search catalogue">
       <label for="nhrils-search-query">Search the catalogue</label>
@@ -40,6 +54,7 @@
         <a href="/search?q=guidelines">Guidelines</a>
         <a href="/search?q=publication_year:%5B2020%20TO%202026%5D">2020-2026</a>
       </div>
+      <p class="nhrils-search-note">Use Advanced search when you need exact fields, identifiers, or publication-year ranges.</p>
     </form>
   </section>
 
@@ -67,10 +82,61 @@
   </section>
 
   <section class="nhrils-content-grid">
+    <article class="nhrils-panel nhrils-panel-large">
+      <div class="nhrils-panel-header">
+        <div>
+          <p class="nhrils-eyebrow">Featured records</p>
+          <h2>Representative NIMR publication records</h2>
+        </div>
+        <a class="nhrils-inline-action" href="/search">View all results</a>
+      </div>
+      <div class="nhrils-record-list" aria-label="Featured catalogue records">
+        <article class="nhrils-record-card">
+          <div>
+            <span class="nhrils-record-type">Article</span>
+            <h3>Artemisinin-resistant malaria in Africa demands urgent action</h3>
+            <p>Dhorda, Kaneko, Komatsu, Mshamu, Gesase, von Seidlein - 2026</p>
+          </div>
+          <a href="/search?q=artemisinin-resistant%20malaria">Search</a>
+        </article>
+        <article class="nhrils-record-card">
+          <div>
+            <span class="nhrils-record-type">Serial</span>
+            <h3>Tanzania Journal of Health Research</h3>
+            <p>National Institute for Medical Research - 2026</p>
+          </div>
+          <a href="/search?q=Tanzania%20Journal%20of%20Health%20Research">Search</a>
+        </article>
+        <article class="nhrils-record-card">
+          <div>
+            <span class="nhrils-record-type">Article</span>
+            <h3>Infection prevention and control of highly infectious pathogens</h3>
+            <p>Kinyenje, Hokororo, Ngowi, Kiremeji, Nagu - 2026</p>
+          </div>
+          <a href="/search?q=infection%20prevention%20Marburg">Search</a>
+        </article>
+      </div>
+    </article>
+
+    <aside class="nhrils-panel nhrils-panel-muted" aria-labelledby="nhrils-filter-title">
+      <div class="nhrils-panel-header">
+        <p class="nhrils-eyebrow">Refine results</p>
+        <h2 id="nhrils-filter-title">Catalogue filters</h2>
+      </div>
+      <ul class="nhrils-filter-list">
+        <li><span>Material type</span><strong>Articles, books, standards</strong></li>
+        <li><span>Availability</span><strong>Physical or digital access</strong></li>
+        <li><span>Subject</span><strong>Malaria, public health, outbreaks</strong></li>
+        <li><span>Year</span><strong>Recent and historical holdings</strong></li>
+      </ul>
+    </aside>
+  </section>
+
+  <section class="nhrils-content-grid">
     <article class="nhrils-panel">
       <div class="nhrils-panel-header">
         <p class="nhrils-eyebrow">Discovery workflow</p>
-        <h2>Catalogue search built around researcher tasks</h2>
+        <h2>Search built around researcher tasks</h2>
       </div>
       <ol class="nhrils-steps">
         <li><strong>Search</strong><span>Use title, contributor, subject, identifier, or year.</span></li>
@@ -80,7 +146,7 @@
       </ol>
     </article>
 
-    <aside class="nhrils-panel nhrils-panel-muted" aria-labelledby="nhrils-help-title">
+    <aside class="nhrils-panel nhrils-panel-help" aria-labelledby="nhrils-help-title">
       <div class="nhrils-panel-header">
         <p class="nhrils-eyebrow">Need help?</p>
         <h2 id="nhrils-help-title">Search guidance</h2>

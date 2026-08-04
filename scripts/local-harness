@@ -197,7 +197,7 @@ case "${COMMAND}" in
     require_venv
     COVERAGE_FILE=/tmp/nhrils_coverage PYTHONPYCACHEPREFIX=/tmp/nhrils_pycache \
       "${PYTHON_BIN}" -m pytest tests/test_catalogue_shell.py -q \
-      -k 'seed or search_guide' -p no:cacheprovider
+      -k 'seed or search_guide or catalogue_shell_static' -p no:cacheprovider
     ;;
   test-services)
     cat <<'EOF' >&2
