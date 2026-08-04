@@ -31,6 +31,9 @@ def test_catalogue_shell_renders(client):
     assert b"National Health Research Integrated Library System" in res.data
     assert b"Search the catalogue" in res.data
     assert b"/nhrils/catalogue/search" in res.data
+    assert b"/nhrils/catalogue/search-guide" in res.data
+    assert b"/nhrils/catalogue/about" in res.data
+    assert b"/nhrils/catalogue/contact" in res.data
     assert b"/search" in res.data
     assert b"nimr.svg" in res.data
     assert b"42" in res.data
@@ -45,6 +48,45 @@ def test_catalogue_shell_renders(client):
     assert b"Seed data is ready for NIMR review" in res.data
 
 
+def test_catalogue_about_page_renders(client):
+    """Test the NHRILS catalogue about page."""
+    res = client.get(url_for("nhrils_catalogue_shell.catalogue_about_view"))
+
+    assert res.status_code == 200
+    assert b"About NHRILS" in res.data
+    assert b"National health research discovery service" in res.data
+    assert b"What the catalogue supports" in res.data
+    assert b"Current MVP boundary" in res.data
+    assert b"/nhrils/catalogue/search" in res.data
+    assert b'aria-current="page">About' in res.data
+
+
+def test_catalogue_help_page_renders(client):
+    """Test the NHRILS catalogue search guide page."""
+    res = client.get(url_for("nhrils_catalogue_shell.catalogue_search_guide_view"))
+
+    assert res.status_code == 200
+    assert b"Search Guide" in res.data
+    assert b"Search NIMR resources with practical health research terms" in res.data
+    assert b"Recommended search patterns" in res.data
+    assert b"malaria guidelines" in res.data
+    assert b"Tanzania Journal of Health Research" in res.data
+    assert b'aria-current="page">Search guide' in res.data
+
+
+def test_catalogue_contact_page_renders(client):
+    """Test the NHRILS catalogue contact page."""
+    res = client.get(url_for("nhrils_catalogue_shell.catalogue_contact_view"))
+
+    assert res.status_code == 200
+    assert b"Contact And Requests" in res.data
+    assert b"Request catalogue support from the NIMR library team" in res.data
+    assert b"When to contact the library" in res.data
+    assert b"Information to include" in res.data
+    assert b"Support status" in res.data
+    assert b'aria-current="page">Contact' in res.data
+
+
 def test_catalogue_search_results_shell_renders(client):
     """Test the NHRILS public review search results shell."""
     res = client.get(
@@ -57,6 +99,7 @@ def test_catalogue_search_results_shell_renders(client):
     assert b"Search NIMR health research resources" in res.data
     assert b"review seed catalogue" in res.data
     assert b"Refine results" in res.data
+    assert b"/nhrils/catalogue/search-guide" in res.data
     assert b"Online access" in res.data
     assert b"Public digital source attached" in res.data
     assert b"View online" in res.data
@@ -465,6 +508,8 @@ def test_catalogue_shell_static_markup():
     assert "Find health research resources held by NIMR" in shell
     assert "Search the catalogue" in shell
     assert "/nhrils/catalogue/search" in shell
+    assert "/nhrils/catalogue/search-guide" in shell
+    assert "/pages/search-guide" not in shell
     assert "seed records" in shell
     assert "Featured records" in shell
     assert "Representative NIMR catalogue records" in shell
@@ -501,6 +546,8 @@ def test_catalogue_search_static_markup():
     assert "result.access.online_url" in shell
     assert "View online" in shell
     assert "/nhrils/catalogue/search" in shell
+    assert "/nhrils/catalogue/search-guide" in shell
+    assert "/pages/search-guide" not in shell
     assert "result.detail_url" in shell
 
 
@@ -527,6 +574,34 @@ def test_catalogue_record_static_markup():
     assert "Confirm metadata" in shell
     assert "Confirm access" in shell
     assert "Add holdings" in shell
+    assert "_catalogue_topbar.html" in shell
+
+
+def test_catalogue_info_static_markup():
+    """Test catalogue help page copy and navigation."""
+    shell = (
+        Path(__file__).resolve().parents[1]
+        / "invenio_app_ils"
+        / "templates"
+        / "invenio_app_ils"
+        / "catalogue_info.html"
+    ).read_text(encoding="utf-8")
+    nav = (
+        Path(__file__).resolve().parents[1]
+        / "invenio_app_ils"
+        / "templates"
+        / "invenio_app_ils"
+        / "_catalogue_topbar.html"
+    ).read_text(encoding="utf-8")
+
+    assert "nhrils-info-title" in shell
+    assert "Search the catalogue" in shell
+    assert "Open catalogue results" in shell
+    assert "/nhrils/catalogue/search" in shell
+    assert "/nhrils/catalogue/search-guide" in nav
+    assert "/nhrils/catalogue/about" in nav
+    assert "/nhrils/catalogue/contact" in nav
+    assert "/pages/search-guide" not in nav
 
 
 def test_search_guide_uses_health_research_examples():

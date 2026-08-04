@@ -1,0 +1,56 @@
+{% extends config.THEME_BASE_TEMPLATE %}
+
+{% block page_body %}
+<link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
+
+<main class="nhrils-page-shell" aria-labelledby="nhrils-info-title">
+  {% set active_page = page["active_page"] %}
+  {% include "invenio_app_ils/_catalogue_topbar.html" %}
+
+  <section class="nhrils-info-hero" aria-labelledby="nhrils-info-title">
+    <div>
+      <p class="nhrils-eyebrow">{{ page["eyebrow"] }}</p>
+      <h1 id="nhrils-info-title">{{ page["title"] }}</h1>
+      <p>{{ page["lead"] }}</p>
+    </div>
+    <form class="nhrils-search-panel nhrils-search-panel-compact" action="/nhrils/catalogue/search" method="get" role="search" aria-label="Search catalogue from help page">
+      <label for="nhrils-info-search-query">Search the catalogue</label>
+      <div class="nhrils-search-control">
+        <input id="nhrils-info-search-query" name="q" type="search" placeholder="Topic, title, author, identifier, or year">
+        <button class="nhrils-button nhrils-button-primary" type="submit">Search</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="nhrils-content-grid">
+    <article class="nhrils-panel nhrils-info-content">
+      {% for section in page["sections"] %}
+        <section aria-labelledby="nhrils-info-section-{{ loop.index }}">
+          <h2 id="nhrils-info-section-{{ loop.index }}">{{ section["title"] }}</h2>
+          <ul class="nhrils-info-list">
+            {% for item in section["items"] %}
+              <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endfor %}
+    </article>
+
+    <aside class="nhrils-panel nhrils-panel-help" aria-labelledby="nhrils-info-aside-title">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
+        <p class="nhrils-eyebrow">Reference</p>
+        <h2 id="nhrils-info-aside-title">{{ page["aside_title"] }}</h2>
+      </div>
+      <dl class="nhrils-metadata-list">
+        {% for label, value in page["aside_items"] %}
+          <div>
+            <dt>{{ label }}</dt>
+            <dd>{{ value }}</dd>
+          </div>
+        {% endfor %}
+      </dl>
+      <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/search">Open catalogue results</a>
+    </aside>
+  </section>
+</main>
+{% endblock %}

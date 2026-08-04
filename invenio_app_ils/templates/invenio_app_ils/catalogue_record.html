@@ -4,22 +4,8 @@
 <link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
 
 <main class="nhrils-page-shell" aria-labelledby="nhrils-record-title">
-  <header class="nhrils-topbar" aria-label="NHRILS catalogue header">
-    <a class="nhrils-brand" href="/nhrils/catalogue" aria-label="NHRILS catalogue home">
-      <img src="{{ url_for('invenio_app_ils.static', filename='images/nimr.svg') }}" alt="NIMR">
-      <span>
-        <strong>NHRILS</strong>
-        <small>National Health Research Integrated Library System</small>
-      </span>
-    </a>
-    <nav class="nhrils-nav" aria-label="Catalogue navigation">
-      <a href="/nhrils/catalogue">Catalogue</a>
-      <a href="/nhrils/catalogue/search">Results</a>
-      <a href="/search">Advanced search</a>
-      <a href="/pages/search-guide">Search guide</a>
-      <a href="/api">API</a>
-    </nav>
-  </header>
+  {% set active_page = "" %}
+  {% include "invenio_app_ils/_catalogue_topbar.html" %}
 
   <section class="nhrils-record-detail-layout">
     <article class="nhrils-panel nhrils-record-detail-main">

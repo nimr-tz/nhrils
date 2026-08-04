@@ -59,7 +59,127 @@ def create_catalogue_shell_blueprint(app):
         "/nhrils/catalogue/records/<pid>",
         view_func=catalogue_record_view,
     )
+    blueprint.add_url_rule(
+        "/nhrils/catalogue/about",
+        view_func=catalogue_about_view,
+    )
+    blueprint.add_url_rule(
+        "/nhrils/catalogue/search-guide",
+        view_func=catalogue_search_guide_view,
+    )
+    blueprint.add_url_rule(
+        "/nhrils/catalogue/contact",
+        view_func=catalogue_contact_view,
+    )
     return blueprint
+
+
+CATALOGUE_HELP_PAGES = {
+    "about": {
+        "active_page": "about",
+        "eyebrow": "About NHRILS",
+        "title": "National health research discovery service",
+        "lead": (
+            "NHRILS is the National Health Research Integrated Library System "
+            "for discovering NIMR library materials, publications, reports, "
+            "journals, guidelines, and selected digital research resources."
+        ),
+        "sections": [
+            {
+                "title": "What the catalogue supports",
+                "items": [
+                    "Search across representative health research records.",
+                    "Filter by material type, access, year, source, language, and subject.",
+                    "Open records to review identifiers, abstracts, source links, and availability notes.",
+                    "Prepare records for later InvenioILS database import and indexed discovery.",
+                ],
+            },
+            {
+                "title": "Current MVP boundary",
+                "items": [
+                    "The public catalogue shell is review-ready and seed-backed.",
+                    "Circulation, patron requests, and production imports remain approval-gated.",
+                    "Physical holdings will be attached after locations, shelves, and barcodes are confirmed.",
+                ],
+            },
+        ],
+        "aside_title": "Catalogue scope",
+        "aside_items": [
+            ("Primary users", "Researchers, students, librarians, and NIMR staff."),
+            ("Record types", "Articles, reports, journals, guidelines, standards, and proceedings."),
+            ("Access model", "Public metadata first, with digital links shown when approved."),
+        ],
+    },
+    "search-guide": {
+        "active_page": "search-guide",
+        "eyebrow": "Search Guide",
+        "title": "Search NIMR resources with practical health research terms",
+        "lead": (
+            "Use the catalogue search to find resources by title, author, "
+            "subject, identifier, source, or publication year."
+        ),
+        "sections": [
+            {
+                "title": "Recommended search patterns",
+                "items": [
+                    "Start broad with a topic such as malaria, maternal health, tuberculosis, or climate health.",
+                    "Use quoted phrases for exact titles or programme names.",
+                    "Search identifiers such as DOI, ISSN, ISBN, report number, or local accession number when available.",
+                    "Use filters after searching to narrow by type, source, language, year, or access.",
+                ],
+            },
+            {
+                "title": "Examples",
+                "items": [
+                    "malaria guidelines",
+                    "\"Tanzania Journal of Health Research\"",
+                    "maternal health 2026",
+                    "schistosomiasis online",
+                ],
+            },
+        ],
+        "aside_title": "Search workflow",
+        "aside_items": [
+            ("Search", "Enter a topic, title, author, source, identifier, or year."),
+            ("Filter", "Narrow results by the facets shown on the left side."),
+            ("Open", "Review the record, identifiers, source, availability, and access notes."),
+        ],
+    },
+    "contact": {
+        "active_page": "contact",
+        "eyebrow": "Contact And Requests",
+        "title": "Request catalogue support from the NIMR library team",
+        "lead": (
+            "Use this page as the first support route while request workflows, "
+            "patron accounts, and circulation operations are being configured."
+        ),
+        "sections": [
+            {
+                "title": "When to contact the library",
+                "items": [
+                    "A record needs metadata correction or a missing identifier.",
+                    "A digital link is missing, restricted, or points to the wrong source.",
+                    "A physical holding, shelf location, or barcode needs confirmation.",
+                    "You need help finding NIMR publications, reports, journals, or guidelines.",
+                ],
+            },
+            {
+                "title": "Information to include",
+                "items": [
+                    "Record title or local PID.",
+                    "Your name, institution, and reason for request.",
+                    "Whether you need online access, a physical item, or metadata correction.",
+                ],
+            },
+        ],
+        "aside_title": "Support status",
+        "aside_items": [
+            ("Current channel", "Library support details are pending NIMR confirmation."),
+            ("Future workflow", "Authenticated request and circulation workflows are planned after MVP validation."),
+            ("Catalogue action", "Open a record first, then include the PID in any support request."),
+        ],
+    },
+}
 
 
 def catalogue_shell_view():
@@ -97,6 +217,29 @@ def catalogue_record_view(pid):
         record=response.record,
         return_to=_safe_catalogue_return_url(request.args.get("return_to")),
         search_backend=response.backend,
+    )
+
+
+def catalogue_about_view():
+    """Render the NHRILS catalogue about page."""
+    return _render_catalogue_help_page("about")
+
+
+def catalogue_search_guide_view():
+    """Render the NHRILS catalogue search guide page."""
+    return _render_catalogue_help_page("search-guide")
+
+
+def catalogue_contact_view():
+    """Render the NHRILS catalogue contact page."""
+    return _render_catalogue_help_page("contact")
+
+
+def _render_catalogue_help_page(page):
+    """Render a static NHRILS catalogue help page."""
+    return render_template(
+        "invenio_app_ils/catalogue_info.html",
+        page=CATALOGUE_HELP_PAGES[page],
     )
 
 

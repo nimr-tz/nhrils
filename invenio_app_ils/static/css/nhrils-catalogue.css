@@ -267,7 +267,35 @@
   margin: 0 0 8px;
 }
 
+.nhrils-info-hero {
+  align-items: end;
+  background: var(--nhrils-surface);
+  border: 1px solid var(--nhrils-border);
+  border-radius: var(--nhrils-radius-md);
+  box-shadow: var(--nhrils-shadow-sm);
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 460px);
+  margin: 0 auto 24px;
+  max-width: 1180px;
+  padding: 28px;
+}
+
+.nhrils-info-hero h1 {
+  color: var(--nhrils-blue-900);
+  font-size: 30px;
+  line-height: 1.15;
+  margin: 0 0 8px;
+}
+
 .nhrils-search-header p {
+  color: var(--nhrils-muted);
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.nhrils-info-hero p {
   color: var(--nhrils-muted);
   font-size: 15px;
   line-height: 1.5;
@@ -862,6 +890,29 @@
   line-height: 1.45;
 }
 
+.nhrils-info-content {
+  display: grid;
+  gap: 22px;
+}
+
+.nhrils-info-content section + section {
+  border-top: 1px solid var(--nhrils-border);
+  padding-top: 22px;
+}
+
+.nhrils-info-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.nhrils-info-list li {
+  color: var(--nhrils-muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
 .nhrils-steps {
   display: grid;
   gap: 12px;
@@ -916,6 +967,7 @@
 
   .nhrils-topbar,
   .nhrils-hero,
+  .nhrils-info-hero,
   .nhrils-search-header,
   .nhrils-results-layout,
   .nhrils-record-detail-layout,

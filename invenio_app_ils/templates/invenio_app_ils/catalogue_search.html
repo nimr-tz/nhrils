@@ -24,22 +24,8 @@
 <link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
 
 <main class="nhrils-page-shell" aria-labelledby="nhrils-search-title">
-  <header class="nhrils-topbar" aria-label="NHRILS catalogue header">
-    <a class="nhrils-brand" href="/nhrils/catalogue" aria-label="NHRILS catalogue home">
-      <img src="{{ url_for('invenio_app_ils.static', filename='images/nimr.svg') }}" alt="NIMR">
-      <span>
-        <strong>NHRILS</strong>
-        <small>National Health Research Integrated Library System</small>
-      </span>
-    </a>
-    <nav class="nhrils-nav" aria-label="Catalogue navigation">
-      <a href="/nhrils/catalogue">Catalogue</a>
-      <a href="/nhrils/catalogue/search" aria-current="page">Results</a>
-      <a href="/search">Advanced search</a>
-      <a href="/pages/search-guide">Search guide</a>
-      <a href="/api">API</a>
-    </nav>
-  </header>
+  {% set active_page = "results" %}
+  {% include "invenio_app_ils/_catalogue_topbar.html" %}
 
   <section class="nhrils-search-header">
     <div>
@@ -131,7 +117,7 @@
             <p>Showing {{ pagination.first_item }}-{{ pagination.last_item }} of {{ result_count }} records.</p>
           {% endif %}
         </div>
-        <a class="nhrils-inline-action" href="/pages/search-guide">Search guide</a>
+        <a class="nhrils-inline-action" href="/nhrils/catalogue/search-guide">Search guide</a>
       </div>
 
       {% if results %}

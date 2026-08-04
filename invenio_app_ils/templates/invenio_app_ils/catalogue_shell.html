@@ -4,22 +4,8 @@
 <link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
 
 <main class="nhrils-page-shell" aria-labelledby="nhrils-catalogue-title">
-  <header class="nhrils-topbar" aria-label="NHRILS catalogue header">
-    <a class="nhrils-brand" href="/nhrils/catalogue" aria-label="NHRILS catalogue home">
-      <img src="{{ url_for('invenio_app_ils.static', filename='images/nimr.svg') }}" alt="NIMR">
-      <span>
-        <strong>NHRILS</strong>
-        <small>National Health Research Integrated Library System</small>
-      </span>
-    </a>
-    <nav class="nhrils-nav" aria-label="Catalogue navigation">
-      <a href="/nhrils/catalogue" aria-current="page">Catalogue</a>
-      <a href="/nhrils/catalogue/search">Results</a>
-      <a href="/search">Advanced search</a>
-      <a href="/pages/search-guide">Search guide</a>
-      <a href="/api">API</a>
-    </nav>
-  </header>
+  {% set active_page = "catalogue" %}
+  {% include "invenio_app_ils/_catalogue_topbar.html" %}
 
   <section class="nhrils-hero nhrils-hero-review" aria-labelledby="nhrils-catalogue-title">
     <div class="nhrils-hero-copy">
@@ -67,7 +53,7 @@
         <p>Records are validated for catalogue preview. Database import, indexing, and circulation remain gated.</p>
       </div>
     </article>
-    <a class="nhrils-inline-action" href="/pages/search-guide">Review search guidance</a>
+    <a class="nhrils-inline-action" href="/nhrils/catalogue/search-guide">Review search guidance</a>
   </section>
 
   <section class="nhrils-grid nhrils-grid-four" aria-label="Catalogue scope">
@@ -164,7 +150,7 @@
         <h2 id="nhrils-help-title">Search guidance</h2>
       </div>
       <p>Use quotes for exact phrases, field names for precise searches, and year ranges when you need recent resources.</p>
-      <a class="nhrils-button nhrils-button-secondary" href="/pages/search-guide">Open search guide</a>
+      <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/search-guide">Open search guide</a>
     </aside>
   </section>
 </main>
