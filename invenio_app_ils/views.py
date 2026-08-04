@@ -71,6 +71,10 @@ def create_catalogue_shell_blueprint(app):
         "/nhrils/catalogue/contact",
         view_func=catalogue_contact_view,
     )
+    blueprint.add_url_rule(
+        "/nhrils/catalogue/seed-review",
+        view_func=catalogue_seed_review_view,
+    )
     return blueprint
 
 
@@ -233,6 +237,15 @@ def catalogue_search_guide_view():
 def catalogue_contact_view():
     """Render the NHRILS catalogue contact page."""
     return _render_catalogue_help_page("contact")
+
+
+def catalogue_seed_review_view():
+    """Render a read-only NHRILS seed dataset review page."""
+    response = get_catalogue_search_backend().seed_review()
+    return render_template(
+        "invenio_app_ils/catalogue_seed_review.html",
+        review=response,
+    )
 
 
 def _render_catalogue_help_page(page):

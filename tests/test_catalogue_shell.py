@@ -87,6 +87,24 @@ def test_catalogue_contact_page_renders(client):
     assert b'aria-current="page">Contact' in res.data
 
 
+def test_catalogue_review_page_renders(client):
+    """Test the read-only seed review page."""
+    res = client.get(url_for("nhrils_catalogue_shell.catalogue_seed_review_view"))
+
+    assert res.status_code == 200
+    assert b"Seed Dataset Review" in res.data
+    assert b"Review the catalogue seed before import" in res.data
+    assert b"Total records" in res.data
+    assert b"Digital links" in res.data
+    assert b"Records needing review" in res.data
+    assert b"Material types" in res.data
+    assert b"Records missing digital access" in res.data
+    assert b"Source and language coverage" in res.data
+    assert b"Subjects needing vocabulary review" in res.data
+    assert b'aria-current="page">Seed review' in res.data
+    assert b"Database and OpenSearch writes remain approval-gated" not in res.data
+
+
 def test_catalogue_search_results_shell_renders(client):
     """Test the NHRILS public review search results shell."""
     res = client.get(
@@ -411,6 +429,37 @@ def test_seed_catalogue_search_backend_filters_by_source_language_and_subject():
     assert any(facet["value"] == "malaria" for facet in response.facets["subject"])
 
 
+def test_seed_catalogue_search_backend_builds_seed_review_summary():
+    """Test the read-only seed review summary behind the review page."""
+    response = SeedCatalogueSearchBackend().seed_review()
+
+    assert response.backend == "seed-review"
+    assert response.summary["record_count"] == 42
+    assert response.summary["digital_link_count"] == 21
+    assert response.summary["physical_item_count"] == 0
+    assert response.summary["records_needing_review"] == (
+        response.summary["record_count"]
+        - response.summary["records_with_digital_access"]
+    )
+    assert response.summary["identifier_record_count"] >= len(
+        response.records_with_identifiers
+    )
+    assert response.summary["material_type_count"] >= 1
+    assert response.records_missing_digital_access
+    assert all(
+        not record["has_online_access"]
+        for record in response.records_missing_digital_access
+    )
+    assert len(response.records_missing_digital_access) <= 10
+    assert len(response.records_with_identifiers) <= 10
+    assert response.source_distribution
+    assert response.language_distribution == [
+        {"value": "ENG", "label": "ENG", "count": 42}
+    ]
+    assert response.subject_cleanup
+    assert all("review_note" in subject for subject in response.subject_cleanup)
+
+
 def test_catalogue_search_query_reads_extended_filter_args():
     """Test request argument parsing for facet-ready catalogue search."""
     query = CatalogueSearchQuery.from_mapping(
@@ -485,6 +534,9 @@ def test_native_catalogue_search_backend_is_explicitly_gated():
 
     with pytest.raises(NotImplementedError, match="OpenSearch"):
         backend.get_record("nimr-doc-0001")
+
+    with pytest.raises(NotImplementedError, match="OpenSearch"):
+        backend.seed_review()
 
 
 def test_logged_out_page_uses_nhrils_return_path(client, users):
@@ -599,9 +651,32 @@ def test_catalogue_info_static_markup():
     assert "Open catalogue results" in shell
     assert "/nhrils/catalogue/search" in shell
     assert "/nhrils/catalogue/search-guide" in nav
+    assert "/nhrils/catalogue/seed-review" in nav
     assert "/nhrils/catalogue/about" in nav
     assert "/nhrils/catalogue/contact" in nav
     assert "/pages/search-guide" not in nav
+
+
+def test_catalogue_seed_review_static_markup():
+    """Test seed review page copy and structure."""
+    shell = (
+        Path(__file__).resolve().parents[1]
+        / "invenio_app_ils"
+        / "templates"
+        / "invenio_app_ils"
+        / "catalogue_seed_review.html"
+    ).read_text(encoding="utf-8")
+
+    assert "Review the catalogue seed before import" in shell
+    assert "Search seed records" in shell
+    assert "Records missing digital access" in shell
+    assert "View filtered records" in shell
+    assert "Records with identifiers" in shell
+    assert "Source and language coverage" in shell
+    assert "Subjects needing vocabulary review" in shell
+    assert "database import, indexing, or circulation setup is approved" in shell
+    assert "/nhrils/catalogue/search?availability=review" in shell
+    assert "_catalogue_topbar.html" in shell
 
 
 def test_search_guide_uses_health_research_examples():

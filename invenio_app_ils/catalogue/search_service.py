@@ -95,6 +95,19 @@ class CatalogueRecordResult:
     backend: str
 
 
+@dataclass(frozen=True)
+class SeedCatalogueReviewResult:
+    """Template-ready catalogue seed review response."""
+
+    summary: dict[str, Any]
+    records_missing_digital_access: list[dict[str, Any]]
+    records_with_identifiers: list[dict[str, Any]]
+    source_distribution: list[dict[str, Any]]
+    language_distribution: list[dict[str, Any]]
+    subject_cleanup: list[dict[str, Any]]
+    backend: str
+
+
 class CatalogueSearchBackend:
     """Search backend contract for catalogue route adapters."""
 
@@ -106,6 +119,10 @@ class CatalogueSearchBackend:
 
     def get_record(self, pid: str) -> CatalogueRecordResult | None:
         """Return a single catalogue record by public PID."""
+        raise NotImplementedError
+
+    def seed_review(self) -> SeedCatalogueReviewResult:
+        """Return a read-only seed review summary."""
         raise NotImplementedError
 
 
@@ -178,6 +195,70 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
         ]
         return CatalogueRecordResult(
             record=self._present_document_detail(document, eitems),
+            backend=self.name,
+        )
+
+    def seed_review(self) -> SeedCatalogueReviewResult:
+        """Return template-ready seed review diagnostics without side effects."""
+        seed = self._load_seed_bundle()
+        documents = seed["documents"]
+        eitems = seed.get("eitems", [])
+        eitems_by_document_pid = self._eitems_by_document_pid(eitems)
+        records_missing_digital_access = []
+        records_with_identifiers = []
+
+        for document in documents:
+            pid = document["pid"]
+            presented = self._present_document(
+                document,
+                eitems_by_document_pid.get(pid, []),
+            )
+            identifiers = document.get("identifiers", [])
+            if not presented["has_online_access"]:
+                records_missing_digital_access.append(presented)
+            if identifiers:
+                records_with_identifiers.append(
+                    {
+                        **presented,
+                        "identifiers": self._present_identifiers(identifiers),
+                    }
+                )
+
+        source_distribution = self._build_distribution(documents, "source")
+        language_distribution = self._build_language_facets(documents)
+        subject_cleanup = [
+            {
+                **facet,
+                "review_note": (
+                    "Confirm spelling, capitalization, and controlled subject vocabulary."
+                ),
+            }
+            for facet in self._build_keyword_facets(documents)
+            if facet["count"] == 1
+        ][:8]
+
+        return SeedCatalogueReviewResult(
+            summary={
+                "record_count": len(documents),
+                "digital_link_count": len(eitems),
+                "records_with_digital_access": len(documents)
+                - len(records_missing_digital_access),
+                "records_needing_review": len(records_missing_digital_access),
+                "material_type_count": len(
+                    {
+                        document.get("document_type")
+                        for document in documents
+                        if document.get("document_type")
+                    }
+                ),
+                "identifier_record_count": len(records_with_identifiers),
+                "physical_item_count": len(seed.get("items", [])),
+            },
+            records_missing_digital_access=records_missing_digital_access[:10],
+            records_with_identifiers=records_with_identifiers[:10],
+            source_distribution=source_distribution,
+            language_distribution=language_distribution,
+            subject_cleanup=subject_cleanup,
             backend=self.name,
         )
 
@@ -401,6 +482,40 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
             },
         }
 
+    def _present_identifiers(
+        self,
+        identifiers: Sequence[Mapping[str, Any]],
+    ) -> list[str]:
+        """Return compact identifier strings for seed review tables."""
+        values = []
+        for identifier in identifiers:
+            scheme = str(identifier.get("scheme", "")).strip()
+            value = str(identifier.get("value", "")).strip()
+            if scheme and value:
+                values.append("{}: {}".format(scheme, value))
+            elif value:
+                values.append(value)
+        return values
+
+    def _build_distribution(
+        self,
+        documents: Sequence[Mapping[str, Any]],
+        field: str,
+    ) -> list[dict[str, Any]]:
+        """Build an uncapped distribution for a seed document field."""
+        counts: dict[str, int] = {}
+        for document in documents:
+            value = str(document.get(field, "")).strip()
+            if value:
+                counts[value] = counts.get(value, 0) + 1
+        return [
+            {"value": value, "label": value.replace("_", " ").title(), "count": count}
+            for value, count in sorted(
+                counts.items(),
+                key=lambda item: (-item[1], item[0]),
+            )
+        ]
+
     def _build_count_facets(
         self,
         documents: Sequence[Mapping[str, Any]],
@@ -518,6 +633,13 @@ class InvenioCatalogueSearchBackend(CatalogueSearchBackend):
         raise NotImplementedError(
             "Native InvenioILS catalogue record lookup requires approved record "
             "import, OpenSearch mapping/index readiness, and a reindex rollout plan."
+        )
+
+    def seed_review(self) -> SeedCatalogueReviewResult:
+        """Block native seed review for non-seed backends."""
+        raise NotImplementedError(
+            "Native InvenioILS seed review requires approved record import, "
+            "OpenSearch mapping/index readiness, and a reindex rollout plan."
         )
 
 

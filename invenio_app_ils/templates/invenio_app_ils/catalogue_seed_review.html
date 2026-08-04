@@ -1,0 +1,165 @@
+{% extends config.THEME_BASE_TEMPLATE %}
+
+{% block page_body %}
+<link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
+
+<main class="nhrils-page-shell" aria-labelledby="nhrils-seed-review-title">
+  {% set active_page = "seed-review" %}
+  {% include "invenio_app_ils/_catalogue_topbar.html" %}
+
+  <section class="nhrils-info-hero" aria-labelledby="nhrils-seed-review-title">
+    <div>
+      <p class="nhrils-eyebrow">Seed Dataset Review</p>
+      <h1 id="nhrils-seed-review-title">Review the catalogue seed before import</h1>
+      <p>
+        Inspect source coverage, digital access, identifiers, and subject cleanup needs before any database import, indexing, or circulation setup is approved.
+      </p>
+    </div>
+    <form class="nhrils-search-panel nhrils-search-panel-compact" action="/nhrils/catalogue/search" method="get" role="search" aria-label="Search seed records">
+      <label for="nhrils-seed-review-search-query">Search seed records</label>
+      <div class="nhrils-search-control">
+        <input id="nhrils-seed-review-search-query" name="q" type="search" placeholder="Title, topic, source, author, or year">
+        <button class="nhrils-button nhrils-button-primary" type="submit">Search</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="nhrils-grid nhrils-grid-four" aria-label="Seed review summary">
+    <article class="nhrils-card nhrils-card-coverage">
+      <span class="nhrils-card-icon">{{ review.summary["record_count"] }}</span>
+      <h2>Total records</h2>
+      <p>Seed documents available for catalogue review.</p>
+    </article>
+    <article class="nhrils-card nhrils-card-coverage">
+      <span class="nhrils-card-icon">{{ review.summary["digital_link_count"] }}</span>
+      <h2>Digital links</h2>
+      <p>Electronic items attached to seed records.</p>
+    </article>
+    <article class="nhrils-card nhrils-card-coverage">
+      <span class="nhrils-card-icon">{{ review.summary["records_needing_review"] }}</span>
+      <h2>Records needing review</h2>
+      <p>Records without attached digital source links.</p>
+    </article>
+    <article class="nhrils-card nhrils-card-coverage">
+      <span class="nhrils-card-icon">{{ review.summary["material_type_count"] }}</span>
+      <h2>Material types</h2>
+      <p>Distinct document categories in the seed bundle.</p>
+    </article>
+  </section>
+
+  <section class="nhrils-content-grid">
+    <article class="nhrils-panel">
+      <div class="nhrils-panel-header">
+        <div>
+          <p class="nhrils-eyebrow">Access gaps</p>
+          <h2>Records missing digital access</h2>
+        </div>
+        <a class="nhrils-inline-action" href="/nhrils/catalogue/search?availability=review">View filtered records</a>
+      </div>
+      <div class="nhrils-table-wrap">
+        <table class="nhrils-review-table">
+          <thead>
+            <tr>
+              <th>PID</th>
+              <th>Title</th>
+              <th>Year</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for record in review.records_missing_digital_access %}
+              <tr>
+                <td><a href="{{ record.detail_url }}">{{ record.pid }}</a></td>
+                <td>{{ record.title }}</td>
+                <td>{{ record.publication_year }}</td>
+                <td>{{ record.document_type }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <aside class="nhrils-panel nhrils-panel-muted" aria-labelledby="nhrils-import-readiness-title">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
+        <p class="nhrils-eyebrow">Import readiness</p>
+        <h2 id="nhrils-import-readiness-title">What this report means</h2>
+      </div>
+      <ol class="nhrils-steps">
+        <li><strong>Review metadata</strong><span>Confirm titles, authors, years, sources, and identifiers.</span></li>
+        <li><strong>Confirm access</strong><span>Classify public, licensed, internal, and missing digital links.</span></li>
+        <li><strong>Approve import</strong><span>Database and OpenSearch writes remain outside this page.</span></li>
+      </ol>
+    </aside>
+  </section>
+
+  <section class="nhrils-content-grid">
+    <article class="nhrils-panel">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
+        <p class="nhrils-eyebrow">Identifiers</p>
+        <h2>Records with identifiers</h2>
+      </div>
+      <div class="nhrils-table-wrap">
+        <table class="nhrils-review-table">
+          <thead>
+            <tr>
+              <th>PID</th>
+              <th>Title</th>
+              <th>Identifiers</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for record in review.records_with_identifiers %}
+              <tr>
+                <td><a href="{{ record.detail_url }}">{{ record.pid }}</a></td>
+                <td>{{ record.title }}</td>
+                <td>{{ record.identifiers|join("; ") }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <aside class="nhrils-panel nhrils-panel-help">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
+        <p class="nhrils-eyebrow">Distribution</p>
+        <h2>Source and language coverage</h2>
+      </div>
+      <dl class="nhrils-metadata-list">
+        {% for source in review.source_distribution %}
+          <div>
+            <dt>{{ source.value }}</dt>
+            <dd>{{ source.count }} records</dd>
+          </div>
+        {% endfor %}
+        {% for language in review.language_distribution %}
+          <div>
+            <dt>Language {{ language.value }}</dt>
+            <dd>{{ language.count }} records</dd>
+          </div>
+        {% endfor %}
+      </dl>
+    </aside>
+  </section>
+
+  <section class="nhrils-panel nhrils-seed-review-wide" aria-labelledby="nhrils-subject-cleanup-title">
+    <div class="nhrils-panel-header">
+      <div>
+        <p class="nhrils-eyebrow">Subject cleanup</p>
+        <h2 id="nhrils-subject-cleanup-title">Subjects needing vocabulary review</h2>
+      </div>
+      <a class="nhrils-inline-action" href="/nhrils/catalogue/search-guide">Search guide</a>
+    </div>
+    <div class="nhrils-review-chip-list">
+      {% for subject in review.subject_cleanup %}
+        <article>
+          <strong>{{ subject.label }}</strong>
+          <span>{{ subject.count }} record</span>
+          <p>{{ subject.review_note }}</p>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+</main>
+{% endblock %}
