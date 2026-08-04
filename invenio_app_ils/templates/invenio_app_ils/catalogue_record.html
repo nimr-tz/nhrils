@@ -53,15 +53,18 @@
         </span>
         <p>{{ record.access.status.summary }}</p>
       </div>
-      <div class="nhrils-access-actions" aria-label="Record access actions">
-        {% if record.primary_link %}
-          <a class="nhrils-button nhrils-button-primary" href="{{ record.primary_link.href }}" target="_blank" rel="noopener noreferrer">View online</a>
-        {% else %}
-          <span class="nhrils-button nhrils-button-disabled" aria-disabled="true">View online</span>
-        {% endif %}
-        <a class="nhrils-button nhrils-button-secondary" href="{{ record.detail_url }}/request">{{ record.access.request.label }}</a>
-        <a class="nhrils-button nhrils-button-secondary" href="{{ record.detail_url }}/request">{{ record.access.contact.label }}</a>
-      </div>
+      <section class="nhrils-access-decision" aria-labelledby="nhrils-access-decision-title">
+        <h3 id="nhrils-access-decision-title">What you can do</h3>
+        <div class="nhrils-access-actions" aria-label="Record access actions">
+          {% if record.primary_link %}
+            <a class="nhrils-button nhrils-button-primary" href="{{ record.primary_link.href }}" target="_blank" rel="noopener noreferrer">Open digital source</a>
+          {% else %}
+            <span class="nhrils-button nhrils-button-disabled" aria-disabled="true">Digital source unavailable</span>
+          {% endif %}
+          <a class="nhrils-button nhrils-button-secondary" href="{{ record.detail_url }}/request">Prepare request</a>
+          <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/contact">Contact library</a>
+        </div>
+      </section>
       <dl class="nhrils-access-checks">
         <div>
           <dt>Digital source</dt>
@@ -80,6 +83,14 @@
           <dd>{{ record.access.contact.summary }}</dd>
         </div>
       </dl>
+      <section class="nhrils-access-readiness" aria-labelledby="nhrils-access-readiness-title">
+        <h3 id="nhrils-access-readiness-title">Before request activation</h3>
+        <ul>
+          <li>Confirm patron sign-in and account matching.</li>
+          <li>Approve request queue, notifications, and service routing.</li>
+          <li>Attach physical holdings before circulation actions are enabled.</li>
+        </ul>
+      </section>
     </aside>
   </section>
 

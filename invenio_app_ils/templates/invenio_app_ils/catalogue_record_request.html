@@ -13,7 +13,7 @@
       <p class="nhrils-eyebrow">Catalogue request · {{ record.document_type }} · {{ record.publication_year }}</p>
       <h1 id="nhrils-request-title">Prepare a library request</h1>
       <p>
-        Review the record details below before contacting the NIMR library team. This MVP page does not submit, approve, or create circulation requests yet.
+        Review the record, intended request type, and service requirements before the library enables request submission. This MVP page does not submit, approve, or create circulation transactions yet.
       </p>
 
       <section class="nhrils-request-record" aria-labelledby="nhrils-request-record-title">
@@ -51,6 +51,11 @@
           <p class="nhrils-eyebrow">Request details</p>
           <h2 id="nhrils-request-intent-title">Information the library will need</h2>
         </div>
+        <ol class="nhrils-request-prep-list" aria-label="Request preparation steps">
+          <li><strong>Confirm the record</strong><span>Use the local PID, title, year, and access state shown above.</span></li>
+          <li><strong>State the need</strong><span>Specify digital access, physical copy, metadata correction, or research support.</span></li>
+          <li><strong>Route for action</strong><span>The enabled workflow will send the request to the approved library queue.</span></li>
+        </ol>
         <div class="nhrils-request-fields">
           <label>
             Request type
@@ -76,7 +81,7 @@
       </div>
       <div class="nhrils-access-state nhrils-access-state-review">
         <span class="nhrils-access-chip">Not submitting yet</span>
-        <p>Use this page to confirm the future request workflow and required information before enabling writes.</p>
+        <p>This page is a guided preview. It records no request and changes no library, patron, or circulation data.</p>
       </div>
       <ol class="nhrils-steps">
         <li><strong>Confirm identity</strong><span>Define patron sign-in and library account matching.</span></li>

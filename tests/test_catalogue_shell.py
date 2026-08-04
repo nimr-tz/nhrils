@@ -327,18 +327,21 @@ def test_catalogue_record_detail_shell_renders(client):
     assert b"Mehul Dhorda" in res.data
     assert b"Digital access available" in res.data
     assert b"Availability and access" in res.data
-    assert b"View online" in res.data
+    assert b"What you can do" in res.data
+    assert b"Open digital source" in res.data
+    assert b"Prepare request" in res.data
+    assert b"Contact library" in res.data
     assert b"Record summary" in res.data
     assert b"Abstract" in res.data
     assert b"Subjects" in res.data
     assert b"Local PID" in res.data
     assert b"Language" in res.data
     assert b"rel=\"noopener noreferrer\"" in res.data
-    assert b"Request item" in res.data
-    assert b"Ask librarian" in res.data
     assert b"/nhrils/catalogue/records/nimr-doc-0001/request" in res.data
     assert b"No physical holding attached" in res.data
     assert b"Request workflow will be enabled" in res.data
+    assert b"Before request activation" in res.data
+    assert b"Confirm patron sign-in and account matching" in res.data
     assert b"Bibliographic metadata" in res.data
     assert b"Before production import" in res.data
     assert b"Confirm metadata" in res.data
@@ -375,6 +378,7 @@ def test_catalogue_record_detail_review_only_access_panel(client):
     assert b"Metadata review required" in res.data
     assert b"No digital access link is attached" in res.data
     assert b"Not attached" in res.data
+    assert b"Digital source unavailable" in res.data
     assert b"nhrils-button-disabled" in res.data
     assert b"Request workflow will be enabled" in res.data
     assert b"Librarian contact workflow is pending" in res.data
@@ -452,13 +456,19 @@ def test_catalogue_record_request_shell_renders(client):
     assert res.status_code == 200
     assert b"Catalogue request" in res.data
     assert b"Prepare a library request" in res.data
+    assert b"Review the record, intended request type, and service requirements" in res.data
     assert b"Artemisinin-resistant malaria in Africa demands urgent action" in res.data
     assert b"Request record summary" in res.data
     assert b"Request details" in res.data
     assert b"Information the library will need" in res.data
+    assert b"Request preparation steps" in res.data
+    assert b"Confirm the record" in res.data
+    assert b"State the need" in res.data
+    assert b"Route for action" in res.data
     assert b"Request submission is intentionally disabled" in res.data
     assert b"Request workflow shell" in res.data
     assert b"Not submitting yet" in res.data
+    assert b"records no request and changes no library, patron, or circulation data" in res.data
     assert b"Contact support" in res.data
     assert b"/nhrils/catalogue/contact" in res.data
     assert b"method=\"post\"" not in res.data
@@ -1039,15 +1049,19 @@ def test_catalogue_record_static_markup():
     assert "Abstract" in shell
     assert "Subjects" in shell
     assert "Availability and access" in shell
+    assert "What you can do" in shell
+    assert "Open digital source" in shell
+    assert "Digital source unavailable" in shell
+    assert "Prepare request" in shell
+    assert "Contact library" in shell
+    assert "Before request activation" in shell
     assert "record.access.status.label" in shell
-    assert "View online" in shell
     assert "record.primary_link" in shell
     assert "record.identifier_items" in shell
     assert "record.link_items" in shell
     assert "noopener noreferrer" in shell
-    assert "record.access.request.label" in shell
-    assert "record.access.contact.label" in shell
     assert "record.access.physical_holding.label" in shell
+    assert "record.access.request.summary" in shell
     assert "record.access.contact.summary" in shell
     assert "/request" in shell
     assert "Before production import" in shell
@@ -1073,9 +1087,14 @@ def test_catalogue_record_request_static_markup():
     assert "Selected record" in shell
     assert "Request record summary" in shell
     assert "Information the library will need" in shell
+    assert "Request preparation steps" in shell
+    assert "Confirm the record" in shell
+    assert "State the need" in shell
+    assert "Route for action" in shell
     assert "Request submission is intentionally disabled" in shell
     assert "Request workflow shell" in shell
     assert "Not submitting yet" in shell
+    assert "records no request and changes no library, patron, or circulation data" in shell
     assert "Contact support" in shell
     assert "/nhrils/catalogue/contact" in shell
     assert "record.pid" in shell
