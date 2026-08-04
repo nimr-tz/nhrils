@@ -56,6 +56,10 @@ def create_catalogue_shell_blueprint(app):
         view_func=catalogue_search_view,
     )
     blueprint.add_url_rule(
+        "/nhrils/catalogue/collections",
+        view_func=catalogue_collections_view,
+    )
+    blueprint.add_url_rule(
         "/nhrils/catalogue/records/<pid>",
         view_func=catalogue_record_view,
     )
@@ -206,6 +210,17 @@ def catalogue_search_view():
         facets=response.facets,
         pagination=response.pagination,
         search_return_url=search_return_url,
+        search_backend=response.backend,
+    )
+
+
+def catalogue_collections_view():
+    """Render public NHRILS catalogue collection cards from seed data."""
+    response = get_catalogue_search_backend().collections()
+    return render_template(
+        "invenio_app_ils/catalogue_collections.html",
+        collections=response.collections,
+        summary=response.summary,
         search_backend=response.backend,
     )
 

@@ -96,6 +96,15 @@ class CatalogueRecordResult:
 
 
 @dataclass(frozen=True)
+class CatalogueCollectionsResult:
+    """Template-ready catalogue collections response."""
+
+    collections: list[dict[str, Any]]
+    summary: dict[str, Any]
+    backend: str
+
+
+@dataclass(frozen=True)
 class SeedCatalogueReviewResult:
     """Template-ready catalogue seed review response."""
 
@@ -121,6 +130,10 @@ class CatalogueSearchBackend:
 
     def get_record(self, pid: str) -> CatalogueRecordResult | None:
         """Return a single catalogue record by public PID."""
+        raise NotImplementedError
+
+    def collections(self) -> CatalogueCollectionsResult:
+        """Return public catalogue collection cards."""
         raise NotImplementedError
 
     def seed_review(self) -> SeedCatalogueReviewResult:
@@ -197,6 +210,86 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
         ]
         return CatalogueRecordResult(
             record=self._present_document_detail(document, eitems),
+            backend=self.name,
+        )
+
+    def collections(self) -> CatalogueCollectionsResult:
+        """Return seed-backed public collection cards without side effects."""
+        seed = self._load_seed_bundle()
+        documents = seed["documents"]
+        definitions = [
+            {
+                "key": "peer-reviewed-papers",
+                "title": "Peer-reviewed papers",
+                "material_type": "ARTICLE",
+                "summary": (
+                    "Published NIMR research articles and collaborative papers "
+                    "for scientific discovery."
+                ),
+                "action_label": "Browse papers",
+            },
+            {
+                "key": "reports",
+                "title": "Reports",
+                "material_type": "BOOK",
+                "summary": (
+                    "Institutional reports and book-like records prepared for "
+                    "library review."
+                ),
+                "action_label": "Browse reports",
+            },
+            {
+                "key": "journals",
+                "title": "Journals",
+                "material_type": "SERIAL_ISSUE",
+                "summary": (
+                    "Journal issues and serial publications relevant to health "
+                    "research users."
+                ),
+                "action_label": "Browse journals",
+            },
+            {
+                "key": "guidelines-standards",
+                "title": "Guidelines and standards",
+                "material_type": "STANDARD",
+                "summary": (
+                    "Guidelines, standards, and technical reference materials "
+                    "for applied health research."
+                ),
+                "action_label": "Browse guidelines",
+            },
+            {
+                "key": "proceedings",
+                "title": "Proceedings",
+                "material_type": "PROCEEDINGS",
+                "summary": (
+                    "Conference and meeting proceedings connected to NIMR "
+                    "research work."
+                ),
+                "action_label": "Browse proceedings",
+            },
+        ]
+        collections = [
+            {
+                **definition,
+                "count": self._count_documents_by_type(
+                    documents,
+                    definition["material_type"],
+                ),
+                "href": "/nhrils/catalogue/search?type={}".format(
+                    definition["material_type"]
+                ),
+            }
+            for definition in definitions
+        ]
+
+        return CatalogueCollectionsResult(
+            collections=collections,
+            summary={
+                "collection_count": len(collections),
+                "record_count": len(documents),
+                "digital_link_count": len(seed.get("eitems", [])),
+            },
             backend=self.name,
         )
 
@@ -605,6 +698,18 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
             )
         ]
 
+    def _count_documents_by_type(
+        self,
+        documents: Sequence[Mapping[str, Any]],
+        material_type: str,
+    ) -> int:
+        """Return the number of seed documents for a material type."""
+        return sum(
+            1
+            for document in documents
+            if document.get("document_type") == material_type
+        )
+
     def _build_count_facets(
         self,
         documents: Sequence[Mapping[str, Any]],
@@ -722,6 +827,13 @@ class InvenioCatalogueSearchBackend(CatalogueSearchBackend):
         raise NotImplementedError(
             "Native InvenioILS catalogue record lookup requires approved record "
             "import, OpenSearch mapping/index readiness, and a reindex rollout plan."
+        )
+
+    def collections(self) -> CatalogueCollectionsResult:
+        """Block native collections until import/indexing are approved."""
+        raise NotImplementedError(
+            "Native InvenioILS collections require approved record import, "
+            "OpenSearch mapping/index readiness, and a reindex rollout plan."
         )
 
     def seed_review(self) -> SeedCatalogueReviewResult:

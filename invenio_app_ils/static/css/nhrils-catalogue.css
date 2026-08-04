@@ -1023,6 +1023,66 @@
   line-height: 1.4;
 }
 
+.nhrils-collection-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.nhrils-collection-card {
+  background: #f9fcfa;
+  border: 1px solid var(--nhrils-border);
+  border-radius: var(--nhrils-radius-md);
+  display: grid;
+  gap: 8px;
+  min-height: 226px;
+  padding: 18px;
+}
+
+.nhrils-collection-card span {
+  color: var(--nhrils-green-700);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.nhrils-collection-card strong {
+  color: var(--nhrils-blue-900);
+  font-size: 32px;
+  line-height: 1;
+}
+
+.nhrils-collection-card h3 {
+  color: var(--nhrils-ink);
+  font-size: 18px;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.nhrils-collection-card p {
+  margin: 0;
+}
+
+.nhrils-collection-card a {
+  align-self: end;
+  border: 1px solid var(--nhrils-blue-800);
+  border-radius: var(--nhrils-radius-sm);
+  color: var(--nhrils-blue-900);
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 700;
+  justify-content: center;
+  min-height: 38px;
+  padding: 9px 12px;
+  text-decoration: none;
+}
+
+.nhrils-collection-card a:hover,
+.nhrils-collection-card a:focus {
+  background: var(--nhrils-blue-100);
+  outline: none;
+}
+
 .nhrils-readiness-list {
   display: grid;
   gap: 10px;
@@ -1153,6 +1213,7 @@
 
   .nhrils-grid-four,
   .nhrils-content-grid,
+  .nhrils-collection-grid,
   .nhrils-review-action-grid,
   .nhrils-review-chip-list {
     grid-template-columns: 1fr;

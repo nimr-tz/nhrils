@@ -109,6 +109,25 @@ def test_catalogue_review_page_renders(client):
     assert b"Database and OpenSearch writes remain approval-gated" not in res.data
 
 
+def test_catalogue_collections_page_renders(client):
+    """Test the read-only catalogue collections page."""
+    res = client.get(url_for("nhrils_catalogue_shell.catalogue_collections_view"))
+
+    assert res.status_code == 200
+    assert b"Catalogue Collections" in res.data
+    assert b"Browse NIMR resources by collection" in res.data
+    assert b"Search all collections" in res.data
+    assert b"Peer-reviewed papers" in res.data
+    assert b"Reports" in res.data
+    assert b"Journals" in res.data
+    assert b"Guidelines and standards" in res.data
+    assert b"Proceedings" in res.data
+    assert b"/nhrils/catalogue/search?type=ARTICLE" in res.data
+    assert b"/nhrils/catalogue/search?type=STANDARD" in res.data
+    assert b'aria-current="page">Collections' in res.data
+    assert b"Database import" not in res.data
+
+
 def test_catalogue_search_results_shell_renders(client):
     """Test the NHRILS public review search results shell."""
     res = client.get(
@@ -526,6 +545,35 @@ def test_seed_catalogue_search_backend_builds_seed_review_summary():
     assert all("review_note" in subject for subject in response.subject_cleanup)
 
 
+def test_seed_catalogue_search_backend_builds_collections():
+    """Test seed-backed catalogue collections and search filter handoffs."""
+    response = SeedCatalogueSearchBackend().collections()
+
+    assert response.backend == "seed-review"
+    assert response.summary == {
+        "collection_count": 5,
+        "record_count": 42,
+        "digital_link_count": 21,
+    }
+    assert [collection["title"] for collection in response.collections] == [
+        "Peer-reviewed papers",
+        "Reports",
+        "Journals",
+        "Guidelines and standards",
+        "Proceedings",
+    ]
+    assert [collection["count"] for collection in response.collections] == [
+        25,
+        1,
+        5,
+        9,
+        2,
+    ]
+    assert response.collections[0]["href"] == "/nhrils/catalogue/search?type=ARTICLE"
+    assert response.collections[3]["href"] == "/nhrils/catalogue/search?type=STANDARD"
+    assert all(collection["summary"] for collection in response.collections)
+
+
 def test_catalogue_search_query_reads_extended_filter_args():
     """Test request argument parsing for facet-ready catalogue search."""
     query = CatalogueSearchQuery.from_mapping(
@@ -600,6 +648,9 @@ def test_native_catalogue_search_backend_is_explicitly_gated():
 
     with pytest.raises(NotImplementedError, match="OpenSearch"):
         backend.get_record("nimr-doc-0001")
+
+    with pytest.raises(NotImplementedError, match="OpenSearch"):
+        backend.collections()
 
     with pytest.raises(NotImplementedError, match="OpenSearch"):
         backend.seed_review()
@@ -716,6 +767,7 @@ def test_catalogue_info_static_markup():
     assert "Search the catalogue" in shell
     assert "Open catalogue results" in shell
     assert "/nhrils/catalogue/search" in shell
+    assert "/nhrils/catalogue/collections" in nav
     assert "/nhrils/catalogue/search-guide" in nav
     assert "/nhrils/catalogue/seed-review" in nav
     assert "/nhrils/catalogue/about" in nav
@@ -749,6 +801,26 @@ def test_catalogue_seed_review_static_markup():
     assert "Subjects needing vocabulary review" in shell
     assert "database import, indexing, or circulation setup is approved" in shell
     assert "/nhrils/catalogue/search?availability=review" in shell
+    assert "_catalogue_topbar.html" in shell
+
+
+def test_catalogue_collections_static_markup():
+    """Test catalogue collections page copy and structure."""
+    shell = (
+        Path(__file__).resolve().parents[1]
+        / "invenio_app_ils"
+        / "templates"
+        / "invenio_app_ils"
+        / "catalogue_collections.html"
+    ).read_text(encoding="utf-8")
+
+    assert "Browse NIMR resources by collection" in shell
+    assert "Search all collections" in shell
+    assert "nhrils-collection-grid" in shell
+    assert "collection.material_type" in shell
+    assert "collection.action_label" in shell
+    assert "Browse all records" in shell
+    assert "/nhrils/catalogue/seed-review" in shell
     assert "_catalogue_topbar.html" in shell
 
 

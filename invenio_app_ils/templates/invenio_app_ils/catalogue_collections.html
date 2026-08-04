@@ -1,0 +1,59 @@
+{% extends config.THEME_BASE_TEMPLATE %}
+
+{% block page_body %}
+<link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
+
+<main class="nhrils-page-shell" aria-labelledby="nhrils-collections-title">
+  {% set active_page = "collections" %}
+  {% include "invenio_app_ils/_catalogue_topbar.html" %}
+
+  <section class="nhrils-info-hero" aria-labelledby="nhrils-collections-title">
+    <div>
+      <p class="nhrils-eyebrow">Catalogue Collections</p>
+      <h1 id="nhrils-collections-title">Browse NIMR resources by collection</h1>
+      <p>
+        Start with common library resource groups, then refine results by subject, year, source, language, or digital access.
+      </p>
+    </div>
+    <form class="nhrils-search-panel nhrils-search-panel-compact" action="/nhrils/catalogue/search" method="get" role="search" aria-label="Search all catalogue collections">
+      <label for="nhrils-collections-search-query">Search all collections</label>
+      <div class="nhrils-search-control">
+        <input id="nhrils-collections-search-query" name="q" type="search" placeholder="Malaria, maternal health, journal, guideline">
+        <button class="nhrils-button nhrils-button-primary" type="submit">Search</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="nhrils-status-strip" aria-label="Collection summary">
+    <article>
+      <span class="nhrils-status-dot nhrils-status-dot-review" aria-hidden="true"></span>
+      <div>
+        <strong>{{ summary["collection_count"] }} collections · {{ summary["record_count"] }} seed records</strong>
+        <p>{{ summary["digital_link_count"] }} digital links are attached in the current review bundle.</p>
+      </div>
+    </article>
+    <a class="nhrils-inline-action" href="/nhrils/catalogue/seed-review">Open seed review</a>
+  </section>
+
+  <section class="nhrils-panel nhrils-seed-review-wide" aria-labelledby="nhrils-collection-cards-title">
+    <div class="nhrils-panel-header">
+      <div>
+        <p class="nhrils-eyebrow">Resource groups</p>
+        <h2 id="nhrils-collection-cards-title">Choose a collection to browse</h2>
+      </div>
+      <a class="nhrils-inline-action" href="/nhrils/catalogue/search">Browse all records</a>
+    </div>
+    <div class="nhrils-collection-grid">
+      {% for collection in collections %}
+        <article class="nhrils-collection-card">
+          <span>{{ collection.material_type }}</span>
+          <strong>{{ collection.count }}</strong>
+          <h3>{{ collection.title }}</h3>
+          <p>{{ collection.summary }}</p>
+          <a href="{{ collection.href }}">{{ collection.action_label }}</a>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+</main>
+{% endblock %}
