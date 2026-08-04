@@ -47,6 +47,26 @@
     </article>
   </section>
 
+  <section class="nhrils-panel nhrils-seed-review-wide" aria-labelledby="nhrils-review-workflow-title">
+    <div class="nhrils-panel-header">
+      <div>
+        <p class="nhrils-eyebrow">Review workflow</p>
+        <h2 id="nhrils-review-workflow-title">Start with the records that need decisions</h2>
+      </div>
+      <a class="nhrils-inline-action" href="/nhrils/catalogue/search">Browse all seed records</a>
+    </div>
+    <div class="nhrils-review-action-grid">
+      {% for action in review.review_actions %}
+        <a class="nhrils-review-action" href="{{ action.href }}">
+          <span>{{ action.status }}</span>
+          <strong>{{ action.count }}</strong>
+          <b>{{ action.label }}</b>
+          <small>{{ action.summary }}</small>
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+
   <section class="nhrils-content-grid">
     <article class="nhrils-panel">
       <div class="nhrils-panel-header">
@@ -80,11 +100,19 @@
       </div>
     </article>
 
-    <aside class="nhrils-panel nhrils-panel-muted" aria-labelledby="nhrils-import-readiness-title">
+    <aside id="nhrils-readiness" class="nhrils-panel nhrils-panel-muted" aria-labelledby="nhrils-import-readiness-title">
       <div class="nhrils-panel-header nhrils-panel-header-stacked">
         <p class="nhrils-eyebrow">Import readiness</p>
         <h2 id="nhrils-import-readiness-title">What this report means</h2>
       </div>
+      <dl class="nhrils-readiness-list">
+        {% for check in review.readiness_checks %}
+          <div>
+            <dt>{{ check.label }}</dt>
+            <dd><strong>{{ check.value }}</strong><span>{{ check.status }}</span></dd>
+          </div>
+        {% endfor %}
+      </dl>
       <ol class="nhrils-steps">
         <li><strong>Review metadata</strong><span>Confirm titles, authors, years, sources, and identifiers.</span></li>
         <li><strong>Confirm access</strong><span>Classify public, licensed, internal, and missing digital links.</span></li>
@@ -94,7 +122,7 @@
   </section>
 
   <section class="nhrils-content-grid">
-    <article class="nhrils-panel">
+    <article id="nhrils-identifiers" class="nhrils-panel">
       <div class="nhrils-panel-header nhrils-panel-header-stacked">
         <p class="nhrils-eyebrow">Identifiers</p>
         <h2>Records with identifiers</h2>

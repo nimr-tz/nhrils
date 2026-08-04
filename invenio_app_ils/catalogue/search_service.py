@@ -100,6 +100,8 @@ class SeedCatalogueReviewResult:
     """Template-ready catalogue seed review response."""
 
     summary: dict[str, Any]
+    review_actions: list[dict[str, Any]]
+    readiness_checks: list[dict[str, Any]]
     records_missing_digital_access: list[dict[str, Any]]
     records_with_identifiers: list[dict[str, Any]]
     source_distribution: list[dict[str, Any]]
@@ -203,9 +205,16 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
         seed = self._load_seed_bundle()
         documents = seed["documents"]
         eitems = seed.get("eitems", [])
+        items = seed.get("items", [])
         eitems_by_document_pid = self._eitems_by_document_pid(eitems)
+        item_document_pids = {
+            item.get("document_pid")
+            for item in items
+            if item.get("document_pid")
+        }
         records_missing_digital_access = []
         records_with_identifiers = []
+        records_missing_physical_holdings = []
 
         for document in documents:
             pid = document["pid"]
@@ -223,6 +232,8 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
                         "identifiers": self._present_identifiers(identifiers),
                     }
                 )
+            if pid not in item_document_pids:
+                records_missing_physical_holdings.append(presented)
 
         source_distribution = self._build_distribution(documents, "source")
         language_distribution = self._build_language_facets(documents)
@@ -236,24 +247,29 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
             for facet in self._build_keyword_facets(documents)
             if facet["count"] == 1
         ][:8]
+        summary = {
+            "record_count": len(documents),
+            "digital_link_count": len(eitems),
+            "records_with_digital_access": len(documents)
+            - len(records_missing_digital_access),
+            "records_needing_review": len(records_missing_digital_access),
+            "material_type_count": len(
+                {
+                    document.get("document_type")
+                    for document in documents
+                    if document.get("document_type")
+                }
+            ),
+            "identifier_record_count": len(records_with_identifiers),
+            "physical_item_count": len(items),
+            "physical_holdings_missing_count": len(records_missing_physical_holdings),
+            "subject_cleanup_count": len(subject_cleanup),
+        }
 
         return SeedCatalogueReviewResult(
-            summary={
-                "record_count": len(documents),
-                "digital_link_count": len(eitems),
-                "records_with_digital_access": len(documents)
-                - len(records_missing_digital_access),
-                "records_needing_review": len(records_missing_digital_access),
-                "material_type_count": len(
-                    {
-                        document.get("document_type")
-                        for document in documents
-                        if document.get("document_type")
-                    }
-                ),
-                "identifier_record_count": len(records_with_identifiers),
-                "physical_item_count": len(seed.get("items", [])),
-            },
+            summary=summary,
+            review_actions=self._build_seed_review_actions(summary),
+            readiness_checks=self._build_seed_readiness_checks(summary),
             records_missing_digital_access=records_missing_digital_access[:10],
             records_with_identifiers=records_with_identifiers[:10],
             source_distribution=source_distribution,
@@ -261,6 +277,79 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
             subject_cleanup=subject_cleanup,
             backend=self.name,
         )
+
+    def _build_seed_review_actions(
+        self,
+        summary: Mapping[str, Any],
+    ) -> list[dict[str, Any]]:
+        """Return reviewer action links for the seed review page."""
+        return [
+            {
+                "label": "Missing digital access",
+                "count": summary["records_needing_review"],
+                "summary": "Open records that need a public, licensed, or internal source decision.",
+                "href": "/nhrils/catalogue/search?availability=review",
+                "status": "Needs review",
+            },
+            {
+                "label": "Records with identifiers",
+                "count": summary["identifier_record_count"],
+                "summary": "Check DOI, ISSN, ISBN, and local identifier coverage before import.",
+                "href": "#nhrils-identifiers",
+                "status": "Review",
+            },
+            {
+                "label": "Physical holdings missing",
+                "count": summary["physical_holdings_missing_count"],
+                "summary": "Confirm whether each record has no shelf copy or needs holdings added.",
+                "href": "#nhrils-readiness",
+                "status": "Confirm",
+            },
+            {
+                "label": "All seed records",
+                "count": summary["record_count"],
+                "summary": "Browse the full provisional catalogue dataset.",
+                "href": "/nhrils/catalogue/search",
+                "status": "Browse",
+            },
+        ]
+
+    def _build_seed_readiness_checks(
+        self,
+        summary: Mapping[str, Any],
+    ) -> list[dict[str, Any]]:
+        """Return plain-language readiness checks for reviewers."""
+        return [
+            {
+                "label": "Digital access",
+                "value": "{} of {} linked".format(
+                    summary["records_with_digital_access"],
+                    summary["record_count"],
+                ),
+                "status": "Needs review"
+                if summary["records_needing_review"]
+                else "Ready",
+            },
+            {
+                "label": "Identifiers",
+                "value": "{} records have identifiers".format(
+                    summary["identifier_record_count"]
+                ),
+                "status": "Review",
+            },
+            {
+                "label": "Physical holdings",
+                "value": "{} items attached".format(summary["physical_item_count"]),
+                "status": "Confirm",
+            },
+            {
+                "label": "Controlled subjects",
+                "value": "{} low-frequency terms listed".format(
+                    summary["subject_cleanup_count"]
+                ),
+                "status": "Review",
+            },
+        ]
 
     def _load_seed_bundle(self) -> dict[str, Any]:
         """Load the review seed bundle without database or index side effects."""

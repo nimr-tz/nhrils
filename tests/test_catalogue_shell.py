@@ -99,6 +99,10 @@ def test_catalogue_review_page_renders(client):
     assert b"Records needing review" in res.data
     assert b"Material types" in res.data
     assert b"Records missing digital access" in res.data
+    assert b"Review workflow" in res.data
+    assert b"Missing digital access" in res.data
+    assert b"Physical holdings missing" in res.data
+    assert b"Browse all seed records" in res.data
     assert b"Source and language coverage" in res.data
     assert b"Subjects needing vocabulary review" in res.data
     assert b'aria-current="page">Seed review' in res.data
@@ -444,7 +448,69 @@ def test_seed_catalogue_search_backend_builds_seed_review_summary():
     assert response.summary["identifier_record_count"] >= len(
         response.records_with_identifiers
     )
+    assert response.summary["physical_holdings_missing_count"] == 42
+    assert response.summary["subject_cleanup_count"] == len(response.subject_cleanup)
     assert response.summary["material_type_count"] >= 1
+    assert response.review_actions == [
+        {
+            "label": "Missing digital access",
+            "count": response.summary["records_needing_review"],
+            "summary": (
+                "Open records that need a public, licensed, or internal source decision."
+            ),
+            "href": "/nhrils/catalogue/search?availability=review",
+            "status": "Needs review",
+        },
+        {
+            "label": "Records with identifiers",
+            "count": response.summary["identifier_record_count"],
+            "summary": (
+                "Check DOI, ISSN, ISBN, and local identifier coverage before import."
+            ),
+            "href": "#nhrils-identifiers",
+            "status": "Review",
+        },
+        {
+            "label": "Physical holdings missing",
+            "count": response.summary["physical_holdings_missing_count"],
+            "summary": (
+                "Confirm whether each record has no shelf copy or needs holdings added."
+            ),
+            "href": "#nhrils-readiness",
+            "status": "Confirm",
+        },
+        {
+            "label": "All seed records",
+            "count": response.summary["record_count"],
+            "summary": "Browse the full provisional catalogue dataset.",
+            "href": "/nhrils/catalogue/search",
+            "status": "Browse",
+        },
+    ]
+    assert response.readiness_checks == [
+        {
+            "label": "Digital access",
+            "value": "21 of 42 linked",
+            "status": "Needs review",
+        },
+        {
+            "label": "Identifiers",
+            "value": "19 records have identifiers",
+            "status": "Review",
+        },
+        {
+            "label": "Physical holdings",
+            "value": "0 items attached",
+            "status": "Confirm",
+        },
+        {
+            "label": "Controlled subjects",
+            "value": "{} low-frequency terms listed".format(
+                response.summary["subject_cleanup_count"]
+            ),
+            "status": "Review",
+        },
+    ]
     assert response.records_missing_digital_access
     assert all(
         not record["has_online_access"]
@@ -669,6 +735,13 @@ def test_catalogue_seed_review_static_markup():
 
     assert "Review the catalogue seed before import" in shell
     assert "Search seed records" in shell
+    assert "Review workflow" in shell
+    assert "Start with the records that need decisions" in shell
+    assert "nhrils-review-action-grid" in shell
+    assert "review.review_actions" in shell
+    assert "review.readiness_checks" in shell
+    assert "nhrils-readiness" in shell
+    assert "nhrils-identifiers" in shell
     assert "Records missing digital access" in shell
     assert "View filtered records" in shell
     assert "Records with identifiers" in shell
