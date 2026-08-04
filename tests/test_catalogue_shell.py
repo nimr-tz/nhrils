@@ -8,6 +8,7 @@
 """NHRILS catalogue shell tests."""
 
 from flask import url_for
+import importlib.util
 from pathlib import Path
 import json
 
@@ -65,7 +66,7 @@ def test_nimr_publications_seed_bundle_shape():
     eitems = seed["eitems"]
     document_pids = {document["pid"] for document in documents}
 
-    assert len(documents) >= 25
+    assert len(documents) >= 40
     assert len(document_pids) == len(documents)
     assert len({eitem["pid"] for eitem in eitems}) == len(eitems)
     assert seed["items"] == []
@@ -91,3 +92,30 @@ def test_nimr_publications_seed_bundle_shape():
         }
 
     assert {eitem["document_pid"] for eitem in eitems}.issubset(document_pids)
+    assert "https://nimr.or.tz/peer-reviewed-papers/" in seed["bundle"]["source_pages"]
+    assert any(
+        document["source"] == "NIMR 2025/2026 Peer Reviewed Papers"
+        for document in documents
+    )
+
+
+def test_nimr_publications_seed_dry_run_validator_accepts_bundle():
+    """Test that the seed bundle passes the dry-run import-readiness gate."""
+    repo_root = Path(__file__).resolve().parents[1]
+    validator_path = repo_root / "scripts" / "validate_seed_bundle.py"
+    seed_path = repo_root / "docs" / "seed-data" / "nimr-publications-seed.json"
+
+    spec = importlib.util.spec_from_file_location("validate_seed_bundle", validator_path)
+    validator = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(validator)
+
+    result = validator.validate_seed_bundle(seed_path)
+
+    assert result["ok"], result["errors"]
+    assert result["counts"] == {
+        "documents": 42,
+        "eitems": 21,
+        "locations": 1,
+        "internal_locations": 2,
+        "items": 0,
+    }
