@@ -79,7 +79,34 @@
         </div>
       </section>
 
-      {% if selected_filters.availability or selected_filters.type or selected_filters.year or query %}
+      <section aria-labelledby="nhrils-source-filter">
+        <h3 id="nhrils-source-filter">Source</h3>
+        <div class="nhrils-facet-list">
+          {% for facet in facets.source %}
+            {{ filter_link(facet.label, "source", facet.value, facet.count, selected_filters, query) }}
+          {% endfor %}
+        </div>
+      </section>
+
+      <section aria-labelledby="nhrils-language-filter">
+        <h3 id="nhrils-language-filter">Language</h3>
+        <div class="nhrils-facet-list">
+          {% for facet in facets.language %}
+            {{ filter_link(facet.label, "language", facet.value, facet.count, selected_filters, query) }}
+          {% endfor %}
+        </div>
+      </section>
+
+      <section aria-labelledby="nhrils-subject-filter">
+        <h3 id="nhrils-subject-filter">Subject</h3>
+        <div class="nhrils-facet-list">
+          {% for facet in facets.subject %}
+            {{ filter_link(facet.label, "subject", facet.value, facet.count, selected_filters, query) }}
+          {% endfor %}
+        </div>
+      </section>
+
+      {% if selected_filters.availability or selected_filters.type or selected_filters.year or selected_filters.source or selected_filters.language or selected_filters.subject or query %}
         <a class="nhrils-inline-action" href="/nhrils/catalogue/search">Clear filters</a>
       {% endif %}
     </aside>

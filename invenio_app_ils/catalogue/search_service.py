@@ -38,6 +38,9 @@ class CatalogueSearchQuery:
     material_type: str = ""
     year: str = ""
     availability: str = ""
+    source: str = ""
+    language: str = ""
+    subject: str = ""
     page: int = 1
     size: int = DEFAULT_PAGE_SIZE
 
@@ -51,6 +54,9 @@ class CatalogueSearchQuery:
             material_type=str(values.get("type", "")).strip(),
             year=str(values.get("year", "")).strip(),
             availability=str(values.get("availability", "")).strip(),
+            source=str(values.get("source", "")).strip(),
+            language=str(values.get("language", "")).strip(),
+            subject=str(values.get("subject", "")).strip(),
             page=page,
             size=size,
         )
@@ -62,6 +68,9 @@ class CatalogueSearchQuery:
             "availability": self.availability,
             "type": self.material_type,
             "year": self.year,
+            "source": self.source,
+            "language": self.language,
+            "subject": self.subject,
         }
 
 
@@ -135,6 +144,9 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
                 ),
                 "type": self._build_count_facets(documents, "document_type"),
                 "year": self._build_count_facets(documents, "publication_year"),
+                "source": self._build_count_facets(documents, "source"),
+                "language": self._build_language_facets(documents),
+                "subject": self._build_keyword_facets(documents),
             },
             backend=self.name,
         )
@@ -178,6 +190,12 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
                 continue
             if query.year and str(document.get("publication_year", "")) != query.year:
                 continue
+            if query.source and document.get("source") != query.source:
+                continue
+            if query.language and query.language not in self._document_languages(document):
+                continue
+            if query.subject and query.subject not in self._document_keywords(document):
+                continue
             has_online_access = document["pid"] in eitem_document_pids
             if query.availability == "online" and not has_online_access:
                 continue
@@ -209,6 +227,22 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
             for identifier in document.get("identifiers", [])
         )
         return " ".join(values).lower()
+
+    def _document_languages(self, document: Mapping[str, Any]) -> list[str]:
+        """Return normalized language codes from a seed document."""
+        return [
+            str(language).strip()
+            for language in document.get("languages", [])
+            if str(language).strip()
+        ]
+
+    def _document_keywords(self, document: Mapping[str, Any]) -> list[str]:
+        """Return keyword values from a seed document."""
+        return [
+            keyword.get("value", "").strip()
+            for keyword in document.get("keywords", [])
+            if keyword.get("value", "").strip()
+        ]
 
     def _present_document(
         self,
@@ -300,6 +334,40 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
             {"value": "online", "label": "Digital access", "count": online_count},
             {"value": "review", "label": "Review record", "count": review_count},
         ]
+
+    def _build_language_facets(
+        self,
+        documents: Sequence[Mapping[str, Any]],
+    ) -> list[dict[str, Any]]:
+        """Build language facets from seed language code arrays."""
+        counts: dict[str, int] = {}
+        for document in documents:
+            for language in self._document_languages(document):
+                counts[language] = counts.get(language, 0) + 1
+        return [
+            {"value": value, "label": value, "count": count}
+            for value, count in sorted(
+                counts.items(),
+                key=lambda item: (-item[1], item[0]),
+            )
+        ][:8]
+
+    def _build_keyword_facets(
+        self,
+        documents: Sequence[Mapping[str, Any]],
+    ) -> list[dict[str, Any]]:
+        """Build subject facets from seed keyword values."""
+        counts: dict[str, int] = {}
+        for document in documents:
+            for keyword in self._document_keywords(document):
+                counts[keyword] = counts.get(keyword, 0) + 1
+        return [
+            {"value": value, "label": value.title(), "count": count}
+            for value, count in sorted(
+                counts.items(),
+                key=lambda item: (-item[1], item[0]),
+            )
+        ][:12]
 
 
 class InvenioCatalogueSearchBackend(CatalogueSearchBackend):

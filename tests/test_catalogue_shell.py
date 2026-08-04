@@ -59,6 +59,9 @@ def test_catalogue_search_results_shell_renders(client):
     assert b"Refine results" in res.data
     assert b"Digital access" in res.data
     assert b"Material type" in res.data
+    assert b"Source" in res.data
+    assert b"Language" in res.data
+    assert b"Subject" in res.data
     assert b"Artemisinin-resistant malaria" in res.data
     assert b"nimr-doc-0001" in res.data
     assert b"/nhrils/catalogue/records/nimr-doc-0001" in res.data
@@ -124,11 +127,80 @@ def test_seed_catalogue_search_backend_filters_and_paginates():
         "availability": "online",
         "type": "",
         "year": "",
+        "source": "",
+        "language": "",
+        "subject": "",
     }
     assert all(result["has_online_access"] for result in response.results)
     assert any("malaria" in result["title"].lower() for result in response.results)
-    assert {"availability", "type", "year"}.issubset(response.facets)
+    assert {"availability", "type", "year", "source", "language", "subject"}.issubset(
+        response.facets
+    )
     assert response.facets["availability"][0]["label"] == "Digital access"
+
+
+def test_seed_catalogue_search_backend_filters_by_source_language_and_subject():
+    """Test source, language, and subject filters for the review seed backend."""
+    response = SeedCatalogueSearchBackend().search(
+        CatalogueSearchQuery(
+            source="NIMR 2025/2026 Peer Reviewed Papers",
+            language="ENG",
+            subject="malaria",
+            page=1,
+            size=20,
+        )
+    )
+
+    assert response.result_count >= 1
+    assert response.query.selected_filters["source"] == (
+        "NIMR 2025/2026 Peer Reviewed Papers"
+    )
+    assert response.query.selected_filters["language"] == "ENG"
+    assert response.query.selected_filters["subject"] == "malaria"
+    assert all("malaria" in result["keywords"] for result in response.results)
+    assert any(
+        facet["value"] == "NIMR 2025/2026 Peer Reviewed Papers"
+        for facet in response.facets["source"]
+    )
+    assert response.facets["language"] == [
+        {"value": "ENG", "label": "ENG", "count": 42}
+    ]
+    assert any(facet["value"] == "malaria" for facet in response.facets["subject"])
+
+
+def test_catalogue_search_query_reads_extended_filter_args():
+    """Test request argument parsing for facet-ready catalogue search."""
+    query = CatalogueSearchQuery.from_mapping(
+        {
+            "q": " health ",
+            "type": "ARTICLE",
+            "year": "2026",
+            "availability": "online",
+            "source": "NIMR Publications",
+            "language": "ENG",
+            "subject": "malaria",
+            "page": "2",
+            "size": "500",
+        }
+    )
+
+    assert query.query == "health"
+    assert query.material_type == "ARTICLE"
+    assert query.year == "2026"
+    assert query.availability == "online"
+    assert query.source == "NIMR Publications"
+    assert query.language == "ENG"
+    assert query.subject == "malaria"
+    assert query.page == 2
+    assert query.size == 100
+    assert query.selected_filters == {
+        "availability": "online",
+        "type": "ARTICLE",
+        "year": "2026",
+        "source": "NIMR Publications",
+        "language": "ENG",
+        "subject": "malaria",
+    }
 
 
 def test_seed_catalogue_search_backend_record_detail():
@@ -197,6 +269,9 @@ def test_catalogue_search_static_markup():
 
     assert "Search NIMR health research resources" in shell
     assert "Refine results" in shell
+    assert "Source" in shell
+    assert "Language" in shell
+    assert "Subject" in shell
     assert "No review records match this search" in shell
     assert "Browse the review seed catalogue" in shell
     assert "/nhrils/catalogue/search" in shell
