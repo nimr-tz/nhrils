@@ -1130,6 +1130,69 @@
   line-height: 1.4;
 }
 
+.nhrils-quality-section-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.nhrils-quality-card {
+  background: #f9fcfa;
+  border: 1px solid var(--nhrils-border);
+  border-radius: var(--nhrils-radius-md);
+  display: grid;
+  gap: 8px;
+  min-height: 188px;
+  padding: 16px;
+}
+
+.nhrils-quality-card div {
+  align-items: baseline;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.nhrils-quality-card span {
+  color: var(--nhrils-green-700);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.nhrils-quality-card strong {
+  color: var(--nhrils-blue-900);
+  font-size: 28px;
+  line-height: 1;
+}
+
+.nhrils-quality-card h3 {
+  color: var(--nhrils-ink);
+  font-size: 16px;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.nhrils-quality-card p {
+  color: var(--nhrils-muted);
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.nhrils-quality-card a {
+  align-self: end;
+  color: var(--nhrils-blue-800);
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.nhrils-quality-card a:hover,
+.nhrils-quality-card a:focus {
+  text-decoration: underline;
+}
+
 .nhrils-collection-grid {
   display: grid;
   gap: 14px;
@@ -1235,6 +1298,34 @@
   max-width: 1180px;
 }
 
+.nhrils-distribution-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.nhrils-distribution-grid article {
+  background: #f9fcfa;
+  border: 1px solid var(--nhrils-border);
+  border-radius: var(--nhrils-radius-md);
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+}
+
+.nhrils-distribution-grid h3 {
+  color: var(--nhrils-blue-900);
+  font-size: 16px;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.nhrils-distribution-grid p {
+  color: var(--nhrils-muted);
+  font-size: 13px;
+  margin: 0;
+}
+
 .nhrils-review-chip-list {
   display: grid;
   gap: 12px;
@@ -1324,6 +1415,8 @@
   .nhrils-record-fact-grid,
   .nhrils-collection-grid,
   .nhrils-review-action-grid,
+  .nhrils-quality-section-grid,
+  .nhrils-distribution-grid,
   .nhrils-review-chip-list {
     grid-template-columns: 1fr;
   }

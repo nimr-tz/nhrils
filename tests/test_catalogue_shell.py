@@ -100,11 +100,21 @@ def test_catalogue_review_page_renders(client):
     assert b"Material types" in res.data
     assert b"Records missing digital access" in res.data
     assert b"Review workflow" in res.data
+    assert b"Data quality workbench" in res.data
+    assert b"Catalogue cleanup before import" in res.data
+    assert b"Digital access cleanup" in res.data
+    assert b"Identifier review" in res.data
+    assert b"Physical holdings" in res.data
+    assert b"Subject vocabulary" in res.data
     assert b"Missing digital access" in res.data
     assert b"Physical holdings missing" in res.data
+    assert b"Source, language, and type coverage" in res.data
+    assert b"Material type distribution" in res.data
+    assert b"Source distribution" in res.data
+    assert b"Language distribution" in res.data
     assert b"Browse all seed records" in res.data
-    assert b"Source and language coverage" in res.data
     assert b"Subjects needing vocabulary review" in res.data
+    assert b"/nhrils/catalogue/search?availability=review" in res.data
     assert b'aria-current="page">Seed review' in res.data
     assert b"Database and OpenSearch writes remain approval-gated" not in res.data
 
@@ -592,7 +602,7 @@ def test_seed_catalogue_search_backend_builds_seed_review_summary():
             "summary": (
                 "Confirm whether each record has no shelf copy or needs holdings added."
             ),
-            "href": "#nhrils-readiness",
+            "href": "#nhrils-holdings",
             "status": "Confirm",
         },
         {
@@ -627,13 +637,61 @@ def test_seed_catalogue_search_backend_builds_seed_review_summary():
             "status": "Review",
         },
     ]
+    assert response.quality_sections == [
+        {
+            "label": "Digital access cleanup",
+            "count": response.summary["records_needing_review"],
+            "status": "Needs review",
+            "summary": (
+                "Classify missing public, licensed, internal, or restricted access decisions."
+            ),
+            "href": "/nhrils/catalogue/search?availability=review",
+            "action_label": "Open records",
+        },
+        {
+            "label": "Identifier review",
+            "count": response.summary["identifier_record_count"],
+            "status": "Review",
+            "summary": "Confirm DOI, ISSN, ISBN, and local identifier consistency.",
+            "href": "#nhrils-identifiers",
+            "action_label": "Review identifiers",
+        },
+        {
+            "label": "Physical holdings",
+            "count": response.summary["physical_holdings_missing_count"],
+            "status": "Confirm",
+            "summary": (
+                "Decide whether a catalogue record needs a shelf copy, item, barcode, or no holding."
+            ),
+            "href": "#nhrils-holdings",
+            "action_label": "Review holdings",
+        },
+        {
+            "label": "Subject vocabulary",
+            "count": response.summary["subject_cleanup_count"],
+            "status": "Review",
+            "summary": (
+                "Normalize low-frequency terms before controlled vocabulary approval."
+            ),
+            "href": "#nhrils-subjects",
+            "action_label": "Review subjects",
+        },
+    ]
     assert response.records_missing_digital_access
     assert all(
         not record["has_online_access"]
         for record in response.records_missing_digital_access
     )
     assert len(response.records_missing_digital_access) <= 10
+    assert response.records_missing_physical_holdings
+    assert len(response.records_missing_physical_holdings) <= 10
     assert len(response.records_with_identifiers) <= 10
+    assert [group["label"] for group in response.distribution_groups] == [
+        "Material type distribution",
+        "Source distribution",
+        "Language distribution",
+    ]
+    assert all(group["items"] for group in response.distribution_groups)
     assert response.source_distribution
     assert response.language_distribution == [
         {"value": "ENG", "label": "ENG", "count": 42}
@@ -931,13 +989,19 @@ def test_catalogue_seed_review_static_markup():
     assert "Start with the records that need decisions" in shell
     assert "nhrils-review-action-grid" in shell
     assert "review.review_actions" in shell
+    assert "Data quality workbench" in shell
+    assert "review.quality_sections" in shell
     assert "review.readiness_checks" in shell
     assert "nhrils-readiness" in shell
+    assert "nhrils-holdings" in shell
     assert "nhrils-identifiers" in shell
+    assert "nhrils-subjects" in shell
     assert "Records missing digital access" in shell
     assert "View filtered records" in shell
+    assert "records_missing_physical_holdings" in shell
     assert "Records with identifiers" in shell
-    assert "Source and language coverage" in shell
+    assert "Source, language, and type coverage" in shell
+    assert "review.distribution_groups" in shell
     assert "Subjects needing vocabulary review" in shell
     assert "database import, indexing, or circulation setup is approved" in shell
     assert "/nhrils/catalogue/search?availability=review" in shell

@@ -67,6 +67,29 @@
     </div>
   </section>
 
+  <section class="nhrils-panel nhrils-seed-review-wide" aria-labelledby="nhrils-quality-workbench-title">
+    <div class="nhrils-panel-header">
+      <div>
+        <p class="nhrils-eyebrow">Data quality workbench</p>
+        <h2 id="nhrils-quality-workbench-title">Catalogue cleanup before import</h2>
+      </div>
+      <a class="nhrils-inline-action" href="/nhrils/catalogue/search?availability=review">Open records needing review</a>
+    </div>
+    <div class="nhrils-quality-section-grid">
+      {% for section in review.quality_sections %}
+        <article class="nhrils-quality-card">
+          <div>
+            <span>{{ section.status }}</span>
+            <strong>{{ section.count }}</strong>
+          </div>
+          <h3>{{ section.label }}</h3>
+          <p>{{ section.summary }}</p>
+          <a href="{{ section.href }}">{{ section.action_label }}</a>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+
   <section class="nhrils-content-grid">
     <article class="nhrils-panel">
       <div class="nhrils-panel-header">
@@ -122,6 +145,38 @@
   </section>
 
   <section class="nhrils-content-grid">
+    <article id="nhrils-holdings" class="nhrils-panel">
+      <div class="nhrils-panel-header">
+        <div>
+          <p class="nhrils-eyebrow">Holdings gaps</p>
+          <h2>Physical holdings missing</h2>
+        </div>
+        <a class="nhrils-inline-action" href="/nhrils/catalogue/search">Browse records</a>
+      </div>
+      <div class="nhrils-table-wrap">
+        <table class="nhrils-review-table">
+          <thead>
+            <tr>
+              <th>PID</th>
+              <th>Title</th>
+              <th>Year</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for record in review.records_missing_physical_holdings %}
+              <tr>
+                <td><a href="{{ record.detail_url }}">{{ record.pid }}</a></td>
+                <td>{{ record.title }}</td>
+                <td>{{ record.publication_year }}</td>
+                <td>{{ record.document_type }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </article>
+
     <article id="nhrils-identifiers" class="nhrils-panel">
       <div class="nhrils-panel-header nhrils-panel-header-stacked">
         <p class="nhrils-eyebrow">Identifiers</p>
@@ -148,30 +203,32 @@
         </table>
       </div>
     </article>
-
-    <aside class="nhrils-panel nhrils-panel-help">
-      <div class="nhrils-panel-header nhrils-panel-header-stacked">
-        <p class="nhrils-eyebrow">Distribution</p>
-        <h2>Source and language coverage</h2>
-      </div>
-      <dl class="nhrils-metadata-list">
-        {% for source in review.source_distribution %}
-          <div>
-            <dt>{{ source.value }}</dt>
-            <dd>{{ source.count }} records</dd>
-          </div>
-        {% endfor %}
-        {% for language in review.language_distribution %}
-          <div>
-            <dt>Language {{ language.value }}</dt>
-            <dd>{{ language.count }} records</dd>
-          </div>
-        {% endfor %}
-      </dl>
-    </aside>
   </section>
 
-  <section class="nhrils-panel nhrils-seed-review-wide" aria-labelledby="nhrils-subject-cleanup-title">
+  <section class="nhrils-panel nhrils-seed-review-wide" aria-labelledby="nhrils-distribution-title">
+    <div class="nhrils-panel-header nhrils-panel-header-stacked">
+      <p class="nhrils-eyebrow">Distribution</p>
+      <h2 id="nhrils-distribution-title">Source, language, and type coverage</h2>
+    </div>
+    <div class="nhrils-distribution-grid">
+      {% for group in review.distribution_groups %}
+        <article>
+          <h3>{{ group.label }}</h3>
+          <p>{{ group.summary }}</p>
+          <dl class="nhrils-metadata-list">
+            {% for item in group["items"][:8] %}
+              <div>
+                <dt>{{ item.label }}</dt>
+                <dd>{{ item.count }} records</dd>
+              </div>
+            {% endfor %}
+          </dl>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section id="nhrils-subjects" class="nhrils-panel nhrils-seed-review-wide" aria-labelledby="nhrils-subject-cleanup-title">
     <div class="nhrils-panel-header">
       <div>
         <p class="nhrils-eyebrow">Subject cleanup</p>

@@ -112,9 +112,12 @@ class SeedCatalogueReviewResult:
 
     summary: dict[str, Any]
     review_actions: list[dict[str, Any]]
+    quality_sections: list[dict[str, Any]]
     readiness_checks: list[dict[str, Any]]
     records_missing_digital_access: list[dict[str, Any]]
+    records_missing_physical_holdings: list[dict[str, Any]]
     records_with_identifiers: list[dict[str, Any]]
+    distribution_groups: list[dict[str, Any]]
     source_distribution: list[dict[str, Any]]
     language_distribution: list[dict[str, Any]]
     subject_cleanup: list[dict[str, Any]]
@@ -331,6 +334,7 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
             if pid not in item_document_pids:
                 records_missing_physical_holdings.append(presented)
 
+        type_distribution = self._build_distribution(documents, "document_type")
         source_distribution = self._build_distribution(documents, "source")
         language_distribution = self._build_language_facets(documents)
         subject_cleanup = [
@@ -365,9 +369,28 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
         return SeedCatalogueReviewResult(
             summary=summary,
             review_actions=self._build_seed_review_actions(summary),
+            quality_sections=self._build_seed_quality_sections(summary),
             readiness_checks=self._build_seed_readiness_checks(summary),
             records_missing_digital_access=records_missing_digital_access[:10],
+            records_missing_physical_holdings=records_missing_physical_holdings[:10],
             records_with_identifiers=records_with_identifiers[:10],
+            distribution_groups=[
+                {
+                    "label": "Material type distribution",
+                    "summary": "Record categories represented in the seed bundle.",
+                    "items": type_distribution,
+                },
+                {
+                    "label": "Source distribution",
+                    "summary": "Origin systems and source lists represented in the seed bundle.",
+                    "items": source_distribution,
+                },
+                {
+                    "label": "Language distribution",
+                    "summary": "Language coverage currently detected from seed metadata.",
+                    "items": language_distribution,
+                },
+            ],
             source_distribution=source_distribution,
             language_distribution=language_distribution,
             subject_cleanup=subject_cleanup,
@@ -398,7 +421,7 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
                 "label": "Physical holdings missing",
                 "count": summary["physical_holdings_missing_count"],
                 "summary": "Confirm whether each record has no shelf copy or needs holdings added.",
-                "href": "#nhrils-readiness",
+                "href": "#nhrils-holdings",
                 "status": "Confirm",
             },
             {
@@ -407,6 +430,48 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
                 "summary": "Browse the full provisional catalogue dataset.",
                 "href": "/nhrils/catalogue/search",
                 "status": "Browse",
+            },
+        ]
+
+    def _build_seed_quality_sections(
+        self,
+        summary: Mapping[str, Any],
+    ) -> list[dict[str, Any]]:
+        """Return reviewer-owned metadata quality sections for the seed bundle."""
+        return [
+            {
+                "label": "Digital access cleanup",
+                "count": summary["records_needing_review"],
+                "status": "Needs review"
+                if summary["records_needing_review"]
+                else "Ready",
+                "summary": "Classify missing public, licensed, internal, or restricted access decisions.",
+                "href": "/nhrils/catalogue/search?availability=review",
+                "action_label": "Open records",
+            },
+            {
+                "label": "Identifier review",
+                "count": summary["identifier_record_count"],
+                "status": "Review",
+                "summary": "Confirm DOI, ISSN, ISBN, and local identifier consistency.",
+                "href": "#nhrils-identifiers",
+                "action_label": "Review identifiers",
+            },
+            {
+                "label": "Physical holdings",
+                "count": summary["physical_holdings_missing_count"],
+                "status": "Confirm",
+                "summary": "Decide whether a catalogue record needs a shelf copy, item, barcode, or no holding.",
+                "href": "#nhrils-holdings",
+                "action_label": "Review holdings",
+            },
+            {
+                "label": "Subject vocabulary",
+                "count": summary["subject_cleanup_count"],
+                "status": "Review",
+                "summary": "Normalize low-frequency terms before controlled vocabulary approval.",
+                "href": "#nhrils-subjects",
+                "action_label": "Review subjects",
             },
         ]
 
