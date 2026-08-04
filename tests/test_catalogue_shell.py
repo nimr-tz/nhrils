@@ -95,6 +95,31 @@ def test_catalogue_search_results_pagination_renders(client):
     assert b"size=5" in res.data
 
 
+def test_catalogue_search_result_links_preserve_result_context(client):
+    """Test record links carry the current search context as a safe return URL."""
+    res = client.get(
+        url_for("nhrils_catalogue_shell.catalogue_search_view"),
+        query_string={
+            "q": "malaria",
+            "availability": "online",
+            "language": "ENG",
+            "subject": "malaria",
+            "page": "2",
+            "size": "5",
+        },
+    )
+
+    assert res.status_code == 200
+    assert b"/nhrils/catalogue/records/" in res.data
+    assert b"return_to=" in res.data
+    assert b"/nhrils/catalogue/search%3Fq%3Dmalaria" in res.data
+    assert b"availability%3Donline" in res.data
+    assert b"language%3DENG" in res.data
+    assert b"subject%3Dmalaria" in res.data
+    assert b"page%3D2" in res.data
+    assert b"size%3D5" in res.data
+
+
 def test_catalogue_record_detail_shell_renders(client):
     """Test the NHRILS public review record detail shell."""
     res = client.get(
@@ -113,6 +138,59 @@ def test_catalogue_record_detail_shell_renders(client):
     assert b"Before production import" in res.data
     assert b"Confirm metadata" in res.data
     assert b"NIMR source page" in res.data
+
+
+def test_catalogue_record_detail_back_link_uses_safe_return_context(client):
+    """Test record detail back link returns to the previous result state."""
+    return_to = (
+        "/nhrils/catalogue/search?q=malaria&availability=online"
+        "&language=ENG&subject=malaria&page=2&size=5"
+    )
+    res = client.get(
+        url_for(
+            "nhrils_catalogue_shell.catalogue_record_view",
+            pid="nimr-doc-0001",
+        ),
+        query_string={"return_to": return_to},
+    )
+
+    assert res.status_code == 200
+    assert b"Back to results" in res.data
+    assert b"/nhrils/catalogue/search?q=malaria&amp;availability=online" in res.data
+    assert b"language=ENG" in res.data
+    assert b"subject=malaria" in res.data
+    assert b"page=2" in res.data
+    assert b"size=5" in res.data
+
+
+def test_catalogue_record_detail_rejects_external_return_context(client):
+    """Test external return URLs are not rendered into record detail links."""
+    res = client.get(
+        url_for(
+            "nhrils_catalogue_shell.catalogue_record_view",
+            pid="nimr-doc-0001",
+        ),
+        query_string={"return_to": "https://example.test/phishing"},
+    )
+
+    assert res.status_code == 200
+    assert b"https://example.test/phishing" not in res.data
+    assert b'href="/nhrils/catalogue/search"' in res.data
+
+
+def test_catalogue_record_detail_rejects_search_prefix_lookalike(client):
+    """Test non-search catalogue paths cannot be used as return targets."""
+    res = client.get(
+        url_for(
+            "nhrils_catalogue_shell.catalogue_record_view",
+            pid="nimr-doc-0001",
+        ),
+        query_string={"return_to": "/nhrils/catalogue/searchbad"},
+    )
+
+    assert res.status_code == 200
+    assert b"/nhrils/catalogue/searchbad" not in res.data
+    assert b'href="/nhrils/catalogue/search"' in res.data
 
 
 def test_catalogue_record_detail_unknown_pid_returns_404(client):
@@ -331,6 +409,7 @@ def test_catalogue_search_static_markup():
     assert "Browse the review seed catalogue" in shell
     assert "Search results pages" in shell
     assert "Showing {{ pagination.first_item }}-{{ pagination.last_item }}" in shell
+    assert "return_to={{ search_return_url|urlencode }}" in shell
     assert "/nhrils/catalogue/search" in shell
     assert "result.detail_url" in shell
     assert "Digital access" in shell
@@ -347,6 +426,7 @@ def test_catalogue_record_static_markup():
     ).read_text(encoding="utf-8")
 
     assert "Bibliographic metadata" in shell
+    assert 'href="{{ return_to }}"' in shell
     assert "Digital access available" in shell
     assert "Before production import" in shell
     assert "Confirm metadata" in shell

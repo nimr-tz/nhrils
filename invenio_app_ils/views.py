@@ -71,6 +71,7 @@ def catalogue_search_view():
     """Render the NHRILS catalogue search results shell from review seed data."""
     search_query = CatalogueSearchQuery.from_mapping(request.args)
     response = get_catalogue_search_backend().search(search_query)
+    search_return_url = request.full_path.rstrip("?")
 
     return render_template(
         "invenio_app_ils/catalogue_search.html",
@@ -80,6 +81,7 @@ def catalogue_search_view():
         results=response.results,
         facets=response.facets,
         pagination=response.pagination,
+        search_return_url=search_return_url,
         search_backend=response.backend,
     )
 
@@ -93,8 +95,19 @@ def catalogue_record_view(pid):
     return render_template(
         "invenio_app_ils/catalogue_record.html",
         record=response.record,
+        return_to=_safe_catalogue_return_url(request.args.get("return_to")),
         search_backend=response.backend,
     )
+
+
+def _safe_catalogue_return_url(value):
+    """Return a safe catalogue search back link."""
+    if value and (
+        value == "/nhrils/catalogue/search"
+        or value.startswith("/nhrils/catalogue/search?")
+    ):
+        return value
+    return "/nhrils/catalogue/search"
 
 
 def create_logged_out_blueprint(app):

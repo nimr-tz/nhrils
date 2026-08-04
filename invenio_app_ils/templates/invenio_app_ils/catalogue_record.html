@@ -23,7 +23,7 @@
 
   <section class="nhrils-record-detail-layout">
     <article class="nhrils-panel nhrils-record-detail-main">
-      <a class="nhrils-inline-action" href="/nhrils/catalogue/search">Back to results</a>
+      <a class="nhrils-inline-action" href="{{ return_to }}">Back to results</a>
       <p class="nhrils-eyebrow">Review record · {{ record.document_type }} · {{ record.publication_year }}</p>
       <h1 id="nhrils-record-title">{{ record.title }}</h1>
       {% if record.all_authors %}
