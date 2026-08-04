@@ -134,10 +134,34 @@ def test_catalogue_record_detail_shell_renders(client):
     assert b"Artemisinin-resistant malaria in Africa demands urgent action" in res.data
     assert b"Mehul Dhorda" in res.data
     assert b"Digital access available" in res.data
+    assert b"Availability and access" in res.data
+    assert b"View online" in res.data
+    assert b"Request item" in res.data
+    assert b"Ask librarian" in res.data
+    assert b"No physical holding attached" in res.data
+    assert b"Request workflow will be enabled" in res.data
     assert b"Bibliographic metadata" in res.data
     assert b"Before production import" in res.data
     assert b"Confirm metadata" in res.data
     assert b"NIMR source page" in res.data
+
+
+def test_catalogue_record_detail_review_only_access_panel(client):
+    """Test review-only records show disabled access actions honestly."""
+    res = client.get(
+        url_for(
+            "nhrils_catalogue_shell.catalogue_record_view",
+            pid="nimr-doc-0004",
+        )
+    )
+
+    assert res.status_code == 200
+    assert b"Metadata review required" in res.data
+    assert b"No digital access link is attached" in res.data
+    assert b"Not attached" in res.data
+    assert b"nhrils-button-disabled" in res.data
+    assert b"Request workflow will be enabled" in res.data
+    assert b"Librarian contact workflow is pending" in res.data
 
 
 def test_catalogue_record_detail_back_link_uses_safe_return_context(client):
@@ -344,8 +368,26 @@ def test_seed_catalogue_search_backend_record_detail():
     assert response.backend == "seed-review"
     assert response.record["pid"] == "nimr-doc-0001"
     assert response.record["has_online_access"]
+    assert response.record["access"]["status"]["label"] == "Digital access available"
+    assert response.record["access"]["online_url"]
+    assert not response.record["access"]["request"]["enabled"]
+    assert not response.record["access"]["contact"]["enabled"]
     assert response.record["all_authors"]
     assert response.record["urls"]
+
+
+def test_seed_catalogue_search_backend_record_detail_without_eitem():
+    """Test access shaping for records without attached digital e-items."""
+    response = SeedCatalogueSearchBackend().get_record("nimr-doc-0004")
+
+    assert response is not None
+    assert not response.record["has_online_access"]
+    assert response.record["access"]["status"]["label"] == "Metadata review required"
+    assert response.record["access"]["online_url"] is None
+    assert response.record["access"]["physical_holding"]["label"] == (
+        "No physical holding attached"
+    )
+    assert not response.record["urls"]
 
 
 def test_native_catalogue_search_backend_is_explicitly_gated():
@@ -427,7 +469,13 @@ def test_catalogue_record_static_markup():
 
     assert "Bibliographic metadata" in shell
     assert 'href="{{ return_to }}"' in shell
-    assert "Digital access available" in shell
+    assert "Availability and access" in shell
+    assert "record.access.status.label" in shell
+    assert "View online" in shell
+    assert "record.access.request.label" in shell
+    assert "record.access.contact.label" in shell
+    assert "record.access.physical_holding.label" in shell
+    assert "record.access.contact.summary" in shell
     assert "Before production import" in shell
     assert "Confirm metadata" in shell
     assert "Confirm access" in shell

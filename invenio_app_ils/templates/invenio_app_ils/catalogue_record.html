@@ -43,13 +43,41 @@
     <aside class="nhrils-panel nhrils-record-summary" aria-labelledby="nhrils-record-summary-title">
       <div class="nhrils-panel-header nhrils-panel-header-stacked">
         <p class="nhrils-eyebrow">Access</p>
-        <h2 id="nhrils-record-summary-title">Record status</h2>
+        <h2 id="nhrils-record-summary-title">Availability and access</h2>
       </div>
-      {% if record.has_online_access %}
-        <span class="nhrils-access-chip nhrils-access-chip-online">Digital access available</span>
-      {% else %}
-        <span class="nhrils-access-chip">Review record only</span>
-      {% endif %}
+      <div class="nhrils-access-state nhrils-access-state-{{ record.access.status.tone }}">
+        <span class="nhrils-access-chip{% if record.access.status.tone == 'online' %} nhrils-access-chip-online{% endif %}">
+          {{ record.access.status.label }}
+        </span>
+        <p>{{ record.access.status.summary }}</p>
+      </div>
+      <div class="nhrils-access-actions" aria-label="Record access actions">
+        {% if record.access.online_url %}
+          <a class="nhrils-button nhrils-button-primary" href="{{ record.access.online_url.value }}">View online</a>
+        {% else %}
+          <span class="nhrils-button nhrils-button-disabled" aria-disabled="true">View online</span>
+        {% endif %}
+        <span class="nhrils-button nhrils-button-disabled" aria-disabled="true">{{ record.access.request.label }}</span>
+        <span class="nhrils-button nhrils-button-disabled" aria-disabled="true">{{ record.access.contact.label }}</span>
+      </div>
+      <dl class="nhrils-access-checks">
+        <div>
+          <dt>Digital source</dt>
+          <dd>{{ record.access.online_url.description if record.access.online_url else "Not attached" }}</dd>
+        </div>
+        <div>
+          <dt>Physical holding</dt>
+          <dd>{{ record.access.physical_holding.label }}</dd>
+        </div>
+        <div>
+          <dt>Request status</dt>
+          <dd>{{ record.access.request.summary }}</dd>
+        </div>
+        <div>
+          <dt>Librarian support</dt>
+          <dd>{{ record.access.contact.summary }}</dd>
+        </div>
+      </dl>
       <dl class="nhrils-metadata-list">
         <div>
           <dt>Local PID</dt>

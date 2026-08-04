@@ -288,6 +288,7 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
         )
         presented.update(
             {
+                "access": self._present_access(eitems),
                 "all_authors": [
                     author.get("full_name", "")
                     for author in document.get("authors", [])
@@ -304,6 +305,55 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
             }
         )
         return presented
+
+    def _present_access(self, eitems: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+        """Shape access and availability state for the catalogue detail page."""
+        urls = [
+            url
+            for eitem in eitems
+            for url in eitem.get("urls", [])
+            if url.get("value")
+        ]
+        primary_url = urls[0] if urls else None
+        if primary_url:
+            status = {
+                "tone": "online",
+                "label": "Digital access available",
+                "summary": "A public online source is attached to this review record.",
+            }
+        else:
+            status = {
+                "tone": "review",
+                "label": "Metadata review required",
+                "summary": "No digital access link is attached to this review record yet.",
+            }
+
+        return {
+            "status": status,
+            "online_url": primary_url,
+            "physical_holding": {
+                "label": "No physical holding attached",
+                "summary": (
+                    "Physical item, barcode, shelf, and circulation details are "
+                    "not yet part of the review seed."
+                ),
+            },
+            "request": {
+                "enabled": False,
+                "label": "Request item",
+                "summary": (
+                    "Request workflow will be enabled after holdings and circulation "
+                    "rules are approved."
+                ),
+            },
+            "contact": {
+                "enabled": False,
+                "label": "Ask librarian",
+                "summary": (
+                    "Librarian contact workflow is pending NIMR service desk routing."
+                ),
+            },
+        }
 
     def _build_count_facets(
         self,

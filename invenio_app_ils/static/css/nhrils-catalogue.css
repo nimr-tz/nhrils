@@ -497,6 +497,71 @@
   gap: 18px;
 }
 
+.nhrils-access-state {
+  border: 1px solid var(--nhrils-border);
+  border-radius: var(--nhrils-radius-md);
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.nhrils-access-state-online {
+  background: var(--nhrils-green-100);
+  border-color: #bfdfcc;
+}
+
+.nhrils-access-state-review {
+  background: #fffaf0;
+  border-color: #eadca9;
+}
+
+.nhrils-access-state p {
+  margin: 0;
+}
+
+.nhrils-access-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.nhrils-access-actions .nhrils-button {
+  width: 100%;
+}
+
+.nhrils-button-disabled {
+  background: #f2f5f3;
+  border: 1px solid var(--nhrils-border);
+  color: var(--nhrils-muted);
+  cursor: not-allowed;
+}
+
+.nhrils-access-checks {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.nhrils-access-checks div {
+  background: #f9fcfa;
+  border: 1px solid var(--nhrils-border);
+  border-radius: var(--nhrils-radius-sm);
+  padding: 10px;
+}
+
+.nhrils-access-checks dt {
+  color: var(--nhrils-blue-900);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.nhrils-access-checks dd {
+  color: var(--nhrils-muted);
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 4px 0 0;
+}
+
 .nhrils-metadata-list {
   display: grid;
   gap: 12px;
