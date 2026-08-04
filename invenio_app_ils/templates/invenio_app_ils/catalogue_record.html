@@ -15,14 +15,30 @@
       {% if record.all_authors %}
         <p class="nhrils-result-authors">{{ record.all_authors|join("; ") }}</p>
       {% endif %}
-      <p>{{ record.abstract }}</p>
+
+      <dl class="nhrils-record-fact-grid" aria-label="Record summary">
+        {% for item in record.summary_items %}
+          <div>
+            <dt>{{ item.label }}</dt>
+            <dd>{{ item.value }}</dd>
+          </div>
+        {% endfor %}
+      </dl>
+
+      <div class="nhrils-record-section">
+        <h2>Abstract</h2>
+        <p>{{ record.abstract }}</p>
+      </div>
 
       {% if record.keywords %}
-        <div class="nhrils-result-tags" aria-label="Subjects">
-          {% for keyword in record.keywords %}
-            <span>{{ keyword }}</span>
-          {% endfor %}
-        </div>
+        <section class="nhrils-record-section" aria-labelledby="nhrils-record-subjects">
+          <h2 id="nhrils-record-subjects">Subjects</h2>
+          <div class="nhrils-result-tags">
+            {% for keyword in record.keywords %}
+              <span>{{ keyword }}</span>
+            {% endfor %}
+          </div>
+        </section>
       {% endif %}
     </article>
 
@@ -38,8 +54,8 @@
         <p>{{ record.access.status.summary }}</p>
       </div>
       <div class="nhrils-access-actions" aria-label="Record access actions">
-        {% if record.access.online_url %}
-          <a class="nhrils-button nhrils-button-primary" href="{{ record.access.online_url.value }}">View online</a>
+        {% if record.primary_link %}
+          <a class="nhrils-button nhrils-button-primary" href="{{ record.primary_link.href }}" target="_blank" rel="noopener noreferrer">View online</a>
         {% else %}
           <span class="nhrils-button nhrils-button-disabled" aria-disabled="true">View online</span>
         {% endif %}
@@ -49,7 +65,7 @@
       <dl class="nhrils-access-checks">
         <div>
           <dt>Digital source</dt>
-          <dd>{{ record.access.online_url.description if record.access.online_url else "Not attached" }}</dd>
+          <dd>{{ record.primary_link.label if record.primary_link else "Not attached" }}</dd>
         </div>
         <div>
           <dt>Physical holding</dt>
@@ -64,20 +80,6 @@
           <dd>{{ record.access.contact.summary }}</dd>
         </div>
       </dl>
-      <dl class="nhrils-metadata-list">
-        <div>
-          <dt>Local PID</dt>
-          <dd>{{ record.pid }}</dd>
-        </div>
-        <div>
-          <dt>Source</dt>
-          <dd>{{ record.source }}</dd>
-        </div>
-        <div>
-          <dt>Language</dt>
-          <dd>{{ record.languages|join(", ") if record.languages else "Not specified" }}</dd>
-        </div>
-      </dl>
     </aside>
   </section>
 
@@ -88,11 +90,17 @@
         <h2>Identifiers and access links</h2>
       </div>
       <dl class="nhrils-metadata-list nhrils-metadata-list-wide">
-        {% if record.identifiers %}
-          {% for identifier in record.identifiers %}
+        {% if record.identifier_items %}
+          {% for identifier in record.identifier_items %}
             <div>
               <dt>{{ identifier.scheme }}</dt>
-              <dd>{{ identifier.value }}</dd>
+              <dd>
+                {% if identifier.href %}
+                  <a href="{{ identifier.href }}" target="_blank" rel="noopener noreferrer">{{ identifier.value }}</a>
+                {% else %}
+                  {{ identifier.value }}
+                {% endif %}
+              </dd>
             </div>
           {% endfor %}
         {% else %}
@@ -102,11 +110,11 @@
           </div>
         {% endif %}
 
-        {% if record.urls %}
-          {% for url in record.urls %}
+        {% if record.link_items %}
+          {% for url in record.link_items %}
             <div>
-              <dt>{{ url.description or "Digital link" }}</dt>
-              <dd><a href="{{ url.value }}">{{ url.value }}</a></dd>
+              <dt>{{ url.label }}</dt>
+              <dd><a href="{{ url.href }}" target="_blank" rel="noopener noreferrer">{{ url.href }}</a></dd>
             </div>
           {% endfor %}
         {% else %}

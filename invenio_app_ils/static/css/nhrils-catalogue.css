@@ -624,6 +624,50 @@
   margin: 8px 0 12px;
 }
 
+.nhrils-record-fact-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin: 18px 0 20px;
+}
+
+.nhrils-record-fact-grid div {
+  background: #f9fcfa;
+  border: 1px solid var(--nhrils-border);
+  border-radius: var(--nhrils-radius-sm);
+  min-height: 78px;
+  padding: 10px;
+}
+
+.nhrils-record-fact-grid dt {
+  color: var(--nhrils-muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.nhrils-record-fact-grid dd {
+  color: var(--nhrils-ink);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 6px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.nhrils-record-section {
+  border-top: 1px solid var(--nhrils-border);
+  margin-top: 18px;
+  padding-top: 18px;
+}
+
+.nhrils-record-section h2 {
+  color: var(--nhrils-blue-900);
+  font-size: 16px;
+  line-height: 1.3;
+  margin: 0 0 8px;
+}
+
 .nhrils-record-summary {
   display: grid;
   gap: 18px;
@@ -1277,6 +1321,7 @@
 
   .nhrils-grid-four,
   .nhrils-content-grid,
+  .nhrils-record-fact-grid,
   .nhrils-collection-grid,
   .nhrils-review-action-grid,
   .nhrils-review-chip-list {

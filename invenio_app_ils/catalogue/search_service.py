@@ -568,7 +568,12 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
                     for author in document.get("authors", [])
                 ],
                 "identifiers": document.get("identifiers", []),
+                "identifier_items": self._present_identifier_items(
+                    document.get("identifiers", [])
+                ),
                 "languages": document.get("languages", []),
+                "language_label": ", ".join(self._document_languages(document))
+                or "Not specified",
                 "source": document.get("source", "NIMR seed bundle"),
                 "urls": [
                     url
@@ -578,6 +583,11 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
                 ],
             }
         )
+        presented["link_items"] = self._present_link_items(presented["urls"])
+        presented["primary_link"] = (
+            presented["link_items"][0] if presented["link_items"] else None
+        )
+        presented["summary_items"] = self._present_record_summary_items(presented)
         return presented
 
     def _eitems_by_document_pid(
@@ -681,6 +691,75 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
             elif value:
                 values.append(value)
         return values
+
+    def _present_identifier_items(
+        self,
+        identifiers: Sequence[Mapping[str, Any]],
+    ) -> list[dict[str, str]]:
+        """Return identifier objects shaped for record detail display."""
+        items = []
+        for identifier in identifiers:
+            scheme = str(identifier.get("scheme", "")).strip() or "Identifier"
+            value = str(identifier.get("value", "")).strip()
+            if not value:
+                continue
+            items.append(
+                {
+                    "scheme": scheme.upper(),
+                    "value": value,
+                    "href": "https://doi.org/{}".format(value)
+                    if scheme.lower() == "doi"
+                    else "",
+                }
+            )
+        return items
+
+    def _present_link_items(
+        self,
+        urls: Sequence[Mapping[str, Any]],
+    ) -> list[dict[str, str]]:
+        """Return access links shaped for record detail display."""
+        items = []
+        for url in urls:
+            value = str(url.get("value", "")).strip()
+            if not value:
+                continue
+            items.append(
+                {
+                    "label": str(url.get("description", "")).strip()
+                    or "Digital source",
+                    "href": value,
+                }
+            )
+        return items
+
+    def _present_record_summary_items(
+        self,
+        record: Mapping[str, Any],
+    ) -> list[dict[str, str]]:
+        """Return high-value record facts for compact scanning."""
+        return [
+            {
+                "label": "Type",
+                "value": str(record.get("document_type", "Document")),
+            },
+            {
+                "label": "Year",
+                "value": str(record.get("publication_year", "Unknown year")),
+            },
+            {
+                "label": "Source",
+                "value": str(record.get("source", "NIMR seed bundle")),
+            },
+            {
+                "label": "Language",
+                "value": str(record.get("language_label", "Not specified")),
+            },
+            {
+                "label": "Local PID",
+                "value": str(record.get("pid", "")),
+            },
+        ]
 
     def _build_distribution(
         self,

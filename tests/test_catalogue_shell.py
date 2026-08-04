@@ -276,6 +276,12 @@ def test_catalogue_record_detail_shell_renders(client):
     assert b"Digital access available" in res.data
     assert b"Availability and access" in res.data
     assert b"View online" in res.data
+    assert b"Record summary" in res.data
+    assert b"Abstract" in res.data
+    assert b"Subjects" in res.data
+    assert b"Local PID" in res.data
+    assert b"Language" in res.data
+    assert b"rel=\"noopener noreferrer\"" in res.data
     assert b"Request item" in res.data
     assert b"Ask librarian" in res.data
     assert b"No physical holding attached" in res.data
@@ -284,6 +290,23 @@ def test_catalogue_record_detail_shell_renders(client):
     assert b"Before production import" in res.data
     assert b"Confirm metadata" in res.data
     assert b"NIMR source page" in res.data
+
+
+def test_catalogue_record_detail_identifier_links_render(client):
+    """Test DOI identifiers are rendered as safe external links."""
+    res = client.get(
+        url_for(
+            "nhrils_catalogue_shell.catalogue_record_view",
+            pid="nimr-doc-0002",
+        )
+    )
+
+    assert res.status_code == 200
+    assert b"DOI" in res.data
+    assert b"10.1101/2023.11.07.23298207" in res.data
+    assert b"https://doi.org/10.1101/2023.11.07.23298207" in res.data
+    assert b"target=\"_blank\"" in res.data
+    assert b"rel=\"noopener noreferrer\"" in res.data
 
 
 def test_catalogue_record_detail_review_only_access_panel(client):
@@ -695,8 +718,35 @@ def test_seed_catalogue_search_backend_record_detail():
     assert response.record["access"]["online_url"]
     assert not response.record["access"]["request"]["enabled"]
     assert not response.record["access"]["contact"]["enabled"]
+    assert response.record["primary_link"] == {
+        "label": "NIMR source page",
+        "href": "https://nimr.or.tz/publications/",
+    }
+    assert response.record["link_items"] == [response.record["primary_link"]]
+    assert response.record["language_label"] == "ENG"
+    assert response.record["summary_items"] == [
+        {"label": "Type", "value": "ARTICLE"},
+        {"label": "Year", "value": "2026"},
+        {"label": "Source", "value": "NIMR Publications"},
+        {"label": "Language", "value": "ENG"},
+        {"label": "Local PID", "value": "nimr-doc-0001"},
+    ]
     assert response.record["all_authors"]
     assert response.record["urls"]
+
+
+def test_seed_catalogue_search_backend_record_detail_identifier_items():
+    """Test identifier shaping for catalogue detail records."""
+    response = SeedCatalogueSearchBackend().get_record("nimr-doc-0002")
+
+    assert response is not None
+    assert response.record["identifier_items"] == [
+        {
+            "scheme": "DOI",
+            "value": "10.1101/2023.11.07.23298207",
+            "href": "https://doi.org/10.1101/2023.11.07.23298207",
+        }
+    ]
 
 
 def test_seed_catalogue_search_backend_record_detail_without_eitem():
@@ -707,6 +757,8 @@ def test_seed_catalogue_search_backend_record_detail_without_eitem():
     assert not response.record["has_online_access"]
     assert response.record["access"]["status"]["label"] == "Metadata review required"
     assert response.record["access"]["online_url"] is None
+    assert response.record["primary_link"] is None
+    assert response.record["link_items"] == []
     assert response.record["access"]["physical_holding"]["label"] == (
         "No physical holding attached"
     )
@@ -811,9 +863,18 @@ def test_catalogue_record_static_markup():
 
     assert "Bibliographic metadata" in shell
     assert 'href="{{ return_to }}"' in shell
+    assert "nhrils-record-fact-grid" in shell
+    assert "record.summary_items" in shell
+    assert "Record summary" in shell
+    assert "Abstract" in shell
+    assert "Subjects" in shell
     assert "Availability and access" in shell
     assert "record.access.status.label" in shell
     assert "View online" in shell
+    assert "record.primary_link" in shell
+    assert "record.identifier_items" in shell
+    assert "record.link_items" in shell
+    assert "noopener noreferrer" in shell
     assert "record.access.request.label" in shell
     assert "record.access.contact.label" in shell
     assert "record.access.physical_holding.label" in shell
