@@ -1,0 +1,517 @@
+{
+  "bundle": {
+    "name": "nimr-publications-seed",
+    "description": "Provisional NHRILS seed catalogue records prepared from NIMR website publication pages for MVP search and discovery testing.",
+    "prepared_at": "2026-08-04",
+    "source_pages": [
+      "https://nimr.or.tz/",
+      "https://nimr.or.tz/publications/",
+      "https://nimr.or.tz/annual-reports/",
+      "https://nimr.or.tz/recent-policy-briefs/",
+      "https://nimr.or.tz/book-chapter/",
+      "https://nimr.or.tz/conference-proceedings-2/",
+      "https://nimr.or.tz/newsletter/"
+    ],
+    "limitations": [
+      "This is a demonstrator seed bundle, not an authoritative library import.",
+      "Some NIMR publication dropdown pages intermittently returned verification pages to the crawler; blocked pages are represented only where search-visible page content exposed concrete titles.",
+      "Records should be reviewed by NIMR library/documentation staff before production import.",
+      "No patron, circulation, permission, schema, migration, or OpenSearch mapping change is implied by this file."
+    ],
+    "native_invenioils_entities": [
+      "documents",
+      "eitems",
+      "locations",
+      "internal_locations"
+    ]
+  },
+  "locations": [
+    {
+      "pid": "nhrils-loc-hq",
+      "name": "NIMR Library",
+      "opening_weekdays": [
+        {"weekday": "monday", "is_open": true},
+        {"weekday": "tuesday", "is_open": true},
+        {"weekday": "wednesday", "is_open": true},
+        {"weekday": "thursday", "is_open": true},
+        {"weekday": "friday", "is_open": true},
+        {"weekday": "saturday", "is_open": false},
+        {"weekday": "sunday", "is_open": false}
+      ],
+      "opening_exceptions": []
+    }
+  ],
+  "internal_locations": [
+    {
+      "pid": "nhrils-iloc-digital",
+      "location_pid": "nhrils-loc-hq",
+      "name": "Digital Publications"
+    },
+    {
+      "pid": "nhrils-iloc-reference",
+      "location_pid": "nhrils-loc-hq",
+      "name": "Reference Collection"
+    }
+  ],
+  "documents": [
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0001",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "Artemisinin-resistant malaria in Africa demands urgent action",
+      "authors": [
+        {"full_name": "Mehul Dhorda"},
+        {"full_name": "Akira Kaneko"},
+        {"full_name": "Ryuichi Komatsu"},
+        {"full_name": "Salum Mshamu"},
+        {"full_name": "Samwel Gesase"},
+        {"full_name": "Lorenz von Seidlein"}
+      ],
+      "abstract": "NIMR website-listed peer reviewed publication for health research catalogue discovery testing.",
+      "document_type": "ARTICLE",
+      "publication_year": "2026",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "malaria"}, {"source": "NIMR", "value": "artemisinin resistance"}],
+      "source": "NIMR Publications"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0002",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "Country wide surveillance reveals prevalent artemisinin partial resistance mutations with evidence for multiple origins and expansion of sulfadoxine-pyrimethamine resistance mutations in northwest Tanzania",
+      "authors": [
+        {"full_name": "Jonathan J. Juliano"},
+        {"full_name": "David J. Giesbrecht"},
+        {"full_name": "Beatus M. Lyimo"},
+        {"full_name": "Catherine Bakari"},
+        {"full_name": "Rashid A. Madebe"},
+        {"full_name": "Deus S. Ishengoma"}
+      ],
+      "abstract": "NIMR website-listed peer reviewed publication with DOI metadata exposed on the source page.",
+      "document_type": "ARTICLE",
+      "publication_year": "2023",
+      "languages": ["ENG"],
+      "identifiers": [{"scheme": "DOI", "value": "10.1101/2023.11.07.23298207"}],
+      "keywords": [{"source": "NIMR", "value": "malaria"}, {"source": "NIMR", "value": "surveillance"}],
+      "source": "NIMR Publications"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0003",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "Tanzania Journal of Health Research",
+      "authors": [{"full_name": "National Institute for Medical Research", "type": "INSTITUTION"}],
+      "abstract": "Journal link exposed from the NIMR publications and related links areas.",
+      "document_type": "SERIAL_ISSUE",
+      "publication_year": "2026",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "journal"}, {"source": "NIMR", "value": "health research"}],
+      "source": "NIMR Publications"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0004",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "Age-group associations of schistosomiasis prevalence from trial data, Cote d'Ivoire, Kenya and the United Republic of Tanzania",
+      "authors": [
+        {"full_name": "Ryan E. Wiegand"},
+        {"full_name": "Maurice R. Odiere"},
+        {"full_name": "Safari Kinung'hi"},
+        {"full_name": "Eliezer K. N'Goran"},
+        {"full_name": "Pauline Mwinzi"},
+        {"full_name": "W. Evan Secor"}
+      ],
+      "abstract": "NIMR website-listed peer reviewed publication for regional disease prevalence discovery testing.",
+      "document_type": "ARTICLE",
+      "publication_year": "2026",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "schistosomiasis"}, {"source": "NIMR", "value": "trial data"}],
+      "source": "NIMR Publications"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0005",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "Infection prevention and control of highly infectious pathogens in resource-limited countries: an experience from Marburg viral disease outbreak in Kagera Region - Tanzania",
+      "authors": [
+        {"full_name": "Erick Kinyenje"},
+        {"full_name": "Joseph Hokororo"},
+        {"full_name": "Ruth Ngowi"},
+        {"full_name": "Michael Kiremeji"},
+        {"full_name": "Tumaini Nagu"}
+      ],
+      "abstract": "NIMR website-listed peer reviewed publication on infection prevention and outbreak response.",
+      "document_type": "ARTICLE",
+      "publication_year": "2026",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "infection prevention"}, {"source": "NIMR", "value": "Marburg"}],
+      "source": "NIMR Publications"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0006",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "High prevalence and risk of malaria among asymptomatic individuals from villages with high prevalence of artemisinin partial resistance in Kyerwa district of Kagera region, north-western Tanzania",
+      "authors": [
+        {"full_name": "Salehe S. Mandai"},
+        {"full_name": "Filbert Francis"},
+        {"full_name": "Daniel P. Challe"},
+        {"full_name": "Misago D. Seth"},
+        {"full_name": "Deus S. Ishengoma"}
+      ],
+      "abstract": "NIMR website-listed peer reviewed publication on malaria prevalence and resistance risk.",
+      "document_type": "ARTICLE",
+      "publication_year": "2026",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "malaria"}, {"source": "NIMR", "value": "Kagera"}],
+      "source": "NIMR Publications"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0007",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "Evidence of artemisinin partial resistance in North-western Tanzania: clinical and drug resistance markers study",
+      "authors": [
+        {"full_name": "Deus Simon Ishengoma"},
+        {"full_name": "Celine Isaack Mandara"},
+        {"full_name": "Catherine Bakari"},
+        {"full_name": "Rashid A. Madebe"},
+        {"full_name": "Jonathan J. Juliano"}
+      ],
+      "abstract": "NIMR website-listed peer reviewed publication with DOI metadata exposed on the source page.",
+      "document_type": "ARTICLE",
+      "publication_year": "2024",
+      "languages": ["ENG"],
+      "identifiers": [{"scheme": "DOI", "value": "10.1101/2024.01.31.24301954"}],
+      "keywords": [{"source": "NIMR", "value": "malaria"}, {"source": "NIMR", "value": "drug resistance"}],
+      "source": "NIMR Publications"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0008",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "Plasmodium falciparum pfhrp2 and pfhrp3 Gene Deletions Among Patients Enrolled at 100 Health Facilities Throughout Tanzania: February to July 2021",
+      "authors": [
+        {"full_name": "Eric Rogier"},
+        {"full_name": "Nastassia Battle"},
+        {"full_name": "Catherine Bakari"},
+        {"full_name": "Misago D. Seth"},
+        {"full_name": "Deus S. Ishengoma"}
+      ],
+      "abstract": "NIMR website-listed peer reviewed publication with DOI metadata exposed on the source page.",
+      "document_type": "ARTICLE",
+      "publication_year": "2023",
+      "languages": ["ENG"],
+      "identifiers": [{"scheme": "DOI", "value": "10.1101/2023.07.29.23293322"}],
+      "keywords": [{"source": "NIMR", "value": "Plasmodium falciparum"}, {"source": "NIMR", "value": "gene deletions"}],
+      "source": "NIMR Publications"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0009",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "Malaria Species Positivity Rates Among Symptomatic Individuals Across Regions of Differing Transmission Intensities in Mainland Tanzania",
+      "authors": [
+        {"full_name": "Zachary R. Popkin-Hall"},
+        {"full_name": "Misago D. Seth"},
+        {"full_name": "Rashid A. Madebe"},
+        {"full_name": "Filbert Francis"},
+        {"full_name": "Deus S. Ishengoma"}
+      ],
+      "abstract": "NIMR website-listed peer reviewed publication on malaria species positivity rates.",
+      "document_type": "ARTICLE",
+      "publication_year": "2026",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "malaria"}, {"source": "NIMR", "value": "transmission intensity"}],
+      "source": "NIMR Publications"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0010",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "Implication research of a cluster randomized trial evaluating the implementation and effectiveness of intermittent preventive treatment for malaria using dihydroartemisinin-piperaquine on reducing malaria burden in school-aged children in Tanzania: methodology, challenges, and mitigation",
+      "authors": [
+        {"full_name": "Geofrey Makenga"},
+        {"full_name": "Misago D. Seth"},
+        {"full_name": "Vito Baraka"},
+        {"full_name": "Bruno P. Mmbando"},
+        {"full_name": "John P. A. Lusingu"}
+      ],
+      "abstract": "NIMR website-listed peer reviewed publication on implementation and effectiveness of malaria preventive treatment.",
+      "document_type": "ARTICLE",
+      "publication_year": "2026",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "malaria"}, {"source": "NIMR", "value": "school-aged children"}],
+      "source": "NIMR Publications"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0011",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "Report of the CAG for the Year Ended 30th June 2024",
+      "authors": [{"full_name": "National Institute for Medical Research", "type": "INSTITUTION"}],
+      "abstract": "Annual report title listed under NIMR Annual Reports.",
+      "document_type": "STANDARD",
+      "publication_year": "2024",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "annual report"}, {"source": "NIMR", "value": "audit"}],
+      "source": "NIMR Annual Reports"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0012",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "Report of the CAG for the Year Ended 30th June 2023",
+      "authors": [{"full_name": "National Institute for Medical Research", "type": "INSTITUTION"}],
+      "abstract": "Annual report title listed under NIMR Annual Reports.",
+      "document_type": "STANDARD",
+      "publication_year": "2023",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "annual report"}, {"source": "NIMR", "value": "audit"}],
+      "source": "NIMR Annual Reports"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0013",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "NIMR Annual Report (2018/2019)",
+      "authors": [{"full_name": "National Institute for Medical Research", "type": "INSTITUTION"}],
+      "abstract": "Annual report title listed under NIMR Annual Reports.",
+      "document_type": "STANDARD",
+      "publication_year": "2019",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "annual report"}],
+      "source": "NIMR Annual Reports"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0014",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "NIMR Annual Report (2017/2018)",
+      "authors": [{"full_name": "National Institute for Medical Research", "type": "INSTITUTION"}],
+      "abstract": "Annual report title listed under NIMR Annual Reports.",
+      "document_type": "STANDARD",
+      "publication_year": "2018",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "annual report"}],
+      "source": "NIMR Annual Reports"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0015",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "The Use of Intermittent Preventive Treatment for Reducing Malaria Burden in School-aged Children in Moderate and High Endemic Areas in Tanzania",
+      "authors": [{"full_name": "National Institute for Medical Research", "type": "INSTITUTION"}],
+      "abstract": "Policy brief title listed under Recent Policy Briefs.",
+      "document_type": "STANDARD",
+      "publication_year": "2026",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "policy brief"}, {"source": "NIMR", "value": "malaria"}],
+      "source": "NIMR Recent Policy Briefs"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0016",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "Introduction of Point-Of-Care (POC) virological testing for pregnant and breastfeeding women and Early Infant Diagnosis (EID) in Tanzania",
+      "authors": [{"full_name": "National Institute for Medical Research", "type": "INSTITUTION"}],
+      "abstract": "Policy brief title listed under Recent Policy Briefs.",
+      "document_type": "STANDARD",
+      "publication_year": "2026",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "policy brief"}, {"source": "NIMR", "value": "virological testing"}],
+      "source": "NIMR Recent Policy Briefs"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0017",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "HIV Prevention in School Going Adolescents in Tanzania",
+      "authors": [{"full_name": "National Institute for Medical Research", "type": "INSTITUTION"}],
+      "abstract": "Policy brief title listed under Recent Policy Briefs.",
+      "document_type": "STANDARD",
+      "publication_year": "2026",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "policy brief"}, {"source": "NIMR", "value": "HIV prevention"}],
+      "source": "NIMR Recent Policy Briefs"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0018",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "Integrating depression screening at Care and Treatment Centers in Tanzania",
+      "authors": [{"full_name": "National Institute for Medical Research", "type": "INSTITUTION"}],
+      "abstract": "Policy brief title listed under Recent Policy Briefs.",
+      "document_type": "STANDARD",
+      "publication_year": "2026",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "policy brief"}, {"source": "NIMR", "value": "depression screening"}],
+      "source": "NIMR Recent Policy Briefs"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0019",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "Policy-brief-authors-and-titles",
+      "authors": [{"full_name": "National Institute for Medical Research", "type": "INSTITUTION"}],
+      "abstract": "Index/listing item exposed on the NIMR Recent Policy Briefs page.",
+      "document_type": "STANDARD",
+      "publication_year": "2026",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "policy brief"}, {"source": "NIMR", "value": "publication list"}],
+      "source": "NIMR Recent Policy Briefs"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0020",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "Cooperative provenance research. Amani Kukita Kung'oa",
+      "authors": [
+        {"full_name": "WN Kisinza"},
+        {"full_name": "PE Mangesho"},
+        {"full_name": "S. Mollers"},
+        {"full_name": "V. Mwingira"},
+        {"full_name": "A. Schmidt"},
+        {"full_name": "L. Steinkampf"}
+      ],
+      "abstract": "Book chapter listed on the NIMR Book Chapter page: Amani Kukita Kung'oa, pages 21-28.",
+      "document_type": "BOOK",
+      "publication_year": "2025",
+      "languages": ["ENG"],
+      "identifiers": [{"scheme": "ISBN", "value": "978-3-98741-186-1"}],
+      "keywords": [{"source": "NIMR", "value": "book chapter"}, {"source": "NIMR", "value": "Amani"}],
+      "source": "NIMR Book Chapter"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0021",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "31st AJSC Proceedings",
+      "authors": [{"full_name": "National Institute for Medical Research", "type": "INSTITUTION"}],
+      "abstract": "Conference proceeding listed on the NIMR Conference Proceedings page.",
+      "document_type": "PROCEEDINGS",
+      "publication_year": "2026",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "conference proceedings"}],
+      "source": "NIMR Conference Proceedings"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0022",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "The First National Non-Communicable Disease Conference",
+      "authors": [{"full_name": "National Institute for Medical Research", "type": "INSTITUTION"}],
+      "abstract": "Conference proceeding listed on the NIMR Conference Proceedings page.",
+      "document_type": "PROCEEDINGS",
+      "publication_year": "2026",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "non-communicable diseases"}, {"source": "NIMR", "value": "conference proceedings"}],
+      "source": "NIMR Conference Proceedings"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0023",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "NIMR Newsletter 2022/2023",
+      "authors": [{"full_name": "National Institute for Medical Research", "type": "INSTITUTION"}],
+      "abstract": "Newsletter year listed on the NIMR Newsletter page.",
+      "document_type": "SERIAL_ISSUE",
+      "publication_year": "2023",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "newsletter"}],
+      "source": "NIMR Newsletter"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0024",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "NIMR Newsletter 2023/2024",
+      "authors": [{"full_name": "National Institute for Medical Research", "type": "INSTITUTION"}],
+      "abstract": "Newsletter year listed on the NIMR Newsletter page.",
+      "document_type": "SERIAL_ISSUE",
+      "publication_year": "2024",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "newsletter"}],
+      "source": "NIMR Newsletter"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0025",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "NIMR Newsletter 2024/2025",
+      "authors": [{"full_name": "National Institute for Medical Research", "type": "INSTITUTION"}],
+      "abstract": "Newsletter year listed on the NIMR Newsletter page.",
+      "document_type": "SERIAL_ISSUE",
+      "publication_year": "2025",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "newsletter"}],
+      "source": "NIMR Newsletter"
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/documents/document-v2.0.0.json",
+      "pid": "nimr-doc-0026",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "title": "NIMR Newsletter 2025/2026",
+      "authors": [{"full_name": "National Institute for Medical Research", "type": "INSTITUTION"}],
+      "abstract": "Newsletter year listed on the NIMR Newsletter page.",
+      "document_type": "SERIAL_ISSUE",
+      "publication_year": "2026",
+      "languages": ["ENG"],
+      "keywords": [{"source": "NIMR", "value": "newsletter"}],
+      "source": "NIMR Newsletter"
+    }
+  ],
+  "eitems": [
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/eitems/eitem-v3.0.0.json",
+      "pid": "nimr-eitem-0001",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "document_pid": "nimr-doc-0001",
+      "eitem_type": "E-BOOK",
+      "open_access": true,
+      "description": "External publication link listed on NIMR publications page.",
+      "urls": [{"value": "https://nimr.or.tz/publications/", "description": "NIMR source page"}]
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/eitems/eitem-v3.0.0.json",
+      "pid": "nimr-eitem-0002",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "document_pid": "nimr-doc-0002",
+      "eitem_type": "E-BOOK",
+      "open_access": true,
+      "description": "DOI and external publication link listed on NIMR publications page.",
+      "urls": [{"value": "https://doi.org/10.1101/2023.11.07.23298207", "description": "DOI"}]
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/eitems/eitem-v3.0.0.json",
+      "pid": "nimr-eitem-0003",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "document_pid": "nimr-doc-0003",
+      "eitem_type": "E-BOOK",
+      "open_access": true,
+      "description": "Journal link listed on NIMR publications and related links.",
+      "urls": [{"value": "https://www.ajol.info/index.php/thrb", "description": "Tanzania Journal of Health Research"}]
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/eitems/eitem-v3.0.0.json",
+      "pid": "nimr-eitem-0007",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "document_pid": "nimr-doc-0007",
+      "eitem_type": "E-BOOK",
+      "open_access": true,
+      "description": "DOI listed on NIMR publications page.",
+      "urls": [{"value": "https://doi.org/10.1101/2024.01.31.24301954", "description": "DOI"}]
+    },
+    {
+      "$schema": "https://nhrils.apps.nimr.or.tz/schemas/eitems/eitem-v3.0.0.json",
+      "pid": "nimr-eitem-0008",
+      "created_by": {"type": "script", "value": "nimr-publications-seed"},
+      "document_pid": "nimr-doc-0008",
+      "eitem_type": "E-BOOK",
+      "open_access": true,
+      "description": "DOI listed on NIMR publications page.",
+      "urls": [{"value": "https://doi.org/10.1101/2023.07.29.23293322", "description": "DOI"}]
+    }
+  ],
+  "items": []
+}

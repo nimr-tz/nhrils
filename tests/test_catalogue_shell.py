@@ -9,6 +9,7 @@
 
 from flask import url_for
 from pathlib import Path
+import json
 
 
 def test_catalogue_shell_renders(client):
@@ -48,3 +49,45 @@ def test_search_guide_uses_health_research_examples():
     assert "dark matter" not in guide
     assert "Albert Einstein" not in guide
     assert "affiliated to CERN" not in guide
+
+
+def test_nimr_publications_seed_bundle_shape():
+    """Test that the provisional seed bundle can support catalogue MVP review."""
+    seed_path = (
+        Path(__file__).resolve().parents[1]
+        / "docs"
+        / "seed-data"
+        / "nimr-publications-seed.json"
+    )
+    seed = json.loads(seed_path.read_text(encoding="utf-8"))
+
+    documents = seed["documents"]
+    eitems = seed["eitems"]
+    document_pids = {document["pid"] for document in documents}
+
+    assert len(documents) >= 25
+    assert len(document_pids) == len(documents)
+    assert len({eitem["pid"] for eitem in eitems}) == len(eitems)
+    assert seed["items"] == []
+
+    required_document_fields = {
+        "$schema",
+        "pid",
+        "title",
+        "authors",
+        "publication_year",
+        "document_type",
+        "created_by",
+    }
+    for document in documents:
+        assert required_document_fields.issubset(document)
+        assert document["authors"]
+        assert document["document_type"] in {
+            "ARTICLE",
+            "BOOK",
+            "PROCEEDINGS",
+            "STANDARD",
+            "SERIAL_ISSUE",
+        }
+
+    assert {eitem["document_pid"] for eitem in eitems}.issubset(document_pids)
