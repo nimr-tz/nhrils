@@ -59,8 +59,8 @@
         {% else %}
           <span class="nhrils-button nhrils-button-disabled" aria-disabled="true">View online</span>
         {% endif %}
-        <span class="nhrils-button nhrils-button-disabled" aria-disabled="true">{{ record.access.request.label }}</span>
-        <span class="nhrils-button nhrils-button-disabled" aria-disabled="true">{{ record.access.contact.label }}</span>
+        <a class="nhrils-button nhrils-button-secondary" href="{{ record.detail_url }}/request">{{ record.access.request.label }}</a>
+        <a class="nhrils-button nhrils-button-secondary" href="{{ record.detail_url }}/request">{{ record.access.contact.label }}</a>
       </div>
       <dl class="nhrils-access-checks">
         <div>

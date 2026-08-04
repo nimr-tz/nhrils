@@ -738,6 +738,64 @@
   margin: 4px 0 0;
 }
 
+.nhrils-request-record {
+  background: #f9fcfa;
+  border: 1px solid var(--nhrils-border);
+  border-radius: var(--nhrils-radius-md);
+  margin-top: 20px;
+  padding: 18px;
+}
+
+.nhrils-request-record h2 {
+  color: var(--nhrils-blue-900);
+  font-size: 20px;
+  line-height: 1.3;
+  margin: 4px 0 8px;
+}
+
+.nhrils-request-intent {
+  border-top: 1px solid var(--nhrils-border);
+  margin-top: 22px;
+  padding-top: 20px;
+}
+
+.nhrils-request-fields {
+  display: grid;
+  gap: 14px;
+}
+
+.nhrils-request-fields label {
+  color: var(--nhrils-blue-900);
+  display: grid;
+  font-size: 14px;
+  font-weight: 800;
+  gap: 8px;
+}
+
+.nhrils-request-fields select,
+.nhrils-request-fields textarea {
+  background: #f2f5f3;
+  border: 1px solid var(--nhrils-border);
+  border-radius: var(--nhrils-radius-sm);
+  color: var(--nhrils-muted);
+  font: inherit;
+  min-height: 44px;
+  padding: 10px 12px;
+}
+
+.nhrils-request-fields textarea {
+  min-height: 118px;
+  resize: vertical;
+}
+
+.nhrils-request-note {
+  background: #fffaf0;
+  border: 1px solid #eadca9;
+  border-radius: var(--nhrils-radius-sm);
+  margin: 14px 0 0;
+  padding: 12px;
+}
+
 .nhrils-metadata-list {
   display: grid;
   gap: 12px;

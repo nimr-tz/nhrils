@@ -294,6 +294,7 @@ def test_catalogue_record_detail_shell_renders(client):
     assert b"rel=\"noopener noreferrer\"" in res.data
     assert b"Request item" in res.data
     assert b"Ask librarian" in res.data
+    assert b"/nhrils/catalogue/records/nimr-doc-0001/request" in res.data
     assert b"No physical holding attached" in res.data
     assert b"Request workflow will be enabled" in res.data
     assert b"Bibliographic metadata" in res.data
@@ -393,6 +394,68 @@ def test_catalogue_record_detail_rejects_search_prefix_lookalike(client):
 def test_catalogue_record_detail_unknown_pid_returns_404(client):
     """Test that unknown review seed PIDs return not found."""
     res = client.get("/nhrils/catalogue/records/not-a-seed-pid")
+
+    assert res.status_code == 404
+
+
+def test_catalogue_record_request_shell_renders(client):
+    """Test the NHRILS request workflow shell renders without writes."""
+    res = client.get(
+        url_for(
+            "nhrils_catalogue_shell.catalogue_record_request_view",
+            pid="nimr-doc-0001",
+        )
+    )
+
+    assert res.status_code == 200
+    assert b"Catalogue request" in res.data
+    assert b"Prepare a library request" in res.data
+    assert b"Artemisinin-resistant malaria in Africa demands urgent action" in res.data
+    assert b"Request record summary" in res.data
+    assert b"Request details" in res.data
+    assert b"Information the library will need" in res.data
+    assert b"Request submission is intentionally disabled" in res.data
+    assert b"Request workflow shell" in res.data
+    assert b"Not submitting yet" in res.data
+    assert b"Contact support" in res.data
+    assert b"/nhrils/catalogue/contact" in res.data
+    assert b"method=\"post\"" not in res.data
+
+
+def test_catalogue_record_request_back_link_uses_safe_return_context(client):
+    """Test request shell preserves only safe catalogue result return links."""
+    return_to = "/nhrils/catalogue/search?q=malaria&availability=online"
+    res = client.get(
+        url_for(
+            "nhrils_catalogue_shell.catalogue_record_request_view",
+            pid="nimr-doc-0001",
+        ),
+        query_string={"return_to": return_to},
+    )
+
+    assert res.status_code == 200
+    assert b"/nhrils/catalogue/search?q=malaria&amp;availability=online" in res.data
+    assert b"Back to results" in res.data
+
+
+def test_catalogue_record_request_rejects_external_return_context(client):
+    """Test request shell does not render external return URLs."""
+    res = client.get(
+        url_for(
+            "nhrils_catalogue_shell.catalogue_record_request_view",
+            pid="nimr-doc-0001",
+        ),
+        query_string={"return_to": "https://example.test/phishing"},
+    )
+
+    assert res.status_code == 200
+    assert b"https://example.test/phishing" not in res.data
+    assert b'href="/nhrils/catalogue/search"' in res.data
+
+
+def test_catalogue_record_request_unknown_pid_returns_404(client):
+    """Test that unknown review seed PIDs return not found for request shell."""
+    res = client.get("/nhrils/catalogue/records/not-a-seed-pid/request")
 
     assert res.status_code == 404
 
@@ -937,10 +1000,39 @@ def test_catalogue_record_static_markup():
     assert "record.access.contact.label" in shell
     assert "record.access.physical_holding.label" in shell
     assert "record.access.contact.summary" in shell
+    assert "/request" in shell
     assert "Before production import" in shell
     assert "Confirm metadata" in shell
     assert "Confirm access" in shell
     assert "Add holdings" in shell
+    assert "_catalogue_topbar.html" in shell
+
+
+def test_catalogue_record_request_static_markup():
+    """Test catalogue request shell copy and non-mutating structure."""
+    shell = (
+        Path(__file__).resolve().parents[1]
+        / "invenio_app_ils"
+        / "templates"
+        / "invenio_app_ils"
+        / "catalogue_record_request.html"
+    ).read_text(encoding="utf-8")
+
+    assert "Prepare a library request" in shell
+    assert "Back to record" in shell
+    assert "Selected record" in shell
+    assert "Request record summary" in shell
+    assert "Information the library will need" in shell
+    assert "Request submission is intentionally disabled" in shell
+    assert "Request workflow shell" in shell
+    assert "Not submitting yet" in shell
+    assert "Contact support" in shell
+    assert "/nhrils/catalogue/contact" in shell
+    assert "record.pid" in shell
+    assert "record.access.status.label" in shell
+    assert "record.access.physical_holding.label" in shell
+    assert "<form" not in shell
+    assert "method=\"post\"" not in shell
     assert "_catalogue_topbar.html" in shell
 
 

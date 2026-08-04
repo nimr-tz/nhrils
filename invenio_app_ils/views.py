@@ -64,6 +64,10 @@ def create_catalogue_shell_blueprint(app):
         view_func=catalogue_record_view,
     )
     blueprint.add_url_rule(
+        "/nhrils/catalogue/records/<pid>/request",
+        view_func=catalogue_record_request_view,
+    )
+    blueprint.add_url_rule(
         "/nhrils/catalogue/about",
         view_func=catalogue_about_view,
     )
@@ -236,6 +240,21 @@ def catalogue_record_view(pid):
         "invenio_app_ils/catalogue_record.html",
         record=response.record,
         return_to=_safe_catalogue_return_url(request.args.get("return_to")),
+        search_backend=response.backend,
+    )
+
+
+def catalogue_record_request_view(pid):
+    """Render a non-mutating NHRILS catalogue request preparation shell."""
+    response = get_catalogue_search_backend().get_record(pid)
+    if response is None:
+        abort(404)
+
+    return render_template(
+        "invenio_app_ils/catalogue_record_request.html",
+        record=response.record,
+        return_to=_safe_catalogue_return_url(request.args.get("return_to")),
+        record_url="/nhrils/catalogue/records/{}".format(pid),
         search_backend=response.backend,
     )
 
