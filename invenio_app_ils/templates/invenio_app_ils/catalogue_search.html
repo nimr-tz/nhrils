@@ -9,6 +9,17 @@
   </a>
 {%- endmacro %}
 
+{% macro page_link(label, page, pagination, selected_filters, query) -%}
+  {% if page %}
+    <a class="nhrils-page-link"
+       href="/nhrils/catalogue/search?q={{ query|urlencode }}{% for key, selected in selected_filters.items() if selected %}&{{ key }}={{ selected|urlencode }}{% endfor %}&page={{ page }}&size={{ pagination.size }}">
+      {{ label }}
+    </a>
+  {% else %}
+    <span class="nhrils-page-link nhrils-page-link-disabled" aria-disabled="true">{{ label }}</span>
+  {% endif %}
+{%- endmacro %}
+
 {% block page_body %}
 <link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
 
@@ -116,6 +127,9 @@
         <div>
           <p class="nhrils-eyebrow">Results</p>
           <h2>{{ result_count }} review record{% if result_count != 1 %}s{% endif %}</h2>
+          {% if result_count %}
+            <p>Showing {{ pagination.first_item }}-{{ pagination.last_item }} of {{ result_count }} records.</p>
+          {% endif %}
         </div>
         <a class="nhrils-inline-action" href="/pages/search-guide">Search guide</a>
       </div>
@@ -149,6 +163,13 @@
             </article>
           {% endfor %}
         </div>
+        {% if pagination.total_pages > 1 %}
+          <nav class="nhrils-pagination" aria-label="Search results pages">
+            {{ page_link("Previous", pagination.previous_page, pagination, selected_filters, query) }}
+            <span>Page {{ pagination.page }} of {{ pagination.total_pages }}</span>
+            {{ page_link("Next", pagination.next_page, pagination, selected_filters, query) }}
+          </nav>
+        {% endif %}
       {% else %}
         <div class="nhrils-empty-state">
           <h3>No review records match this search</h3>

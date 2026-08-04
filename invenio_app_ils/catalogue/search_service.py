@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
+from math import ceil
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -82,6 +83,7 @@ class CatalogueSearchResult:
     result_count: int
     results: list[dict[str, Any]]
     facets: dict[str, list[dict[str, Any]]]
+    pagination: dict[str, Any]
     backend: str
 
 
@@ -127,7 +129,12 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
             query=query,
             eitem_document_pids=eitem_document_pids,
         )
-        offset = (query.page - 1) * query.size
+        pagination = self._build_pagination(
+            result_count=len(filtered_documents),
+            requested_page=query.page,
+            page_size=query.size,
+        )
+        offset = (pagination["page"] - 1) * query.size
         page_documents = filtered_documents[offset : offset + query.size]
 
         return CatalogueSearchResult(
@@ -148,6 +155,7 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
                 "language": self._build_language_facets(documents),
                 "subject": self._build_keyword_facets(documents),
             },
+            pagination=pagination,
             backend=self.name,
         )
 
@@ -334,6 +342,33 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
             {"value": "online", "label": "Digital access", "count": online_count},
             {"value": "review", "label": "Review record", "count": review_count},
         ]
+
+    def _build_pagination(
+        self,
+        *,
+        result_count: int,
+        requested_page: int,
+        page_size: int,
+    ) -> dict[str, Any]:
+        """Build template-ready pagination metadata."""
+        total_pages = ceil(result_count / page_size) if result_count else 0
+        current_page = min(requested_page, total_pages) if total_pages else 1
+        first_item = ((current_page - 1) * page_size) + 1 if result_count else 0
+        last_item = min(current_page * page_size, result_count)
+        return {
+            "page": current_page,
+            "requested_page": requested_page,
+            "size": page_size,
+            "total_pages": total_pages,
+            "first_item": first_item,
+            "last_item": last_item,
+            "has_previous": current_page > 1,
+            "has_next": bool(total_pages and current_page < total_pages),
+            "previous_page": current_page - 1 if current_page > 1 else None,
+            "next_page": current_page + 1
+            if total_pages and current_page < total_pages
+            else None,
+        }
 
     def _build_language_facets(
         self,

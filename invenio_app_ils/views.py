@@ -79,6 +79,7 @@ def catalogue_search_view():
         result_count=response.result_count,
         results=response.results,
         facets=response.facets,
+        pagination=response.pagination,
         search_backend=response.backend,
     )
 

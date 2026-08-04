@@ -66,7 +66,33 @@ def test_catalogue_search_results_shell_renders(client):
     assert b"nimr-doc-0001" in res.data
     assert b"/nhrils/catalogue/records/nimr-doc-0001" in res.data
     assert b"Open record" in res.data
+    assert b"Showing 1-" in res.data
     assert b"Database import" not in res.data
+
+
+def test_catalogue_search_results_pagination_renders(client):
+    """Test search result pagination preserves active query and filters."""
+    res = client.get(
+        url_for("nhrils_catalogue_shell.catalogue_search_view"),
+        query_string={
+            "q": "malaria",
+            "language": "ENG",
+            "subject": "malaria",
+            "page": "1",
+            "size": "5",
+        },
+    )
+
+    assert res.status_code == 200
+    assert b"Showing 1-5" in res.data
+    assert b"Page 1 of" in res.data
+    assert b"Previous" in res.data
+    assert b"Next" in res.data
+    assert b"q=malaria" in res.data
+    assert b"language=ENG" in res.data
+    assert b"subject=malaria" in res.data
+    assert b"page=2" in res.data
+    assert b"size=5" in res.data
 
 
 def test_catalogue_record_detail_shell_renders(client):
@@ -136,7 +162,36 @@ def test_seed_catalogue_search_backend_filters_and_paginates():
     assert {"availability", "type", "year", "source", "language", "subject"}.issubset(
         response.facets
     )
+    assert response.pagination == {
+        "page": 1,
+        "requested_page": 1,
+        "size": 5,
+        "total_pages": response.pagination["total_pages"],
+        "first_item": 1,
+        "last_item": len(response.results),
+        "has_previous": False,
+        "has_next": response.pagination["total_pages"] > 1,
+        "previous_page": None,
+        "next_page": 2 if response.pagination["total_pages"] > 1 else None,
+    }
     assert response.facets["availability"][0]["label"] == "Digital access"
+
+
+def test_seed_catalogue_search_backend_clamps_requested_page():
+    """Test out-of-range requested pages render the last available page."""
+    response = SeedCatalogueSearchBackend().search(
+        CatalogueSearchQuery(page=99, size=10)
+    )
+
+    assert response.result_count == 42
+    assert response.pagination["requested_page"] == 99
+    assert response.pagination["page"] == 5
+    assert response.pagination["total_pages"] == 5
+    assert response.pagination["first_item"] == 41
+    assert response.pagination["last_item"] == 42
+    assert response.pagination["has_previous"]
+    assert not response.pagination["has_next"]
+    assert len(response.results) == 2
 
 
 def test_seed_catalogue_search_backend_filters_by_source_language_and_subject():
@@ -274,6 +329,8 @@ def test_catalogue_search_static_markup():
     assert "Subject" in shell
     assert "No review records match this search" in shell
     assert "Browse the review seed catalogue" in shell
+    assert "Search results pages" in shell
+    assert "Showing {{ pagination.first_item }}-{{ pagination.last_item }}" in shell
     assert "/nhrils/catalogue/search" in shell
     assert "result.detail_url" in shell
     assert "Digital access" in shell

@@ -437,6 +437,45 @@
   max-width: 520px;
 }
 
+.nhrils-pagination {
+  align-items: center;
+  border-top: 1px solid var(--nhrils-border);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 16px;
+}
+
+.nhrils-pagination span {
+  color: var(--nhrils-muted);
+  font-size: 14px;
+}
+
+.nhrils-page-link {
+  align-items: center;
+  border: 1px solid var(--nhrils-blue-800);
+  border-radius: var(--nhrils-radius-sm);
+  color: var(--nhrils-blue-900);
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 700;
+  min-height: 38px;
+  padding: 0 12px;
+  text-decoration: none;
+}
+
+.nhrils-page-link:hover,
+.nhrils-page-link:focus {
+  background: var(--nhrils-blue-100);
+  outline: none;
+}
+
+.nhrils-page-link-disabled {
+  border-color: var(--nhrils-border);
+  color: var(--nhrils-muted);
+}
+
 .nhrils-record-detail-layout {
   align-items: start;
   display: grid;
