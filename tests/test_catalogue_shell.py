@@ -11,6 +11,7 @@ from flask import url_for
 import importlib.util
 from pathlib import Path
 import json
+import sys
 
 
 def test_catalogue_shell_renders(client):
@@ -146,3 +147,54 @@ def test_nimr_publications_seed_dry_run_validator_accepts_bundle():
         "internal_locations": 2,
         "items": 0,
     }
+
+
+def test_nimr_publications_seed_duplicate_pid_detection(tmp_path):
+    """Test that duplicate document PIDs fail before import planning."""
+    repo_root = Path(__file__).resolve().parents[1]
+    validator_path = repo_root / "scripts" / "validate_seed_bundle.py"
+    seed_path = repo_root / "docs" / "seed-data" / "nimr-publications-seed.json"
+    duplicate_seed_path = tmp_path / "duplicate-seed.json"
+
+    seed = json.loads(seed_path.read_text(encoding="utf-8"))
+    seed["documents"][1]["pid"] = seed["documents"][0]["pid"]
+    duplicate_seed_path.write_text(json.dumps(seed), encoding="utf-8")
+
+    spec = importlib.util.spec_from_file_location("validate_seed_bundle", validator_path)
+    validator = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(validator)
+
+    result = validator.validate_seed_bundle(duplicate_seed_path)
+
+    assert not result["ok"]
+    assert any("Duplicate document PID" in error for error in result["errors"])
+
+
+def test_nimr_publications_seed_import_plan_is_dry_run():
+    """Test that the guarded import planner remains read-only by default."""
+    repo_root = Path(__file__).resolve().parents[1]
+    importer_path = repo_root / "scripts" / "import_seed_bundle.py"
+    seed_path = repo_root / "docs" / "seed-data" / "nimr-publications-seed.json"
+
+    sys_path = str(importer_path.parent)
+    if sys_path not in sys.path:
+        sys.path.insert(0, sys_path)
+
+    spec = importlib.util.spec_from_file_location("import_seed_bundle", importer_path)
+    importer = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(importer)
+
+    plan = importer.build_import_plan(seed_path)
+
+    assert plan["mode"] == "dry-run"
+    assert plan["validation"]["ok"], plan["validation"]["errors"]
+    assert [operation["section"] for operation in plan["operations"]] == [
+        "locations",
+        "internal_locations",
+        "documents",
+        "eitems",
+        "items",
+    ]
+    assert plan["operations"][2]["entity"] == "Document"
+    assert plan["operations"][2]["count"] == 42
+    assert "database writes" in plan["blocked_operations"]

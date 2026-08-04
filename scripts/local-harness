@@ -27,6 +27,8 @@ Commands:
   setup-backend    Run InvenioILS backend setup against local services
   run-backend      Run the Invenio backend development server
   run-worker       Run the Celery worker
+  validate-seed    Validate the provisional NIMR seed bundle
+  seed-dry-run     Show the guarded NIMR seed import plan
   test-local       Run no-service seed/static tests
   test-services    Explain service-backed test isolation requirements
 
@@ -193,11 +195,20 @@ case "${COMMAND}" in
     require_venv
     PATH="$(dirname "${PYTHON_BIN}"):${PATH}" ./scripts/celery
     ;;
+  validate-seed)
+    require_venv
+    "${PYTHON_BIN}" scripts/validate_seed_bundle.py
+    ;;
+  seed-dry-run)
+    require_venv
+    "${PYTHON_BIN}" scripts/import_seed_bundle.py
+    ;;
   test-local)
     require_venv
     COVERAGE_FILE=/tmp/nhrils_coverage PYTHONPYCACHEPREFIX=/tmp/nhrils_pycache \
       "${PYTHON_BIN}" -m pytest tests/test_catalogue_shell.py -q \
-      -k 'seed or search_guide or catalogue_shell_static' -p no:cacheprovider
+      -k 'seed or search_guide or catalogue_shell_static or duplicate_pid' \
+      -p no:cacheprovider
     ;;
   test-services)
     cat <<'EOF' >&2

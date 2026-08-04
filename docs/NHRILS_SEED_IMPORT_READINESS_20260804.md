@@ -40,6 +40,12 @@ Command:
 python3 scripts/validate_seed_bundle.py
 ```
 
+Harness shortcut:
+
+```bash
+./scripts/local-harness validate-seed
+```
+
 Machine-readable output:
 
 ```bash
@@ -68,6 +74,43 @@ The validator intentionally does not:
 - rebuild indexes;
 - change permissions;
 - trigger circulation behavior.
+
+## Guarded Import Plan
+
+Command:
+
+```bash
+python3 scripts/import_seed_bundle.py
+```
+
+Harness shortcut:
+
+```bash
+./scripts/local-harness seed-dry-run
+```
+
+Machine-readable output:
+
+```bash
+python3 scripts/import_seed_bundle.py --json
+```
+
+The import planner validates the bundle and prints the entity order that a later
+approved importer would use:
+
+1. `locations`
+2. `internal_locations`
+3. `documents`
+4. `eitems`
+5. `items`
+
+The planner is intentionally read-only. It does not initialize Invenio, connect
+to services, create records, upload files, rebuild indexes, or change
+permissions.
+
+The `--apply` option is reserved but blocked. It exits with code `2` until the
+database importer, idempotency checks, rollback procedure, and indexing plan are
+approved.
 
 ## Import Gates
 
@@ -105,21 +148,31 @@ Future importer requirements:
 - be safe to rerun without duplicating existing records;
 - document any OpenSearch indexing or reindexing command required after import.
 
-Example future command shape:
+Current guarded command shape:
+
+```bash
+./scripts/local-harness seed-dry-run
+python3 scripts/import_seed_bundle.py --json
+```
+
+Future approved command shape:
 
 ```bash
 ils nhrils seed import docs/seed-data/nimr-publications-seed.json --dry-run
 ils nhrils seed import docs/seed-data/nimr-publications-seed.json --write
 ```
 
-The command above is a design target only. It is not implemented in this slice.
+The future command above remains a design target only.
 
 ## Verification
 
 Completed for this readiness slice:
 
 - dry-run validator added;
+- guarded dry-run import planner added;
+- local harness shortcuts added for validation and import planning;
 - seed-shape test updated to exercise the validator;
+- duplicate PID and import-plan tests added;
 - documentation added for mapping, gates, proposed order, and development-only import plan.
 
 Not completed:
@@ -129,4 +182,3 @@ Not completed:
 - no migration;
 - no deployment;
 - no circulation or patron data change.
-
