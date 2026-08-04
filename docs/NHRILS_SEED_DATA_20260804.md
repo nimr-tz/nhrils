@@ -84,6 +84,8 @@ Completed:
 - `PYTHONPYCACHEPREFIX=/tmp/nhrils_pycache python3 -m json.tool docs/seed-data/nimr-publications-seed.json`
 - `PYTHONPYCACHEPREFIX=/tmp/nhrils_pycache python3 -m py_compile tests/test_catalogue_shell.py`
 - `git diff --check`
+- `.venv/bin/python scripts/validate_seed_bundle.py`
+- `COVERAGE_FILE=/tmp/nhrils_coverage PYTHONPYCACHEPREFIX=/tmp/nhrils_pycache .venv/bin/python -m pytest tests/test_catalogue_shell.py -q -k 'seed or search_guide' -p no:cacheprovider`
 - direct seed-shape validation:
   - `documents=42`
   - `eitems=21`
@@ -96,7 +98,7 @@ Not completed:
 
 - No database import was run.
 - No OpenSearch indexing or reindexing was run.
-- `pytest` was not run because the local `.venv` does not yet have test dependencies installed.
+- Service-backed Flask catalogue tests were not completed because OpenSearch was not running at `localhost:9200`.
 
 ## Next Steps
 

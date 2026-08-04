@@ -27,8 +27,13 @@ NHRILS test environment is ready.
 Activate:
   source ${VENV_DIR}/bin/activate
 
-Run focused tests:
-  python -m pytest tests/test_catalogue_shell.py tests/test_post_logout_redirect.py
+Run no-service focused tests:
+  COVERAGE_FILE=/tmp/nhrils_coverage PYTHONPYCACHEPREFIX=/tmp/nhrils_pycache \
+    python -m pytest tests/test_catalogue_shell.py -q -k 'seed or search_guide' -p no:cacheprovider
+
+Run service-backed catalogue tests after OpenSearch is available:
+  COVERAGE_FILE=/tmp/nhrils_coverage PYTHONPYCACHEPREFIX=/tmp/nhrils_pycache \
+    python -m pytest tests/test_catalogue_shell.py tests/test_post_logout_redirect.py
 
 Run service-backed API tests:
   ./run-tests.sh ils

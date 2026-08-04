@@ -34,11 +34,22 @@ python -m pip install --upgrade pip setuptools wheel
 python -m pip install -e ".[tests,opensearch2,lorem]"
 ```
 
-Run focused tests:
+Run no-service focused tests:
 
 ```bash
 source .venv/bin/activate
-python -m pytest tests/test_catalogue_shell.py tests/test_post_logout_redirect.py
+COVERAGE_FILE=/tmp/nhrils_coverage PYTHONPYCACHEPREFIX=/tmp/nhrils_pycache \
+  python -m pytest tests/test_catalogue_shell.py -q -k 'seed or search_guide' -p no:cacheprovider
+```
+
+This command verifies seed validation and static catalogue guide checks without requiring PostgreSQL, OpenSearch, Redis, or RabbitMQ.
+
+Run service-backed catalogue tests after OpenSearch is available:
+
+```bash
+source .venv/bin/activate
+COVERAGE_FILE=/tmp/nhrils_coverage PYTHONPYCACHEPREFIX=/tmp/nhrils_pycache \
+  python -m pytest tests/test_catalogue_shell.py tests/test_post_logout_redirect.py
 ```
 
 Run service-backed API tests:
@@ -58,11 +69,25 @@ A local `.venv` was created with:
 Python 3.10.20
 ```
 
-Dependency installation was not run automatically in this slice because it can be network-heavy. Run `./scripts/setup-test-venv` when ready to install the full test dependencies.
+Dependency installation has completed successfully through `./scripts/setup-test-venv`.
+
+Verified locally:
+
+- `.venv/bin/python --version` returned `Python 3.10.20`.
+- `.venv/bin/python scripts/validate_seed_bundle.py` passed with 42 documents, 21 e-items, 1 location, 2 internal locations, and 0 items.
+- `COVERAGE_FILE=/tmp/nhrils_coverage PYTHONPYCACHEPREFIX=/tmp/nhrils_pycache .venv/bin/python -m pytest tests/test_catalogue_shell.py -q -k 'seed or search_guide' -p no:cacheprovider` passed: 3 passed, 2 deselected.
+- `PYTHONPYCACHEPREFIX=/tmp/nhrils_pycache .venv/bin/python -m py_compile scripts/validate_seed_bundle.py tests/test_catalogue_shell.py` passed.
+
+Known local limitation:
+
+- `tests/test_catalogue_shell.py` has two Flask app tests that initialize Invenio search indexes and require OpenSearch at `localhost:9200`.
+- Without OpenSearch, those tests fail during setup with `opensearchpy.exceptions.ConnectionError`.
+- Run `./run-tests.sh ils` or start the required services before using service-backed tests.
 
 ## Rules
 
 - Do not commit `.venv`.
 - Do not use `python3` unless it resolves to the agreed baseline.
 - Prefer `python3.10`, `.venv/bin/python`, or an explicitly documented deployment image Python.
+- Use `/tmp` for coverage and pycache paths when running inside restricted worktrees.
 - Revisit the baseline only after building and testing the full dependency set.

@@ -74,7 +74,9 @@ Completed:
 
 Not completed:
 
-- `pytest tests/test_catalogue_shell.py -q` did not run because the local `.venv` does not yet contain pytest/test dependencies. The test environment setup script exists, but dependency installation is intentionally deferred because it requires network-heavy package installation.
+- The local `.venv` test dependencies were installed later through `./scripts/setup-test-venv`.
+- No-service catalogue/seed checks now pass with `COVERAGE_FILE=/tmp/nhrils_coverage PYTHONPYCACHEPREFIX=/tmp/nhrils_pycache .venv/bin/python -m pytest tests/test_catalogue_shell.py -q -k 'seed or search_guide' -p no:cacheprovider`.
+- Service-backed Flask catalogue tests still require OpenSearch at `localhost:9200`.
 
 ## Render Evidence
 
