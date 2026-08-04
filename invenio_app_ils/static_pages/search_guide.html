@@ -1,39 +1,39 @@
-<p>This guide explains how to perform search queries on InvenioILS using easy to understand examples.</p>
+<p>This guide explains how to search the NHRILS catalogue using practical health research examples.</p>
 
 <h3>Simple search (one or multiple terms)</h3>
 
-<p><strong>Example:</strong> <a href="/search?q=dark%20matter"><code>dark matter</code></a></p>
+<p><strong>Example:</strong> <a href="/search?q=malaria%20guidelines"><code>malaria guidelines</code></a></p>
 
-<p>Results will match records with the <em>terms</em> <code>dark</code> <em>or</em> <code>matter</code> in <em>any field</em>.
+<p>Results will match records with the <em>terms</em> <code>malaria</code> <em>or</em> <code>guidelines</code> in <em>any field</em>.</p>
 
 <p>You can require <em>presence</em> of both terms using either the <code>+</code> or <code>AND</code> operator:</p>
 
-<p><strong>Examples:</strong> <a href="/search?q=%2Bdark%20%2Bmatter"><code>+dark +matter</code></a> or <a href="/search?q=dark%20AND%20matter"><code>dark AND matter</code></a></p>
+<p><strong>Examples:</strong> <a href="/search?q=%2Bmalaria%20%2Bguidelines"><code>+malaria +guidelines</code></a> or <a href="/search?q=malaria%20AND%20guidelines"><code>malaria AND guidelines</code></a></p>
 
 <p>You can require <em>absence</em> of one or more terms using either the <code>-</code> or <code>NOT</code> operator:</p>
 
-<p><strong>Examples:</strong> <a href="/search?q=-dark%20%2Bmatter"><code>-dark +matter</code></a> or <a href="/search?q=NOT%20dark%20AND%20matter"><code>NOT dark AND matter</code></a></p>
+<p><strong>Examples:</strong> <a href="/search?q=-vector%20%2Bmalaria"><code>-vector +malaria</code></a> or <a href="/search?q=NOT%20vector%20AND%20malaria"><code>NOT vector AND malaria</code></a></p>
 
 
 <h3 id="phrasesearch">Phrase search</h3>
 
-<p><strong>Example:</strong> <a href="/search?q=%22dark%20matter%22"><code>"dark matter"</code></a></p>
+<p><strong>Example:</strong> <a href="/search?q=%22maternal%20health%22"><code>"maternal health"</code></a></p>
 
-<p>Results will match records with the <em>phrase</em> <code>dark matter</code> in <em>any field</em>.</p>
+<p>Results will match records with the <em>phrase</em> <code>maternal health</code> in <em>any field</em>.</p>
 
 <h3 id="fieldsearch">Field search</h3>
 
-<p><strong>Example:</strong> <a href="/search?q=title:matter"><code>title:matter</code></a></p>
+<p><strong>Example:</strong> <a href="/search?q=title:malaria"><code>title:malaria</code></a></p>
 
-<p>Results will match records with the <em>term</em> <code>matter</code> in the <em>field</em> <code>title</code>. If you want to search for multiple terms in the title you must <strong>group the terms</strong> using parenthesis:</p>
+<p>Results will match records with the <em>term</em> <code>malaria</code> in the <em>field</em> <code>title</code>. If you want to search for multiple terms in the title you must <strong>group the terms</strong> using parenthesis:</p>
 
-<p><strong>Example:</strong> <a href="/search?q=title:(dark%20matter)"><code>title:(dark matter)</code></a></p>
+<p><strong>Example:</strong> <a href="/search?q=title:(malaria%20guidelines)"><code>title:(malaria guidelines)</code></a></p>
 
 <p>See the field reference below for the full list of fields you can search.</p>
 
 <h3 id="combinedsimplephraseorfieldsearch">Combined simple, phrase or field search</h3>
 
-<p><strong>Example:</strong> <a href="/search?q=%2Btitle:%22dark%20matter%22%20-title:experiment"><code>+title:"dark matter" -title:experiment</code></a> or <a href="/search?q=title:(-dark%20%2Bmatter)"><code>title:(-dark +matter)</code></a></p>
+<p><strong>Example:</strong> <a href="/search?q=%2Btitle:%22malaria%20guidelines%22%20-title:draft"><code>+title:"malaria guidelines" -title:draft</code></a> or <a href="/search?q=title:(-draft%20%2Bmalaria)"><code>title:(-draft +malaria)</code></a></p>
 
 <p>You can combine simple, phrase and field search to construct advanced search queries.</p>
 
@@ -59,10 +59,10 @@
 <strong>Example:</strong>
 
 <ul>
-<li><a href="/search?q=9814749133"><code>"9814749133"</code></a> or <a href="/search?q=9789814749138"><code>"9789814749138"</code></a> - ISBN 10 or 13</li>
-<li><a href="/search?q=10.1016\/j.physletb.208020"><code>"10.1016/j.physletb.208020"</code></a> - DOI</li>
+<li><a href="/search?q=9241549122"><code>"9241549122"</code></a> or <a href="/search?q=9789241549127"><code>"9789241549127"</code></a> - ISBN 10 or 13</li>
+<li><a href="/search?q=10.2471\/BLT.20.000000"><code>"10.2471/BLT.20.000000"</code></a> - DOI</li>
 <li><a href="/search?q=1745-2481"><code>"1745-2481"</code></a> - ISSN</li>
-  <li><a href="/search?q=NF-EN-81-80"><code>"NF-EN-81-80”</code></a> - Standard number</li>
+  <li><a href="/search?q=NIMR-GDL-2026-01"><code>"NIMR-GDL-2026-01"</code></a> - Guideline or local reference number</li>
 </ul>
 
 <p>Results will match exactly the provided identifier.</p>
@@ -72,9 +72,9 @@
 <strong>Example:</strong>
 
 <ul>
-<li><a href="/search?q=authors.full_name:(Albert%20Einstein)"><code>authors.full_name:(Albert Einstein)</code></a> - literature from a specific author</li>
-<li><a href="/search?q=authors.affiliations.name:CERN"><code>authors.affiliations.name:CERN</code></a> - literature whose author is affiliated to CERN</li>
-  <li><a href="/search?q=authors.full_name.keyword: /Otto, .%2B/"><code>full_name.keyword: /Otto, .+/</code></a> - Look for authors whose last name is Otto</li>
+<li><a href="/search?q=authors.full_name:(Asha%20Mrema)"><code>authors.full_name:(Asha Mrema)</code></a> - literature from a specific author</li>
+<li><a href="/search?q=authors.affiliations.name:NIMR"><code>authors.affiliations.name:NIMR</code></a> - literature whose author is affiliated to NIMR</li>
+  <li><a href="/search?q=authors.full_name.keyword: /Mrema, .%2B/"><code>full_name.keyword: /Mrema, .+/</code></a> - Look for authors whose last name is Mrema</li>
 </ul>
 
 <h4>Literature source</h4>
@@ -82,8 +82,8 @@
 <strong>Example:</strong>
 
 <ul>
-<li><a href="/search?q=conference_info.acronym:(CHEP*)%20AND%20conference_info.year:2019"><code>conference_info.acronym:(CHEP*) AND conference_info.year:2019</code></a> - conference papers from a particular year</li>
-<li><a href="/search?q=publication_info.journal_title: 'Nucl. Instrum. Methods Phys. Res., A'"><code>publication_info.journal_title: "Nucl. Instrum. Methods Phys. Res., A"</code></a> - publications in a journal</li>
+<li><a href="/search?q=conference_info.acronym:(THS*)%20AND%20conference_info.year:2025"><code>conference_info.acronym:(THS*) AND conference_info.year:2025</code></a> - conference papers from a particular year</li>
+<li><a href="/search?q=publication_info.journal_title: 'Tanzania Journal of Health Research'"><code>publication_info.journal_title: "Tanzania Journal of Health Research"</code></a> - publications in a journal</li>
 <li><a href="/search?q=publication_year:2020"><code>publication_year:2020</code></a> - publication year to disambiguate versions</li>
 </ul>
 
@@ -104,9 +104,9 @@
 
 <h4 id="boosting">Boosting</h4>
 
-<p>You can use the boost operator <code>^</code> when one term is more relevant than another. For instance, you can search for all records with the phrase <em>Dark matter</em> in either <em>title</em> or <em>description</em> field, but rank records with the phrase in the <em>title</em> field higher:</p>
+<p>You can use the boost operator <code>^</code> when one term is more relevant than another. For instance, you can search for all records with the phrase <em>malaria prevention</em> in either <em>title</em> or <em>description</em> field, but rank records with the phrase in the <em>title</em> field higher:</p>
 
-<p><strong>Example:</strong> <a href="/search?q=title:%22dark%20matter%22^5%20description:%22dark matter%22"><code>title:"dark matter"^5 description:"dark matter"</code></a></p>
+<p><strong>Example:</strong> <a href="/search?q=title:%22malaria%20prevention%22^5%20description:%22malaria prevention%22"><code>title:"malaria prevention"^5 description:"malaria prevention"</code></a></p>
 
 <p>Note: <code>^</code> is followed by a positive floating point number specifying the boost value compared to the default 1.
 
@@ -114,23 +114,23 @@
 
 <p>You can search for terms similar to but not exactly like your search term using the fuzzy operator <code>~</code>.</p>
 
-<p><strong>Example:</strong> <a href="/search?q=drak~"><code>drak~</code></a></p>
+<p><strong>Example:</strong> <a href="/search?q=malria~"><code>malria~</code></a></p>
 
-<p>Results will match records with terms similar to <code>drak</code> which would e.g. also match <code>dark</code>.</p>
+<p>Results will match records with terms similar to <code>malria</code> which would e.g. also match <code>malaria</code>.</p>
 
 <h4 id="proximitysearches">Proximity searches</h4>
 
-<p>A phrase search like <code>"collision theory"</code> by default expect all terms in exactly the same order, and thus for instance would not match the record entitled <em>"Quantum collision theory"</em>, but not the record <em>"Theory of heavy ion collision physics in hadron therapy"</em>. A proximity search allows that the terms are not in the exact order and may include other terms inbetween. The degree of flexiblity is specified by an integer afterwards:</p>
+<p>A phrase search like <code>"clinical trial"</code> by default expects all terms in exactly the same order. A proximity search allows that the terms are not in the exact order and may include other terms in between. The degree of flexibility is specified by an integer afterwards:</p>
 
-<p><strong>Example:</strong> <a href="/search?q=%22collision%20theory%22~10"><code>"collision theory"~10</code></a></p>
+<p><strong>Example:</strong> <a href="/search?q=%22clinical%20trial%22~10"><code>"clinical trial"~10</code></a></p>
 
 <h4 id="wildcards">Wildcards</h4>
 
 <p>You can use wildcards in search terms to replace a single character (using <code>?</code> operator) or zero or more characters (using <code>*</code> operator).</p>
 
-<p><strong>Example:</strong> <a href="/search?q=title:(crab%20cavit*)"><code>title:(crab cavit*)</code></a></p>
+<p><strong>Example:</strong> <a href="/search?q=title:(health%20polic*)"><code>title:(health polic*)</code></a></p>
 
-The result will match the literature with title referring to cavities also in languages other than english.
+The result will match literature with title terms such as policy or policies.
 
 <p>Wildcard searches can be slow and should normally be avoided if possible.</p>
 

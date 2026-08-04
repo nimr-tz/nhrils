@@ -8,6 +8,7 @@
 """NHRILS catalogue shell tests."""
 
 from flask import url_for
+from pathlib import Path
 
 
 def test_catalogue_shell_renders(client):
@@ -29,3 +30,21 @@ def test_logged_out_page_uses_nhrils_return_path(client, users):
     assert res.status_code == 200
     assert b"127.0.0.1" not in res.data
     assert b"/nhrils/catalogue" in res.data
+
+
+def test_search_guide_uses_health_research_examples():
+    """Test that the public search guide is NHRILS-domain oriented."""
+    guide = (
+        Path(__file__).resolve().parents[1]
+        / "invenio_app_ils"
+        / "static_pages"
+        / "search_guide.html"
+    ).read_text(encoding="utf-8")
+
+    assert "NHRILS catalogue" in guide
+    assert "malaria guidelines" in guide
+    assert "maternal health" in guide
+    assert "Tanzania Journal of Health Research" in guide
+    assert "dark matter" not in guide
+    assert "Albert Einstein" not in guide
+    assert "affiliated to CERN" not in guide

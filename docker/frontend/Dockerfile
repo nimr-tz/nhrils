@@ -12,11 +12,15 @@ RUN mkdir -p ${WORKING_DIR}
 RUN git clone https://github.com/inveniosoftware/react-invenio-app-ils.git ${WORKING_DIR}
 WORKDIR ${WORKING_DIR}
 
+ARG REACT_APP_INVENIO_UI_URL=https://nhrils.apps.nimr.or.tz
+ARG REACT_APP_INVENIO_REST_ENDPOINTS_BASE_URL=https://nhrils.apps.nimr.or.tz/api
+ARG REACT_APP_ENV_NAME=production
+
 # build React application
 RUN npm install
-RUN REACT_APP_INVENIO_UI_URL="https://127.0.0.1" \
- REACT_APP_INVENIO_REST_ENDPOINTS_BASE_URL="https://127.0.0.1/api" \
- REACT_APP_ENV_NAME="dev" \
+RUN REACT_APP_INVENIO_UI_URL="${REACT_APP_INVENIO_UI_URL}" \
+ REACT_APP_INVENIO_REST_ENDPOINTS_BASE_URL="${REACT_APP_INVENIO_REST_ENDPOINTS_BASE_URL}" \
+ REACT_APP_ENV_NAME="${REACT_APP_ENV_NAME}" \
  npm run build
 
 FROM nginx:1.18
