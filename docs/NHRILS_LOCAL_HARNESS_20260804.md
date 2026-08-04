@@ -30,6 +30,7 @@ Use the repo equivalents:
 
 | Official install step | NHRILS local command |
 | --- | --- |
+| Check local runtime readiness | `./scripts/local-harness preflight` |
 | Start dependent services | `./scripts/local-harness start-services` |
 | Build static assets and setup backend | `./scripts/local-harness setup-backend` |
 | Build static assets only | `./scripts/local-harness build-assets` |
@@ -43,15 +44,34 @@ Use the repo equivalents:
 Required locally:
 
 - Python 3.10 through `.venv`;
+- Node.js 14.x for repeatable asset builds;
 - Docker with Compose v2;
 - enough memory for OpenSearch;
 - local ports available: `5432`, `6379`, `5672`, `9200`, `9300`, and optionally `15672`.
+
+The repository pins local runtime intent with:
+
+- `.python-version`: `3.10`;
+- `.nvmrc`: `14.21.3`;
+- `.node-version`: `14.21.3`.
 
 Create the Python environment first:
 
 ```bash
 ./scripts/setup-test-venv
 ```
+
+Then check the local harness state:
+
+```bash
+./scripts/local-harness preflight
+```
+
+The preflight is a developer readiness check. It fails for missing hard
+requirements such as the Python virtual environment, `invenio-app-ils`, Docker,
+or Docker Compose v2. It warns for recoverable development gaps such as stopped
+services, missing assets, or a Node version that differs from the official
+InvenioILS Node 14 expectation.
 
 ## Start Services
 

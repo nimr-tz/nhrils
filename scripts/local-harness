@@ -11,12 +11,15 @@ set -euo pipefail
 COMMAND="${1:-help}"
 COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.yml}"
 PYTHON_BIN="${PYTHON_BIN:-.venv/bin/python}"
+EXPECTED_NODE_MAJOR="${EXPECTED_NODE_MAJOR:-14}"
+EXPECTED_PYTHON_PREFIX="${EXPECTED_PYTHON_PREFIX:-3.10}"
 
 function usage() {
   cat <<'EOF'
 NHRILS local harness
 
 Commands:
+  preflight        Check local runtime tools, versions, services, and assets
   start-services   Start PostgreSQL, OpenSearch, Redis, and RabbitMQ
   stop-services    Stop local Docker services
   status           Show local Docker service status
@@ -28,6 +31,7 @@ Commands:
   test-services    Explain service-backed test isolation requirements
 
 Typical local loop:
+  ./scripts/local-harness preflight
   ./scripts/local-harness start-services
   ./scripts/local-harness setup-backend
   ./scripts/local-harness run-backend
@@ -35,6 +39,19 @@ Typical local loop:
 In a second terminal:
   ./scripts/local-harness run-worker
 EOF
+}
+
+function ok() {
+  echo "ok: $*"
+}
+
+function warn() {
+  echo "warn: $*" >&2
+}
+
+function fail() {
+  echo "fail: $*" >&2
+  return 1
 }
 
 function require_venv() {
@@ -45,7 +62,109 @@ function require_venv() {
   fi
 }
 
+function command_exists() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+function check_port() {
+  local port="$1"
+  local label="$2"
+  local python_cmd="${PYTHON_BIN}"
+
+  if [[ ! -x "${python_cmd}" ]]; then
+    python_cmd="python3"
+  fi
+
+  if ! command_exists "${python_cmd}"; then
+    warn "cannot inspect ${label} port ${port}; python runtime not found"
+    return 0
+  fi
+
+  if "${python_cmd}" -c "import socket, sys
+try:
+    s = socket.socket()
+    s.settimeout(0.4)
+    sys.exit(0 if s.connect_ex(('127.0.0.1', ${port})) == 0 else 1)
+except OSError:
+    sys.exit(2)"; then
+    ok "${label} port ${port} is listening"
+  else
+    warn "${label} port ${port} is not listening; run start-services when needed"
+  fi
+}
+
+function preflight() {
+  local failures=0
+
+  echo "NHRILS local harness preflight"
+
+  if [[ -x "${PYTHON_BIN}" ]]; then
+    local python_version
+    python_version="$("${PYTHON_BIN}" -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')"
+    if [[ "${python_version}" == ${EXPECTED_PYTHON_PREFIX}* ]]; then
+      ok "Python ${python_version} via ${PYTHON_BIN}"
+    else
+      warn "Python ${python_version} via ${PYTHON_BIN}; expected ${EXPECTED_PYTHON_PREFIX}.x"
+    fi
+    if "${PYTHON_BIN}" -m pip show invenio-app-ils >/dev/null 2>&1; then
+      ok "invenio-app-ils is installed in .venv"
+    else
+      fail "invenio-app-ils is not installed; run ./scripts/setup-test-venv" || failures=1
+    fi
+  else
+    fail "Python venv not found at ${PYTHON_BIN}; run ./scripts/setup-test-venv" || failures=1
+  fi
+
+  if command_exists node; then
+    local node_version
+    local node_major
+    node_version="$(node --version)"
+    node_major="${node_version#v}"
+    node_major="${node_major%%.*}"
+    if [[ "${node_major}" == "${EXPECTED_NODE_MAJOR}" ]]; then
+      ok "Node ${node_version}"
+    else
+      warn "Node ${node_version}; official InvenioILS local guide expects Node ${EXPECTED_NODE_MAJOR}. Use .nvmrc/.node-version for repeatable builds."
+    fi
+  else
+    warn "node is not installed; asset builds require Node ${EXPECTED_NODE_MAJOR}"
+  fi
+
+  if command_exists npm; then
+    ok "npm $(npm --version)"
+  else
+    warn "npm is not installed; asset builds require npm"
+  fi
+
+  if command_exists docker; then
+    ok "$(docker --version)"
+    if docker compose version >/dev/null 2>&1; then
+      ok "$(docker compose version)"
+    else
+      fail "Docker Compose v2 is not available" || failures=1
+    fi
+  else
+    fail "docker is not installed or not on PATH" || failures=1
+  fi
+
+  check_port 5432 "PostgreSQL"
+  check_port 6379 "Redis"
+  check_port 5672 "RabbitMQ"
+  check_port 9200 "OpenSearch HTTP"
+
+  if [[ -f .venv/var/instance/static/dist/manifest.json ]]; then
+    ok "webpack manifest exists"
+  else
+    warn "webpack manifest is missing; run ./scripts/local-harness build-assets"
+  fi
+
+  return "${failures}"
+}
+
 case "${COMMAND}" in
+  preflight)
+    preflight
+    ;;
   start-services)
     docker compose -f "${COMPOSE_FILE}" up -d cache db mq search
     ;;
