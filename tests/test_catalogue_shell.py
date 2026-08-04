@@ -13,6 +13,14 @@ from pathlib import Path
 import json
 import sys
 
+import pytest
+
+from invenio_app_ils.catalogue.search_service import (
+    CatalogueSearchQuery,
+    InvenioCatalogueSearchBackend,
+    SeedCatalogueSearchBackend,
+)
+
 
 def test_catalogue_shell_renders(client):
     """Test the NHRILS public catalogue shell route."""
@@ -96,6 +104,54 @@ def test_catalogue_search_results_empty_state(client):
     assert b"0 review records" in res.data
     assert b"No review records match this search" in res.data
     assert b"Reset search" in res.data
+
+
+def test_seed_catalogue_search_backend_filters_and_paginates():
+    """Test the read-only seed backend behind the catalogue search route."""
+    response = SeedCatalogueSearchBackend().search(
+        CatalogueSearchQuery(
+            query="malaria",
+            availability="online",
+            page=1,
+            size=5,
+        )
+    )
+
+    assert response.backend == "seed-review"
+    assert response.result_count >= 1
+    assert 0 < len(response.results) <= 5
+    assert response.query.selected_filters == {
+        "availability": "online",
+        "type": "",
+        "year": "",
+    }
+    assert all(result["has_online_access"] for result in response.results)
+    assert any("malaria" in result["title"].lower() for result in response.results)
+    assert {"availability", "type", "year"}.issubset(response.facets)
+    assert response.facets["availability"][0]["label"] == "Digital access"
+
+
+def test_seed_catalogue_search_backend_record_detail():
+    """Test record detail shaping through the search service boundary."""
+    response = SeedCatalogueSearchBackend().get_record("nimr-doc-0001")
+
+    assert response is not None
+    assert response.backend == "seed-review"
+    assert response.record["pid"] == "nimr-doc-0001"
+    assert response.record["has_online_access"]
+    assert response.record["all_authors"]
+    assert response.record["urls"]
+
+
+def test_native_catalogue_search_backend_is_explicitly_gated():
+    """Test that the native backend placeholder cannot silently query indexes."""
+    backend = InvenioCatalogueSearchBackend()
+
+    with pytest.raises(NotImplementedError, match="OpenSearch"):
+        backend.search(CatalogueSearchQuery(query="malaria"))
+
+    with pytest.raises(NotImplementedError, match="OpenSearch"):
+        backend.get_record("nimr-doc-0001")
 
 
 def test_logged_out_page_uses_nhrils_return_path(client, users):
