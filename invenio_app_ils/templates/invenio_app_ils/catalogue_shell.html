@@ -1,0 +1,93 @@
+{% extends config.THEME_BASE_TEMPLATE %}
+
+{% block page_body %}
+<link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
+
+<main class="nhrils-page-shell" aria-labelledby="nhrils-catalogue-title">
+  <header class="nhrils-topbar" aria-label="NHRILS catalogue header">
+    <a class="nhrils-brand" href="/nhrils/catalogue" aria-label="NHRILS catalogue home">
+      <img src="{{ url_for('invenio_app_ils.static', filename='images/nimr.svg') }}" alt="NIMR">
+      <span>
+        <strong>NHRILS</strong>
+        <small>National Health Research Integrated Library System</small>
+      </span>
+    </a>
+    <nav class="nhrils-nav" aria-label="Catalogue navigation">
+      <a href="/nhrils/catalogue" aria-current="page">Catalogue</a>
+      <a href="/search">Advanced search</a>
+      <a href="/pages/search-guide">Search guide</a>
+      <a href="/api">API</a>
+    </nav>
+  </header>
+
+  <section class="nhrils-hero" aria-labelledby="nhrils-catalogue-title">
+    <div class="nhrils-hero-copy">
+      <p class="nhrils-eyebrow">NIMR Library Catalogue</p>
+      <h1 id="nhrils-catalogue-title">Find health research resources held by NIMR</h1>
+      <p>
+        Search books, reports, guidelines, proceedings, journals, policy briefs, and digital resources that support health research in Tanzania.
+      </p>
+    </div>
+    <form class="nhrils-search-panel" action="/search" method="get" role="search" aria-label="Search catalogue">
+      <label for="nhrils-search-query">Search the catalogue</label>
+      <div class="nhrils-search-control">
+        <input id="nhrils-search-query" name="q" type="search" placeholder="Title, author, subject, identifier, or year">
+        <button class="nhrils-button nhrils-button-primary" type="submit">Search</button>
+      </div>
+      <div class="nhrils-search-examples" aria-label="Suggested searches">
+        <a href="/search?q=malaria">Malaria</a>
+        <a href="/search?q=public%20health">Public health</a>
+        <a href="/search?q=guidelines">Guidelines</a>
+        <a href="/search?q=publication_year:%5B2020%20TO%202026%5D">2020-2026</a>
+      </div>
+    </form>
+  </section>
+
+  <section class="nhrils-grid nhrils-grid-four" aria-label="Catalogue scope">
+    <article class="nhrils-card">
+      <span class="nhrils-card-icon">B</span>
+      <h2>Books and manuals</h2>
+      <p>Bibliographic records for physical and digital library holdings.</p>
+    </article>
+    <article class="nhrils-card">
+      <span class="nhrils-card-icon">R</span>
+      <h2>Reports and briefs</h2>
+      <p>Institutional and partner resources approved for discovery.</p>
+    </article>
+    <article class="nhrils-card">
+      <span class="nhrils-card-icon">J</span>
+      <h2>Journals and series</h2>
+      <p>Serials, proceedings, and recurring research publications.</p>
+    </article>
+    <article class="nhrils-card">
+      <span class="nhrils-card-icon">E</span>
+      <h2>Electronic resources</h2>
+      <p>Digital links and access notes for public or restricted e-items.</p>
+    </article>
+  </section>
+
+  <section class="nhrils-content-grid">
+    <article class="nhrils-panel">
+      <div class="nhrils-panel-header">
+        <p class="nhrils-eyebrow">Discovery workflow</p>
+        <h2>Catalogue search built around researcher tasks</h2>
+      </div>
+      <ol class="nhrils-steps">
+        <li><strong>Search</strong><span>Use title, contributor, subject, identifier, or year.</span></li>
+        <li><strong>Filter</strong><span>Narrow by material type, availability, language, subject, or date.</span></li>
+        <li><strong>Open</strong><span>Review identifiers, abstract, location, item status, and online access notes.</span></li>
+        <li><strong>Request</strong><span>Contact the library or use enabled request workflows when available.</span></li>
+      </ol>
+    </article>
+
+    <aside class="nhrils-panel nhrils-panel-muted" aria-labelledby="nhrils-help-title">
+      <div class="nhrils-panel-header">
+        <p class="nhrils-eyebrow">Need help?</p>
+        <h2 id="nhrils-help-title">Search guidance</h2>
+      </div>
+      <p>Use quotes for exact phrases, field names for precise searches, and year ranges when you need recent resources.</p>
+      <a class="nhrils-button nhrils-button-secondary" href="/pages/search-guide">Open search guide</a>
+    </aside>
+  </section>
+</main>
+{% endblock %}

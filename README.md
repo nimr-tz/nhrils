@@ -145,6 +145,7 @@ Start here:
 
 - `docs/NHRILS_INITIAL_CUSTOMIZATION_AND_ROLLOUT_PLAN.md`
 - `docs/NHRILS_CATALOGUE_MVP_20260804.md`
+- `docs/NHRILS_UX_DESIGN_SYSTEM_20260804.md`
 - `README.rst` for upstream Invenio-App-ILS provenance.
 
 External references:

@@ -1,12 +1,17 @@
 {% extends config.THEME_BASE_TEMPLATE %}
 
 {% block page_body %}
-<div class="container error-page">
-  <div class="row">
-    <div class="col-sm-12">
-      You were successfully logged out. This is a development-mode page.
-      If you want to return to the home page click <a href="https://127.0.0.1:3000">here</a>.
-    </div>
+<link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
+
+<div class="nhrils-page-shell nhrils-auth-state" aria-labelledby="nhrils-logout-title">
+  <div class="nhrils-auth-card">
+    <img class="nhrils-auth-logo" src="{{ url_for('invenio_app_ils.static', filename='images/nimr.svg') }}" alt="NIMR">
+    <p class="nhrils-eyebrow">National Health Research Integrated Library System</p>
+    <h1 id="nhrils-logout-title">You have signed out</h1>
+    <p>
+      Your catalogue session has ended. Return to the catalogue when you are ready to continue searching NIMR library resources.
+    </p>
+    <a class="nhrils-button nhrils-button-primary" href="/nhrils/catalogue">Return to catalogue</a>
   </div>
 </div>
 {% endblock %}

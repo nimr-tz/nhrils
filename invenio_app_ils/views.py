@@ -39,6 +39,21 @@ class UserInfoResource(UserInfoView):
         return jsonify(user_payload), 200
 
 
+def create_catalogue_shell_blueprint(app):
+    """Create NHRILS catalogue shell blueprint."""
+    blueprint = Blueprint("nhrils_catalogue_shell", __name__)
+    blueprint.add_url_rule(
+        "/nhrils/catalogue",
+        view_func=catalogue_shell_view,
+    )
+    return blueprint
+
+
+def catalogue_shell_view():
+    """Render the first NHRILS catalogue shell."""
+    return render_template("invenio_app_ils/catalogue_shell.html")
+
+
 def create_logged_out_blueprint(app):
     """Create logged_out blueprint."""
     blueprint = Blueprint("logged_out", __name__)
