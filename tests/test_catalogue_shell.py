@@ -87,6 +87,34 @@ def test_catalogue_contact_page_renders(client):
     assert b'aria-current="page">Contact' in res.data
 
 
+def test_catalogue_terms_page_renders(client):
+    """Test the NHRILS catalogue terms page."""
+    res = client.get(url_for("nhrils_catalogue_shell.catalogue_terms_view"))
+
+    assert res.status_code == 200
+    assert b"Terms Of Use" in res.data
+    assert b"Catalogue use and access conditions" in res.data
+    assert b"Using catalogue information" in res.data
+    assert b"Service boundaries" in res.data
+    assert b"Terms status" in res.data
+    assert b"Draft MVP copy for review" in res.data
+    assert b'aria-current="page">Terms' in res.data
+
+
+def test_catalogue_privacy_page_renders(client):
+    """Test the NHRILS catalogue privacy page."""
+    res = client.get(url_for("nhrils_catalogue_shell.catalogue_privacy_view"))
+
+    assert res.status_code == 200
+    assert b"Privacy Notice" in res.data
+    assert b"Catalogue privacy and data handling" in res.data
+    assert b"What the public catalogue shows" in res.data
+    assert b"Future personal data handling" in res.data
+    assert b"Privacy status" in res.data
+    assert b"Patron identity, requests, loans, and notifications require separate approval" in res.data
+    assert b'aria-current="page">Privacy' in res.data
+
+
 def test_catalogue_review_page_renders(client):
     """Test the read-only seed review page."""
     res = client.get(url_for("nhrils_catalogue_shell.catalogue_seed_review_view"))
@@ -1062,7 +1090,28 @@ def test_catalogue_info_static_markup():
     assert "/nhrils/catalogue/seed-review" in nav
     assert "/nhrils/catalogue/about" in nav
     assert "/nhrils/catalogue/contact" in nav
+    assert "/nhrils/catalogue/terms" in nav
+    assert "/nhrils/catalogue/privacy" in nav
     assert "/pages/search-guide" not in nav
+
+
+def test_catalogue_terms_and_privacy_static_definitions():
+    """Test terms and privacy page definitions stay visible and placeholder-safe."""
+    views = (
+        Path(__file__).resolve().parents[1]
+        / "invenio_app_ils"
+        / "views.py"
+    ).read_text(encoding="utf-8")
+
+    assert "\"terms\"" in views
+    assert "\"privacy\"" in views
+    assert "Catalogue use and access conditions" in views
+    assert "Draft MVP copy for review, not final legal text." in views
+    assert "Catalogue privacy and data handling" in views
+    assert "MVP placeholder notice for review." in views
+    assert "Future patron data handling" in views
+    assert "def catalogue_terms_view" in views
+    assert "def catalogue_privacy_view" in views
 
 
 def test_catalogue_seed_review_static_markup():

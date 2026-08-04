@@ -80,6 +80,14 @@ def create_catalogue_shell_blueprint(app):
         view_func=catalogue_contact_view,
     )
     blueprint.add_url_rule(
+        "/nhrils/catalogue/terms",
+        view_func=catalogue_terms_view,
+    )
+    blueprint.add_url_rule(
+        "/nhrils/catalogue/privacy",
+        view_func=catalogue_privacy_view,
+    )
+    blueprint.add_url_rule(
         "/nhrils/catalogue/seed-review",
         view_func=catalogue_seed_review_view,
     )
@@ -191,6 +199,75 @@ CATALOGUE_HELP_PAGES = {
             ("Catalogue action", "Open a record first, then include the PID in any support request."),
         ],
     },
+    "terms": {
+        "active_page": "terms",
+        "eyebrow": "Terms Of Use",
+        "title": "Catalogue use and access conditions",
+        "lead": (
+            "These MVP terms explain how the NHRILS public catalogue should be "
+            "used while NIMR confirms final institutional policies and service "
+            "procedures."
+        ),
+        "sections": [
+            {
+                "title": "Using catalogue information",
+                "items": [
+                    "Catalogue metadata is provided to support discovery of NIMR library and health research resources.",
+                    "Users should verify bibliographic details, access conditions, and citations before relying on a record for formal reporting or publication.",
+                    "Digital links are shown only as access pointers; copyright, licence, publisher, and repository conditions continue to apply.",
+                    "Records may be corrected, enriched, withdrawn, or reclassified as the library team validates holdings and sources.",
+                ],
+            },
+            {
+                "title": "Service boundaries",
+                "items": [
+                    "This MVP catalogue does not yet enable full patron accounts, loans, renewals, reservations, or automated document delivery.",
+                    "Request and librarian-support pages prepare the workflow but do not create circulation transactions until approved.",
+                    "Any operational terms published by NIMR or the library owner will supersede this placeholder copy.",
+                ],
+            },
+        ],
+        "aside_title": "Terms status",
+        "aside_items": [
+            ("Current status", "Draft MVP copy for review, not final legal text."),
+            ("Primary owner", "NIMR library and institutional governance teams to confirm."),
+            ("User action", "Contact the library when a record, access note, or request instruction is unclear."),
+        ],
+    },
+    "privacy": {
+        "active_page": "privacy",
+        "eyebrow": "Privacy Notice",
+        "title": "Catalogue privacy and data handling",
+        "lead": (
+            "NHRILS starts with public catalogue discovery. This MVP notice explains "
+            "the expected privacy posture before authenticated patron and circulation "
+            "workflows are enabled."
+        ),
+        "sections": [
+            {
+                "title": "What the public catalogue shows",
+                "items": [
+                    "Public pages show bibliographic metadata, source details, subjects, identifiers, and approved access links.",
+                    "The catalogue should not expose patron borrowing history, private contact details, internal staff notes, or restricted operational data.",
+                    "Seed review pages are for metadata readiness and should not be treated as final production records.",
+                ],
+            },
+            {
+                "title": "Future personal data handling",
+                "items": [
+                    "Authenticated request, loan, and notification workflows will require separate approval before collecting user identity or contact details.",
+                    "Future patron data handling should define lawful purpose, retention, access control, audit, and support responsibilities.",
+                    "Do not enter sensitive personal information into request notes or support channels unless the approved workflow requires it.",
+                ],
+            },
+        ],
+        "aside_title": "Privacy status",
+        "aside_items": [
+            ("Current status", "MVP placeholder notice for review."),
+            ("Data shown now", "Catalogue metadata and approved public access pointers."),
+            ("Future gate", "Patron identity, requests, loans, and notifications require separate approval."),
+        ],
+    },
 }
 
 
@@ -272,6 +349,16 @@ def catalogue_search_guide_view():
 def catalogue_contact_view():
     """Render the NHRILS catalogue contact page."""
     return _render_catalogue_help_page("contact")
+
+
+def catalogue_terms_view():
+    """Render the NHRILS catalogue terms page."""
+    return _render_catalogue_help_page("terms")
+
+
+def catalogue_privacy_view():
+    """Render the NHRILS catalogue privacy page."""
+    return _render_catalogue_help_page("privacy")
 
 
 def catalogue_seed_review_view():
