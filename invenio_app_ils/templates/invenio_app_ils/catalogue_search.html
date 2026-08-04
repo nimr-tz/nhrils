@@ -20,6 +20,15 @@
   {% endif %}
 {%- endmacro %}
 
+{% macro size_link(label, size, pagination, selected_filters, query) -%}
+  {% set is_selected = pagination.size == size %}
+  <a class="nhrils-size-link{% if is_selected %} nhrils-size-link-active{% endif %}"
+     href="/nhrils/catalogue/search?q={{ query|urlencode }}{% for key, selected in selected_filters.items() if selected %}&{{ key }}={{ selected|urlencode }}{% endfor %}&size={{ size }}"
+     {% if is_selected %}aria-current="true"{% endif %}>
+    {{ label }}
+  </a>
+{%- endmacro %}
+
 {% block page_body %}
 <link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
 
@@ -52,14 +61,18 @@
     <section class="nhrils-filter-context" aria-label="Current search filters">
       {% if search_context.active_filters %}
         <div class="nhrils-active-filter-list" aria-label="Active filters">
-          <span>Active filters</span>
+          <span>Active filters · {{ search_context.active_filters|length }}</span>
           {% for filter in search_context.active_filters %}
-            <a href="{{ filter.href }}" aria-label="Remove {{ filter.label }} filter">{{ filter.label }}</a>
+            <a href="{{ filter.href }}" aria-label="Remove {{ filter.label }} filter">
+              <small>{{ filter.name|replace("_", " ")|title }}</small>
+              {{ filter.label }}
+            </a>
           {% endfor %}
+          <a class="nhrils-clear-chip" href="/nhrils/catalogue/search">Clear all</a>
         </div>
       {% endif %}
       <div class="nhrils-quick-filter-list" aria-label="Quick filters">
-        <span>Quick filters</span>
+        <span>Common refinements</span>
         {% for filter in search_context.quick_filters %}
           <a class="{% if filter.selected %}nhrils-quick-filter-active{% endif %}" href="{{ filter.href }}">{{ filter.label }}</a>
         {% endfor %}
@@ -139,10 +152,22 @@
           <p class="nhrils-eyebrow">Results</p>
           <h2>{{ result_count }} review record{% if result_count != 1 %}s{% endif %}</h2>
           {% if result_count %}
-            <p>Showing {{ pagination.first_item }}-{{ pagination.last_item }} of {{ result_count }} records.</p>
+            <p>
+              Showing {{ pagination.first_item }}-{{ pagination.last_item }} of {{ result_count }} records
+              {% if query %}for "{{ query }}"{% endif %}
+              {% if search_context.active_filters %}with {{ search_context.active_filters|length }} active filter{% if search_context.active_filters|length != 1 %}s{% endif %}{% endif %}.
+            </p>
           {% endif %}
         </div>
-        <a class="nhrils-inline-action" href="/nhrils/catalogue/search-guide">Search guide</a>
+        <div class="nhrils-results-tools" aria-label="Search result tools">
+          <div class="nhrils-size-switcher" aria-label="Records per page">
+            <span>Per page</span>
+            {{ size_link("10", 10, pagination, selected_filters, query) }}
+            {{ size_link("25", 25, pagination, selected_filters, query) }}
+            {{ size_link("50", 50, pagination, selected_filters, query) }}
+          </div>
+          <a class="nhrils-inline-action" href="/nhrils/catalogue/search-guide">Search help</a>
+        </div>
       </div>
 
       {% if results %}
@@ -194,11 +219,13 @@
         <div class="nhrils-empty-state">
           <h3>{{ search_context.empty_title }}</h3>
           <p>{{ search_context.empty_lead }}</p>
-          {% if search_context.collection %}
-            <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/collections">Back to Collections</a>
-          {% else %}
-            <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/search">Reset search</a>
-          {% endif %}
+          <div class="nhrils-empty-actions" aria-label="No result recovery actions">
+            {% if search_context.collection %}
+              <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/collections">Back to Collections</a>
+            {% endif %}
+            <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/search">Clear search</a>
+            <a class="nhrils-inline-action" href="/nhrils/catalogue/search-guide">Open search help</a>
+          </div>
         </div>
       {% endif %}
     </section>

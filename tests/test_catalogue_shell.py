@@ -181,6 +181,11 @@ def test_catalogue_search_results_shell_renders(client):
     assert b"review seed catalogue" in res.data
     assert b"Refine results" in res.data
     assert b"/nhrils/catalogue/search-guide" in res.data
+    assert b"Common refinements" in res.data
+    assert b"Active filters" in res.data
+    assert b"Clear all" in res.data
+    assert b"Per page" in res.data
+    assert b"Search help" in res.data
     assert b"Online access" in res.data
     assert b"Public digital source attached" in res.data
     assert b"View online" in res.data
@@ -210,8 +215,9 @@ def test_catalogue_collection_search_context_renders(client):
     assert b"Back to Collections" in res.data
     assert b"/nhrils/catalogue/collections" in res.data
     assert b"Active filters" in res.data
+    assert b"Type" in res.data
     assert b"Articles" in res.data
-    assert b"Quick filters" in res.data
+    assert b"Common refinements" in res.data
     assert b"Digital access" in res.data
     assert b"Needs review" in res.data
     assert b"Peer-reviewed" in res.data
@@ -230,6 +236,8 @@ def test_catalogue_collection_empty_state_renders(client):
     assert b"No records found in this collection" in res.data
     assert b"Try clearing filters or returning to Collections" in res.data
     assert b"Back to Collections" in res.data
+    assert b"Clear search" in res.data
+    assert b"Open search help" in res.data
     assert b"Reset search" not in res.data
 
 
@@ -273,6 +281,10 @@ def test_catalogue_search_results_pagination_renders(client):
     assert b"subject=malaria" in res.data
     assert b"page=2" in res.data
     assert b"size=5" in res.data
+    assert b"Per page" in res.data
+    assert b"size=10" in res.data
+    assert b"size=25" in res.data
+    assert b"size=50" in res.data
 
 
 def test_catalogue_search_result_links_preserve_result_context(client):
@@ -500,7 +512,8 @@ def test_catalogue_search_results_empty_state(client):
     assert res.status_code == 200
     assert b"0 review records" in res.data
     assert b"No review records match this search" in res.data
-    assert b"Reset search" in res.data
+    assert b"Clear search" in res.data
+    assert b"Open search help" in res.data
 
 
 def test_seed_catalogue_search_backend_filters_and_paginates():
@@ -980,7 +993,11 @@ def test_catalogue_search_static_markup():
     assert "search_context.title" in shell
     assert "nhrils-filter-context" in shell
     assert "Active filters" in shell
-    assert "Quick filters" in shell
+    assert "Common refinements" in shell
+    assert "nhrils-size-switcher" in shell
+    assert "Clear all" in shell
+    assert "Clear search" in shell
+    assert "Open search help" in shell
     assert "search_context.empty_title" in shell
     assert "Refine results" in shell
     assert "Source" in shell
