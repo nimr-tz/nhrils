@@ -155,6 +155,23 @@ Production deployment must override these through reviewed runtime configuration
 
 NHRILS should adopt three separate automation layers.
 
+## Implemented First Step
+
+`Image Build Validation` is now the first CI/CD bridge between local image readiness and deployment automation.
+
+The workflow is intentionally non-publishing:
+
+- builds backend and frontend images on relevant pull requests, pushes to `master`, and manual dispatch;
+- uses Docker Buildx cache;
+- passes the production frontend URL arguments for `nhrils.apps.nimr.or.tz`;
+- writes a GitHub Actions step summary for each image build;
+- does not log in to GHCR;
+- does not push images;
+- does not update `platform-gitops`;
+- does not deploy.
+
+This keeps image-build failures visible before GHCR publishing and GitOps image pin automation are introduced.
+
 ## 1. Pull Request CI
 
 Keep PR validation separate from deployment.

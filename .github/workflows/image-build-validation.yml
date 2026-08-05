@@ -1,0 +1,154 @@
+# -*- coding: utf-8 -*-
+
+name: Image Build Validation
+
+on:
+  pull_request:
+    branches:
+      - master
+      - "maint-**"
+    paths:
+      - ".github/workflows/image-build-validation.yml"
+      - ".dockerignore"
+      - "docker/**"
+      - "scripts/**"
+      - "invenio_app_ils/**"
+      - "setup.cfg"
+      - "setup.py"
+      - "pyproject.toml"
+      - "MANIFEST.in"
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/image-build-validation.yml"
+      - ".dockerignore"
+      - "docker/**"
+      - "scripts/**"
+      - "invenio_app_ils/**"
+      - "setup.cfg"
+      - "setup.py"
+      - "pyproject.toml"
+      - "MANIFEST.in"
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason for manually validating NHRILS image builds"
+        required: false
+        default: "Manual image build validation"
+
+concurrency:
+  group: nhrils-image-build-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  BACKEND_IMAGE: nhrils-backend
+  FRONTEND_IMAGE: nhrils-frontend
+  FRONTEND_UI_URL: https://nhrils.apps.nimr.or.tz
+  FRONTEND_API_URL: https://nhrils.apps.nimr.or.tz/api
+  FRONTEND_ENV_NAME: production
+
+jobs:
+  backend-image:
+    name: Backend image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set image tag
+        id: image
+        run: |
+          short_sha="${GITHUB_SHA::7}"
+          echo "tag=sha-${short_sha}" >> "$GITHUB_OUTPUT"
+          echo "name=${BACKEND_IMAGE}:sha-${short_sha}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/backend/Dockerfile
+          tags: ${{ steps.image.outputs.name }}
+          push: false
+          load: false
+          provenance: false
+          cache-from: type=gha,scope=nhrils-backend
+          cache-to: type=gha,scope=nhrils-backend,mode=max
+
+      - name: Summarize backend validation
+        if: always()
+        run: |
+          {
+            echo "## NHRILS Backend Image Validation"
+            echo ""
+            echo "- Result: ${{ job.status }}"
+            echo "- Image: \`${{ steps.image.outputs.name }}\`"
+            echo "- Source SHA: \`${{ github.sha }}\`"
+            echo "- Dockerfile: \`docker/backend/Dockerfile\`"
+            echo "- Push: disabled"
+            echo "- Deployment: disabled"
+            echo ""
+            echo "Known follow-up: backend build remains slow because the Dockerfile performs live dependency installation and broad recursive permission changes."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  frontend-image:
+    name: Frontend image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set image tag
+        id: image
+        run: |
+          short_sha="${GITHUB_SHA::7}"
+          echo "tag=sha-${short_sha}" >> "$GITHUB_OUTPUT"
+          echo "name=${FRONTEND_IMAGE}:sha-${short_sha}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/frontend/Dockerfile
+          tags: ${{ steps.image.outputs.name }}
+          push: false
+          load: false
+          provenance: false
+          build-args: |
+            REACT_APP_INVENIO_UI_URL=${{ env.FRONTEND_UI_URL }}
+            REACT_APP_INVENIO_REST_ENDPOINTS_BASE_URL=${{ env.FRONTEND_API_URL }}
+            REACT_APP_ENV_NAME=${{ env.FRONTEND_ENV_NAME }}
+          cache-from: type=gha,scope=nhrils-frontend
+          cache-to: type=gha,scope=nhrils-frontend,mode=max
+
+      - name: Summarize frontend validation
+        if: always()
+        run: |
+          {
+            echo "## NHRILS Frontend Image Validation"
+            echo ""
+            echo "- Result: ${{ job.status }}"
+            echo "- Image: \`${{ steps.image.outputs.name }}\`"
+            echo "- Source SHA: \`${{ github.sha }}\`"
+            echo "- Dockerfile: \`docker/frontend/Dockerfile\`"
+            echo "- UI URL: \`${FRONTEND_UI_URL}\`"
+            echo "- API URL: \`${FRONTEND_API_URL}\`"
+            echo "- Environment: \`${FRONTEND_ENV_NAME}\`"
+            echo "- Push: disabled"
+            echo "- Deployment: disabled"
+            echo ""
+            echo "Known follow-up: frontend build still clones the upstream React package during image build; pin or vendor that source before production publishing."
+          } >> "$GITHUB_STEP_SUMMARY"
