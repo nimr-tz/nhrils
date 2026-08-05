@@ -84,6 +84,8 @@ Exact structure must follow existing conventions in `nimr-tz/platform-gitops`, e
 
 Source-side skeleton guidance is documented in `docs/NHRILS_GITOPS_SKELETON_20260805.md`. Treat that file as a blueprint for the future GitOps PR, not as a substitute for checking the current `platform-gitops` main branch.
 
+GitHub Actions deployment automation and runtime error-reporting recommendations are documented in `docs/NHRILS_GITHUB_ACTIONS_AND_ERROR_REPORTING_REVIEW_20260805.md`.
+
 All cluster state must be owned by GitOps. Avoid manual pod edits, hand-applied manifests, or one-off shell fixes except for approved break-glass recovery. If a running-pod change is needed during diagnosis, convert it into a GitOps change before considering the issue resolved.
 
 ## Ownership Boundary
