@@ -172,6 +172,28 @@ The workflow is intentionally non-publishing:
 
 This keeps image-build failures visible before GHCR publishing and GitOps image pin automation are introduced.
 
+## Implemented Second Step
+
+`Publish Images` is now the second CI/CD step.
+
+The workflow publishes immutable SHA-tagged images to GHCR:
+
+- backend: `ghcr.io/nimr-tz/nhrils-backend:sha-<short-sha>`;
+- frontend: `ghcr.io/nimr-tz/nhrils-frontend:sha-<short-sha>`.
+
+It is intentionally not a deployment workflow:
+
+- runs only on pushes to `master` and manual dispatch;
+- does not run on pull requests;
+- uses `GITHUB_TOKEN` with `packages: write`;
+- uses Docker Buildx cache;
+- passes the production frontend URL arguments for `nhrils.apps.nimr.or.tz`;
+- records image digests in GitHub Actions summaries;
+- does not update `platform-gitops`;
+- does not deploy.
+
+The next automation slice should update `platform-gitops` only after both image publish jobs pass.
+
 ## 1. Pull Request CI
 
 Keep PR validation separate from deployment.
