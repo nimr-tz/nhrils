@@ -7,12 +7,12 @@
   {% set active_page = "catalogue" %}
   {% include "invenio_app_ils/_catalogue_topbar.html" %}
 
-  <section class="nhrils-hero nhrils-hero-review" aria-labelledby="nhrils-catalogue-title">
+  <section class="nhrils-hero" aria-labelledby="nhrils-catalogue-title">
     <div class="nhrils-hero-copy">
       <p class="nhrils-eyebrow">NIMR Library Catalogue</p>
       <h1 id="nhrils-catalogue-title">Find health research resources held by NIMR</h1>
       <p>
-        Search a review-ready catalogue foundation for NIMR publications, reports, journals, guidelines, proceedings, and digital health research resources.
+        Search NIMR publications, reports, journals, guidelines, proceedings, and digital health research resources from one catalogue entry point.
       </p>
       <dl class="nhrils-hero-stats" aria-label="Catalogue preview">
         <div>
@@ -45,15 +45,15 @@
     </form>
   </section>
 
-  <section class="nhrils-status-strip" aria-label="Catalogue readiness status">
+  <section class="nhrils-status-strip" aria-label="Catalogue service status">
     <article>
-      <span class="nhrils-status-dot nhrils-status-dot-review" aria-hidden="true"></span>
+      <span class="nhrils-status-dot" aria-hidden="true"></span>
       <div>
-        <strong>Seed data is ready for NIMR review</strong>
-        <p>Records are validated for catalogue preview. Database import, indexing, and circulation remain gated.</p>
+        <strong>Catalogue discovery is available</strong>
+        <p>Search public metadata, browse collections, and open records to review access options.</p>
       </div>
     </article>
-    <a class="nhrils-inline-action" href="/nhrils/catalogue/search-guide">Review search guidance</a>
+    <a class="nhrils-inline-action" href="/nhrils/catalogue/search-guide">Open search guidance</a>
   </section>
 
   <section class="nhrils-grid nhrils-grid-four" aria-label="Catalogue scope">
@@ -84,7 +84,7 @@
       <div class="nhrils-panel-header">
         <div>
           <p class="nhrils-eyebrow">Featured records</p>
-          <h2>Representative NIMR catalogue records</h2>
+          <h2>Start with representative NIMR resources</h2>
         </div>
         <a class="nhrils-inline-action" href="/nhrils/catalogue/search">View all results</a>
       </div>
@@ -116,16 +116,16 @@
       </div>
     </article>
 
-    <aside class="nhrils-panel nhrils-panel-muted" aria-labelledby="nhrils-review-title">
+    <aside class="nhrils-panel nhrils-panel-muted" aria-labelledby="nhrils-access-title">
       <div class="nhrils-panel-header nhrils-panel-header-stacked">
-        <p class="nhrils-eyebrow">Seed review</p>
-        <h2 id="nhrils-review-title">What needs confirmation</h2>
+        <p class="nhrils-eyebrow">Access options</p>
+        <h2 id="nhrils-access-title">Know how to obtain a resource</h2>
       </div>
       <ul class="nhrils-filter-list nhrils-review-list">
-        <li><span>Authors</span><strong>Confirm full author lists from DOI, PubMed, or official export</strong></li>
-        <li><span>Holdings</span><strong>Add physical items after shelves and barcodes are agreed</strong></li>
-        <li><span>Access</span><strong>Confirm which digital links are public, licensed, or restricted</strong></li>
-        <li><span>Import</span><strong>Database and OpenSearch writes remain approval-gated</strong></li>
+        <li><span>Online</span><strong>Open public DOI or source links where available</strong></li>
+        <li><span>Physical</span><strong>Use location and holding notes to plan a library request</strong></li>
+        <li><span>Restricted</span><strong>Contact the library when access requires staff confirmation</strong></li>
+        <li><span>Support</span><strong>Send the record PID when asking for help</strong></li>
       </ul>
     </aside>
   </section>
@@ -152,6 +152,30 @@
       <p>Use quotes for exact phrases, field names for precise searches, and year ranges when you need recent resources.</p>
       <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/search-guide">Open search guide</a>
     </aside>
+  </section>
+
+  <section class="nhrils-content-grid nhrils-content-grid-staff" aria-label="Catalogue support paths">
+    <article class="nhrils-panel">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
+        <p class="nhrils-eyebrow">Library staff</p>
+        <h2>Maintain the catalogue from backoffice tools</h2>
+      </div>
+      <p>
+        Librarians and documentation officers can use InvenioILS staff workflows to create documents, attach physical items, add e-items, and prepare records for indexed discovery.
+      </p>
+      <a class="nhrils-button nhrils-button-secondary" href="/backoffice">Open backoffice</a>
+    </article>
+
+    <article class="nhrils-panel">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
+        <p class="nhrils-eyebrow">Browse</p>
+        <h2>Explore collections before searching deeply</h2>
+      </div>
+      <p>
+        Browse by publication category when users need orientation before applying search terms and filters.
+      </p>
+      <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/collections">Open collections</a>
+    </article>
   </section>
   {% include "invenio_app_ils/_catalogue_footer.html" %}
 </main>

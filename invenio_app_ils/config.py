@@ -194,7 +194,9 @@ COLLECT_STORAGE = "flask_collect.storage.file"
 #: Email address used as sender of account registration emails.
 SECURITY_EMAIL_SENDER = SUPPORT_EMAIL
 #: Email subject for account registration emails.
-SECURITY_EMAIL_SUBJECT_REGISTER = _("Welcome to NHRILS")
+SECURITY_EMAIL_SUBJECT_REGISTER = _(
+    "Welcome to the National Health Research Integrated Library System"
+)
 #: Redis session storage URL.
 ACCOUNTS_SESSION_REDIS_URL = "redis://localhost:6379/1"
 
@@ -1253,4 +1255,4 @@ PAGES_DEFAULT_TEMPLATE = "invenio_pages/default.html"
 APP_THEME = ["semantic-ui"]
 
 # Site name.
-THEME_SITENAME = _("NHRILS")
+THEME_SITENAME = _("National Health Research Integrated Library System")

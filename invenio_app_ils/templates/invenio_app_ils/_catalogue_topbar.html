@@ -1,5 +1,5 @@
-<header class="nhrils-topbar" aria-label="NHRILS catalogue header">
-  <a class="nhrils-brand" href="/nhrils/catalogue" aria-label="NHRILS catalogue home">
+<header class="nhrils-topbar" aria-label="National Health Research Integrated Library System catalogue header">
+  <a class="nhrils-brand" href="/nhrils/catalogue" aria-label="National Health Research Integrated Library System catalogue home">
     <img src="{{ url_for('invenio_app_ils.static', filename='images/nimr.svg') }}" alt="NIMR">
     <span>
       <strong>NHRILS</strong>
@@ -11,7 +11,6 @@
       <a href="/nhrils/catalogue"{% if active_page == "catalogue" %} aria-current="page"{% endif %}>Catalogue</a>
       <a href="/nhrils/catalogue/search"{% if active_page == "results" %} aria-current="page"{% endif %}>Search</a>
       <a href="/nhrils/catalogue/collections"{% if active_page == "collections" %} aria-current="page"{% endif %}>Collections</a>
-      <a href="/nhrils/catalogue/seed-review"{% if active_page == "seed-review" %} aria-current="page"{% endif %}>Review</a>
       <a href="/nhrils/catalogue/contact"{% if active_page == "contact" %} aria-current="page"{% endif %}>Request</a>
     </nav>
     <nav class="nhrils-nav nhrils-nav-utility" aria-label="Catalogue support navigation">

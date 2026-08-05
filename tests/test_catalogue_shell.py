@@ -35,19 +35,24 @@ def test_catalogue_shell_renders(client):
     assert b"/nhrils/catalogue/about" in res.data
     assert b"/nhrils/catalogue/contact" in res.data
     assert b"/api" not in res.data
-    assert b"NIMR health research discovery service" in res.data
-    assert b"Request support" in res.data
     assert b"nimr.svg" in res.data
     assert b"42" in res.data
     assert b"seed records" in res.data
     assert b"Featured records" in res.data
-    assert b"Representative NIMR catalogue records" in res.data
-    assert b"What needs confirmation" in res.data
+    assert b"Start with representative NIMR resources" in res.data
+    assert b"Catalogue discovery is available" in res.data
+    assert b"Open search guidance" in res.data
+    assert b"Access options" in res.data
+    assert b"Know how to obtain a resource" in res.data
+    assert b"Library staff" in res.data
+    assert b"Maintain the catalogue from backoffice tools" in res.data
+    assert b"/backoffice" in res.data
     assert b"Artemisinin-resistant malaria" in res.data
     assert b"Tanzania Journal of Health Research" in res.data
     assert b"Digital access" in res.data
-    assert b"Database import, indexing, and circulation remain gated" in res.data
-    assert b"Seed data is ready for NIMR review" in res.data
+    assert b"Database import, indexing, and circulation remain gated" not in res.data
+    assert b"Seed data is ready for NIMR review" not in res.data
+    assert b"What needs confirmation" not in res.data
 
 
 def test_catalogue_about_page_renders(client):
@@ -145,7 +150,6 @@ def test_catalogue_review_page_renders(client):
     assert b"Browse all seed records" in res.data
     assert b"Subjects needing vocabulary review" in res.data
     assert b"/nhrils/catalogue/search?availability=review" in res.data
-    assert b'aria-current="page">Review' in res.data
     assert b"Database and OpenSearch writes remain approval-gated" not in res.data
 
 
@@ -169,7 +173,7 @@ def test_catalogue_collections_page_renders(client):
 
 
 def test_catalogue_search_results_shell_renders(client):
-    """Test the NHRILS public review search results shell."""
+    """Test the NHRILS public catalogue search results shell."""
     res = client.get(
         url_for("nhrils_catalogue_shell.catalogue_search_view"),
         query_string={"q": "malaria", "availability": "online"},
@@ -178,7 +182,7 @@ def test_catalogue_search_results_shell_renders(client):
     assert res.status_code == 200
     assert b"Catalogue results" in res.data
     assert b"Search NIMR health research resources" in res.data
-    assert b"review seed catalogue" in res.data
+    assert b"Browse available NIMR catalogue records" in res.data
     assert b"Refine results" in res.data
     assert b"/nhrils/catalogue/search-guide" in res.data
     assert b"Common refinements" in res.data
@@ -198,6 +202,9 @@ def test_catalogue_search_results_shell_renders(client):
     assert b"/nhrils/catalogue/records/nimr-doc-0001" in res.data
     assert b"Open record" in res.data
     assert b"Showing 1-" in res.data
+    assert b"catalogue record" in res.data
+    assert b"review record" not in res.data
+    assert b"review seed catalogue" not in res.data
     assert b"Database import" not in res.data
 
 
@@ -219,7 +226,7 @@ def test_catalogue_collection_search_context_renders(client):
     assert b"Articles" in res.data
     assert b"Common refinements" in res.data
     assert b"Digital access" in res.data
-    assert b"Needs review" in res.data
+    assert b"Metadata to confirm" in res.data
     assert b"Peer-reviewed" in res.data
     assert b"name=\"type\" value=\"ARTICLE\"" in res.data
 
@@ -242,15 +249,15 @@ def test_catalogue_collection_empty_state_renders(client):
 
 
 def test_catalogue_search_review_only_result_card_renders(client):
-    """Test review-only result cards expose clear metadata and no online action."""
+    """Test records without online access expose a clear public access state."""
     res = client.get(
         url_for("nhrils_catalogue_shell.catalogue_search_view"),
         query_string={"q": "schistosomiasis", "availability": "review"},
     )
 
     assert res.status_code == 200
-    assert b"Metadata review needed" in res.data
-    assert b"No digital source attached" in res.data
+    assert b"Access details to confirm" in res.data
+    assert b"No digital source attached yet" in res.data
     assert b"View online" not in res.data
     assert b"Record summary" in res.data
     assert b"ARTICLE" in res.data
@@ -313,7 +320,7 @@ def test_catalogue_search_result_links_preserve_result_context(client):
 
 
 def test_catalogue_record_detail_shell_renders(client):
-    """Test the NHRILS public review record detail shell."""
+    """Test the NHRILS public catalogue record detail shell."""
     res = client.get(
         url_for(
             "nhrils_catalogue_shell.catalogue_record_view",
@@ -322,7 +329,8 @@ def test_catalogue_record_detail_shell_renders(client):
     )
 
     assert res.status_code == 200
-    assert b"Review record" in res.data
+    assert b"Catalogue record" in res.data
+    assert b"Review record" not in res.data
     assert b"Artemisinin-resistant malaria in Africa demands urgent action" in res.data
     assert b"Mehul Dhorda" in res.data
     assert b"Digital access available" in res.data
@@ -339,13 +347,17 @@ def test_catalogue_record_detail_shell_renders(client):
     assert b"rel=\"noopener noreferrer\"" in res.data
     assert b"/nhrils/catalogue/records/nimr-doc-0001/request" in res.data
     assert b"No physical holding attached" in res.data
-    assert b"Request workflow will be enabled" in res.data
-    assert b"Before request activation" in res.data
-    assert b"Confirm patron sign-in and account matching" in res.data
+    assert b"Online request workflow is not active" in res.data
+    assert b"Request options" in res.data
+    assert b"Use Prepare request to review the intended library request" in res.data
     assert b"Bibliographic metadata" in res.data
-    assert b"Before production import" in res.data
-    assert b"Confirm metadata" in res.data
+    assert b"Citation and export" in res.data
+    assert b"Copy citation" in res.data
+    assert b"Export RIS" in res.data
+    assert b"Export BibTeX" in res.data
+    assert b"Before production import" not in res.data
     assert b"NIMR source page" in res.data
+    assert b"review seed" not in res.data
 
 
 def test_catalogue_record_detail_identifier_links_render(client):
@@ -365,8 +377,8 @@ def test_catalogue_record_detail_identifier_links_render(client):
     assert b"rel=\"noopener noreferrer\"" in res.data
 
 
-def test_catalogue_record_detail_review_only_access_panel(client):
-    """Test review-only records show disabled access actions honestly."""
+def test_catalogue_record_detail_missing_access_panel(client):
+    """Test records without digital access show disabled actions honestly."""
     res = client.get(
         url_for(
             "nhrils_catalogue_shell.catalogue_record_view",
@@ -375,13 +387,13 @@ def test_catalogue_record_detail_review_only_access_panel(client):
     )
 
     assert res.status_code == 200
-    assert b"Metadata review required" in res.data
-    assert b"No digital access link is attached" in res.data
+    assert b"Access details to confirm" in res.data
+    assert b"No digital access link is attached yet" in res.data
     assert b"Not attached" in res.data
     assert b"Digital source unavailable" in res.data
     assert b"nhrils-button-disabled" in res.data
-    assert b"Request workflow will be enabled" in res.data
-    assert b"Librarian contact workflow is pending" in res.data
+    assert b"Online request workflow is not active" in res.data
+    assert b"Library contact routing is being finalized" in res.data
 
 
 def test_catalogue_record_detail_back_link_uses_safe_return_context(client):
@@ -445,7 +457,7 @@ def test_catalogue_record_detail_unknown_pid_returns_404(client):
 
 
 def test_catalogue_record_request_shell_renders(client):
-    """Test the NHRILS request workflow shell renders without writes."""
+    """Test the NHRILS request preparation page renders without writes."""
     res = client.get(
         url_for(
             "nhrils_catalogue_shell.catalogue_record_request_view",
@@ -456,7 +468,7 @@ def test_catalogue_record_request_shell_renders(client):
     assert res.status_code == 200
     assert b"Catalogue request" in res.data
     assert b"Prepare a library request" in res.data
-    assert b"Review the record, intended request type, and service requirements" in res.data
+    assert b"Review the selected record, access status, and information the library will need" in res.data
     assert b"Artemisinin-resistant malaria in Africa demands urgent action" in res.data
     assert b"Request record summary" in res.data
     assert b"Request details" in res.data
@@ -465,12 +477,16 @@ def test_catalogue_record_request_shell_renders(client):
     assert b"Confirm the record" in res.data
     assert b"State the need" in res.data
     assert b"Route for action" in res.data
-    assert b"Request submission is intentionally disabled" in res.data
-    assert b"Request workflow shell" in res.data
-    assert b"Not submitting yet" in res.data
-    assert b"records no request and changes no library, patron, or circulation data" in res.data
-    assert b"Contact support" in res.data
+    assert b"Online request submission is not active yet" in res.data
+    assert b"Online submission not active" in res.data
+    assert b"No online submission" in res.data
+    assert b"does not create a request, loan, patron update, or circulation transaction" in res.data
+    assert b"Contact library" in res.data
     assert b"/nhrils/catalogue/contact" in res.data
+    assert b"MVP status" not in res.data
+    assert b"guided preview" not in res.data
+    assert b"Request workflow shell" not in res.data
+    assert b"Contact support" not in res.data
     assert b"method=\"post\"" not in res.data
 
 
@@ -513,15 +529,16 @@ def test_catalogue_record_request_unknown_pid_returns_404(client):
 
 
 def test_catalogue_search_results_empty_state(client):
-    """Test that the review search results shell has a useful empty state."""
+    """Test that the catalogue search results shell has a useful empty state."""
     res = client.get(
         url_for("nhrils_catalogue_shell.catalogue_search_view"),
         query_string={"q": "nonexistent-catalogue-query"},
     )
 
     assert res.status_code == 200
-    assert b"0 review records" in res.data
-    assert b"No review records match this search" in res.data
+    assert b"0 catalogue records" in res.data
+    assert b"No catalogue records match this search" in res.data
+    assert b"No review records match this search" not in res.data
     assert b"Clear search" in res.data
     assert b"Open search help" in res.data
 
@@ -586,7 +603,7 @@ def test_seed_catalogue_search_backend_shapes_review_only_result_access():
     assert response.result_count >= 1
     assert all(not result["has_online_access"] for result in response.results)
     assert all(
-        result["access"]["label"] == "Metadata review needed"
+        result["access"]["label"] == "Access details to confirm"
         for result in response.results
     )
     assert all(result["access"]["online_url"] is None for result in response.results)
@@ -929,7 +946,7 @@ def test_seed_catalogue_search_backend_record_detail_without_eitem():
 
     assert response is not None
     assert not response.record["has_online_access"]
-    assert response.record["access"]["status"]["label"] == "Metadata review required"
+    assert response.record["access"]["status"]["label"] == "Access details to confirm"
     assert response.record["access"]["online_url"] is None
     assert response.record["primary_link"] is None
     assert response.record["link_items"] == []
@@ -982,12 +999,17 @@ def test_catalogue_shell_static_markup():
     assert "/pages/search-guide" not in shell
     assert "seed records" in shell
     assert "Featured records" in shell
-    assert "Representative NIMR catalogue records" in shell
-    assert "What needs confirmation" in shell
+    assert "Start with representative NIMR resources" in shell
+    assert "Catalogue discovery is available" in shell
+    assert "Access options" in shell
+    assert "Know how to obtain a resource" in shell
+    assert "Maintain the catalogue from backoffice tools" in shell
+    assert "/backoffice" in shell
     assert "Artemisinin-resistant malaria" in shell
     assert "Tanzania Journal of Health Research" in shell
-    assert "Database and OpenSearch writes remain approval-gated" in shell
-    assert "Seed data is ready for NIMR review" in shell
+    assert "What needs confirmation" not in shell
+    assert "Database and OpenSearch writes remain approval-gated" not in shell
+    assert "Seed data is ready for NIMR review" not in shell
 
 
 def test_catalogue_search_static_markup():
@@ -1016,6 +1038,8 @@ def test_catalogue_search_static_markup():
     assert "search_context.empty_lead" in shell
     assert "Back to Collections" in shell
     assert "search_context.lead" in shell
+    assert "catalogue record" in shell
+    assert "review record" not in shell
     assert "Search results pages" in shell
     assert "Showing {{ pagination.first_item }}-{{ pagination.last_item }}" in shell
     assert "return_to={{ search_return_url|urlencode }}" in shell
@@ -1054,7 +1078,7 @@ def test_catalogue_record_static_markup():
     assert "Digital source unavailable" in shell
     assert "Prepare request" in shell
     assert "Contact library" in shell
-    assert "Before request activation" in shell
+    assert "Request options" in shell
     assert "record.access.status.label" in shell
     assert "record.primary_link" in shell
     assert "record.identifier_items" in shell
@@ -1064,10 +1088,14 @@ def test_catalogue_record_static_markup():
     assert "record.access.request.summary" in shell
     assert "record.access.contact.summary" in shell
     assert "/request" in shell
-    assert "Before production import" in shell
-    assert "Confirm metadata" in shell
-    assert "Confirm access" in shell
-    assert "Add holdings" in shell
+    assert "Catalogue record" in shell
+    assert "Review record" not in shell
+    assert "review seed" not in shell
+    assert "Before production import" not in shell
+    assert "Citation and export" in shell
+    assert "Copy citation" in shell
+    assert "Export RIS" in shell
+    assert "Export BibTeX" in shell
     assert "_catalogue_topbar.html" in shell
     assert "_catalogue_footer.html" in shell
 
@@ -1091,11 +1119,15 @@ def test_catalogue_record_request_static_markup():
     assert "Confirm the record" in shell
     assert "State the need" in shell
     assert "Route for action" in shell
-    assert "Request submission is intentionally disabled" in shell
-    assert "Request workflow shell" in shell
-    assert "Not submitting yet" in shell
-    assert "records no request and changes no library, patron, or circulation data" in shell
-    assert "Contact support" in shell
+    assert "Online request submission is not active yet" in shell
+    assert "Online submission not active" in shell
+    assert "No online submission" in shell
+    assert "does not create a request, loan, patron update, or circulation transaction" in shell
+    assert "Contact library" in shell
+    assert "MVP status" not in shell
+    assert "guided preview" not in shell
+    assert "Request workflow shell" not in shell
+    assert "Contact support" not in shell
     assert "/nhrils/catalogue/contact" in shell
     assert "record.pid" in shell
     assert "record.access.status.label" in shell
@@ -1129,7 +1161,7 @@ def test_catalogue_info_static_markup():
     assert "/nhrils/catalogue/search" in shell
     assert "/nhrils/catalogue/collections" in nav
     assert "/nhrils/catalogue/search-guide" in nav
-    assert "/nhrils/catalogue/seed-review" in nav
+    assert "/nhrils/catalogue/seed-review" not in nav
     assert "/nhrils/catalogue/about" in nav
     assert "/nhrils/catalogue/contact" in nav
     assert "/nhrils/catalogue/terms" in nav
@@ -1137,6 +1169,30 @@ def test_catalogue_info_static_markup():
     assert 'href="/search"' not in nav
     assert 'href="/api"' not in nav
     assert "/pages/search-guide" not in nav
+
+
+def test_catalogue_topbar_uses_nimr_logo_and_full_accessible_name():
+    """Test the catalogue topbar uses NIMR logo with full-name labels."""
+    nav = (
+        Path(__file__).resolve().parents[1]
+        / "invenio_app_ils"
+        / "templates"
+        / "invenio_app_ils"
+        / "_catalogue_topbar.html"
+    ).read_text(encoding="utf-8")
+
+    assert "images/nimr.svg" in nav
+    assert 'alt="NIMR"' in nav
+    assert "<strong>NHRILS</strong>" in nav
+    assert "National Health Research Integrated Library System" in nav
+    assert (
+        'aria-label="National Health Research Integrated Library System catalogue header"'
+        in nav
+    )
+    assert (
+        'aria-label="National Health Research Integrated Library System catalogue home"'
+        in nav
+    )
 
 
 def test_catalogue_footer_static_markup():
@@ -1149,7 +1205,8 @@ def test_catalogue_footer_static_markup():
         / "_catalogue_footer.html"
     ).read_text(encoding="utf-8")
 
-    assert "NHRILS Catalogue" in footer
+    assert "National Health Research Integrated Library System" in footer
+    assert "NHRILS Catalogue" not in footer
     assert "NIMR health research discovery service" in footer
     assert 'aria-label="Catalogue footer navigation"' in footer
     assert "/nhrils/catalogue/search" in footer
@@ -1158,6 +1215,25 @@ def test_catalogue_footer_static_markup():
     assert "/nhrils/catalogue/about" in footer
     assert "/nhrils/catalogue/terms" in footer
     assert "/nhrils/catalogue/privacy" in footer
+
+
+def test_site_name_static_config_uses_full_product_name():
+    """Test the canonical site name is the full product name, not the acronym."""
+    config = (
+        Path(__file__).resolve().parents[1]
+        / "invenio_app_ils"
+        / "config.py"
+    ).read_text(encoding="utf-8")
+
+    assert (
+        'THEME_SITENAME = _("National Health Research Integrated Library System")'
+        in config
+    )
+    assert 'THEME_SITENAME = _("NHRILS")' not in config
+    assert (
+        "Welcome to the National Health Research Integrated Library System"
+        in config
+    )
 
 
 def test_catalogue_terms_and_privacy_static_definitions():

@@ -10,7 +10,7 @@
   <section class="nhrils-record-detail-layout">
     <article class="nhrils-panel nhrils-record-detail-main">
       <a class="nhrils-inline-action" href="{{ return_to }}">Back to results</a>
-      <p class="nhrils-eyebrow">Review record · {{ record.document_type }} · {{ record.publication_year }}</p>
+      <p class="nhrils-eyebrow">Catalogue record · {{ record.document_type }} · {{ record.publication_year }}</p>
       <h1 id="nhrils-record-title">{{ record.title }}</h1>
       {% if record.all_authors %}
         <p class="nhrils-result-authors">{{ record.all_authors|join("; ") }}</p>
@@ -84,11 +84,11 @@
         </div>
       </dl>
       <section class="nhrils-access-readiness" aria-labelledby="nhrils-access-readiness-title">
-        <h3 id="nhrils-access-readiness-title">Before request activation</h3>
+        <h3 id="nhrils-access-readiness-title">Request options</h3>
         <ul>
-          <li>Confirm patron sign-in and account matching.</li>
-          <li>Approve request queue, notifications, and service routing.</li>
-          <li>Attach physical holdings before circulation actions are enabled.</li>
+          <li>Use Prepare request to review the intended library request.</li>
+          <li>Contact the library for access guidance while online requests are being configured.</li>
+          <li>Physical holding and circulation details will appear when available.</li>
         </ul>
       </section>
     </aside>
@@ -117,7 +117,7 @@
         {% else %}
           <div>
             <dt>Identifiers</dt>
-            <dd>Not captured in the review seed.</dd>
+            <dd>Not recorded for this catalogue item.</dd>
           </div>
         {% endif %}
 
@@ -131,7 +131,7 @@
         {% else %}
           <div>
             <dt>Digital link</dt>
-            <dd>No public link is attached to this review record.</dd>
+            <dd>No public link is attached to this catalogue record.</dd>
           </div>
         {% endif %}
       </dl>
@@ -139,13 +139,13 @@
 
     <aside class="nhrils-panel nhrils-panel-muted">
       <div class="nhrils-panel-header nhrils-panel-header-stacked">
-        <p class="nhrils-eyebrow">Review note</p>
-        <h2>Before production import</h2>
+        <p class="nhrils-eyebrow">Record tools</p>
+        <h2>Citation and export</h2>
       </div>
       <ol class="nhrils-steps">
-        <li><strong>Confirm metadata</strong><span>Review authors, identifiers, source, and publication year.</span></li>
-        <li><strong>Confirm access</strong><span>Classify each link as public, licensed, internal, or restricted.</span></li>
-        <li><strong>Add holdings</strong><span>Attach physical items after locations, shelves, and barcodes are agreed.</span></li>
+        <li><strong>Copy citation</strong><span>Use the title, authors, source, and year shown on this page.</span></li>
+        <li><strong>Export RIS</strong><span>Structured citation export will be enabled with indexed catalogue records.</span></li>
+        <li><strong>Export BibTeX</strong><span>BibTeX export will follow the approved citation metadata format.</span></li>
       </ol>
     </aside>
   </section>

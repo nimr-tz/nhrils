@@ -688,8 +688,8 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
             }
         return {
             "tone": "review",
-            "label": "Metadata review needed",
-            "summary": "No digital source attached",
+            "label": "Access details to confirm",
+            "summary": "No digital source attached yet",
             "online_url": None,
         }
 
@@ -706,13 +706,13 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
             status = {
                 "tone": "online",
                 "label": "Digital access available",
-                "summary": "A public online source is attached to this review record.",
+                "summary": "A public online source is attached to this catalogue record.",
             }
         else:
             status = {
                 "tone": "review",
-                "label": "Metadata review required",
-                "summary": "No digital access link is attached to this review record yet.",
+                "label": "Access details to confirm",
+                "summary": "No digital access link is attached yet.",
             }
 
         return {
@@ -722,22 +722,21 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
                 "label": "No physical holding attached",
                 "summary": (
                     "Physical item, barcode, shelf, and circulation details are "
-                    "not yet part of the review seed."
+                    "not available for this catalogue record yet."
                 ),
             },
             "request": {
                 "enabled": False,
                 "label": "Request item",
                 "summary": (
-                    "Request workflow will be enabled after holdings and circulation "
-                    "rules are approved."
+                    "Online request workflow is not active for this record yet."
                 ),
             },
             "contact": {
                 "enabled": False,
                 "label": "Ask librarian",
                 "summary": (
-                    "Librarian contact workflow is pending NIMR service desk routing."
+                    "Library contact routing is being finalized."
                 ),
             },
         }
@@ -867,7 +866,7 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
         filter_labels = {
             "availability": {
                 "online": "Digital access",
-                "review": "Needs metadata review",
+                "review": "Metadata to confirm",
             },
             "type": {
                 "ARTICLE": "Articles",
@@ -908,7 +907,7 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
                 "selected": query.availability == "online",
             },
             {
-                "label": "Needs review",
+                "label": "Metadata to confirm",
                 "name": "availability",
                 "value": "review",
                 "href": self._build_search_href(
@@ -946,13 +945,13 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
             else "Search NIMR health research resources",
             "lead": collection["lead"]
             if collection
-            else "Browse the review seed catalogue before database import and indexed search are enabled.",
+            else "Browse available NIMR catalogue records and refine by access, material type, year, source, language, or subject.",
             "collection": collection,
             "active_filters": active_filters,
             "quick_filters": quick_filters,
             "empty_title": "No records found in this collection"
             if collection
-            else "No review records match this search",
+            else "No catalogue records match this search",
             "empty_lead": (
                 "Try clearing filters or returning to Collections to choose another resource group."
                 if collection
@@ -1082,7 +1081,11 @@ class SeedCatalogueSearchBackend(CatalogueSearchBackend):
         review_count = len(documents) - online_count
         return [
             {"value": "online", "label": "Digital access", "count": online_count},
-            {"value": "review", "label": "Review record", "count": review_count},
+            {
+                "value": "review",
+                "label": "Access details to confirm",
+                "count": review_count,
+            },
         ]
 
     def _build_pagination(

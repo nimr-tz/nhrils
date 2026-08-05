@@ -13,7 +13,7 @@
       <p class="nhrils-eyebrow">Catalogue request · {{ record.document_type }} · {{ record.publication_year }}</p>
       <h1 id="nhrils-request-title">Prepare a library request</h1>
       <p>
-        Review the record, intended request type, and service requirements before the library enables request submission. This MVP page does not submit, approve, or create circulation transactions yet.
+        Review the selected record, access status, and information the library will need before making a request.
       </p>
 
       <section class="nhrils-request-record" aria-labelledby="nhrils-request-record-title">
@@ -54,7 +54,7 @@
         <ol class="nhrils-request-prep-list" aria-label="Request preparation steps">
           <li><strong>Confirm the record</strong><span>Use the local PID, title, year, and access state shown above.</span></li>
           <li><strong>State the need</strong><span>Specify digital access, physical copy, metadata correction, or research support.</span></li>
-          <li><strong>Route for action</strong><span>The enabled workflow will send the request to the approved library queue.</span></li>
+          <li><strong>Route for action</strong><span>The library will route enabled requests to the appropriate support queue.</span></li>
         </ol>
         <div class="nhrils-request-fields">
           <label>
@@ -69,28 +69,28 @@
           </label>
         </div>
         <p id="nhrils-request-disabled-note" class="nhrils-request-note">
-          Request submission is intentionally disabled until patron identity, request queue, notification, and circulation rules are approved.
+          Online request submission is not active yet. Contact the library for help with access, holdings, or metadata questions.
         </p>
       </section>
     </article>
 
     <aside class="nhrils-panel nhrils-record-summary" aria-labelledby="nhrils-request-status-title">
       <div class="nhrils-panel-header nhrils-panel-header-stacked">
-        <p class="nhrils-eyebrow">MVP status</p>
-        <h2 id="nhrils-request-status-title">Request workflow shell</h2>
+        <p class="nhrils-eyebrow">Request status</p>
+        <h2 id="nhrils-request-status-title">Online submission not active</h2>
       </div>
       <div class="nhrils-access-state nhrils-access-state-review">
-        <span class="nhrils-access-chip">Not submitting yet</span>
-        <p>This page is a guided preview. It records no request and changes no library, patron, or circulation data.</p>
+        <span class="nhrils-access-chip">No online submission</span>
+        <p>This page helps prepare the request information only. It does not create a request, loan, patron update, or circulation transaction.</p>
       </div>
       <ol class="nhrils-steps">
-        <li><strong>Confirm identity</strong><span>Define patron sign-in and library account matching.</span></li>
-        <li><strong>Confirm queue</strong><span>Decide how requests are assigned, reviewed, and audited.</span></li>
-        <li><strong>Confirm delivery</strong><span>Approve notification, pickup, access, and circulation rules.</span></li>
+        <li><strong>Check access</strong><span>Use the record access state to decide whether digital access or library help is needed.</span></li>
+        <li><strong>Prepare details</strong><span>Keep the local PID, title, year, and reason ready for library staff.</span></li>
+        <li><strong>Contact library</strong><span>Use the support page until online request submission is enabled.</span></li>
       </ol>
       <div class="nhrils-access-actions" aria-label="Request shell actions">
         <a class="nhrils-button nhrils-button-primary" href="{{ record_url }}">Back to record</a>
-        <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/contact">Contact support</a>
+        <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/contact">Contact library</a>
         <a class="nhrils-button nhrils-button-secondary" href="{{ return_to }}">Back to results</a>
       </div>
     </aside>
