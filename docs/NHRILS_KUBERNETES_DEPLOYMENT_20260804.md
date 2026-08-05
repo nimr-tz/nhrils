@@ -137,8 +137,8 @@ The current local harness uses PostgreSQL, Redis, RabbitMQ, and OpenSearch throu
 Use GHCR under the NIMR organization:
 
 ```text
-ghcr.io/nimr-tz/nhrils:<git-sha>
-ghcr.io/nimr-tz/nhrils-frontend:<git-sha>
+ghcr.io/nimr-tz/nhrils-backend:sha-<short-sha>
+ghcr.io/nimr-tz/nhrils-frontend:sha-<short-sha>
 ```
 
 Use a separate frontend image only while the repository still builds the React frontend from `docker/frontend/Dockerfile`.
@@ -154,6 +154,8 @@ Recommended source-to-cluster flow:
 5. Run the GitOps render/validation command used by the platform repository.
 6. Merge the GitOps change.
 7. Let the GitOps controller apply the deployment.
+
+The source repository now owns a publishing workflow that produces these two GHCR images. The first GitOps deployment PR should consume those exact image package names and avoid introducing a third backend package name.
 
 ## Required Configuration
 

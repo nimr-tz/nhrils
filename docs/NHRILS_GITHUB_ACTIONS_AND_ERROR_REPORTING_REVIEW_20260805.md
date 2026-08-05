@@ -230,8 +230,8 @@ Recommended NHRILS workflow shape:
 - trigger on `main` after PR merge and `workflow_dispatch`;
 - use `concurrency` per branch;
 - permission scope: `contents: read`, `packages: write`;
-- build backend image `ghcr.io/nimr-tz/nhrils:sha-<short-sha>`;
-- build frontend image only if the separate frontend image remains in use;
+- build backend image `ghcr.io/nimr-tz/nhrils-backend:sha-<short-sha>`;
+- build frontend image `ghcr.io/nimr-tz/nhrils-frontend:sha-<short-sha>` while the separate frontend image remains in use;
 - pass production frontend build args:
   - `REACT_APP_INVENIO_UI_URL=https://nhrils.apps.nimr.or.tz`;
   - `REACT_APP_INVENIO_REST_ENDPOINTS_BASE_URL=https://nhrils.apps.nimr.or.tz/api`;

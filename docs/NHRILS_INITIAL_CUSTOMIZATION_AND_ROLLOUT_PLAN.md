@@ -90,8 +90,8 @@ Kubernetes/GitOps:
 Container images:
 
 - Prefer GHCR under the organization namespace:
-  - `ghcr.io/nimr-tz/nhrils`
-  - optionally `ghcr.io/nimr-tz/nhrils-frontend` if the separate frontend image remains required
+  - `ghcr.io/nimr-tz/nhrils-backend`
+  - `ghcr.io/nimr-tz/nhrils-frontend` while the separate frontend image remains required
 - Add GitHub Actions to build, push, and update the GitOps image tag after merge.
 
 Deployment automation:

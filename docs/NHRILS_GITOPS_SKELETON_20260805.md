@@ -179,8 +179,8 @@ Create `clusters/msmt-02/research/nhrils/values.invenio.yaml`:
 ```yaml
 image:
   registry: ghcr.io
-  repository: nimr-tz/nhrils
-  tag: "<git-sha>"
+  repository: nimr-tz/nhrils-backend
+  tag: "sha-<short-sha>"
   pullPolicy: IfNotPresent
   pullSecrets:
     - name: ghcr-pull
@@ -276,7 +276,7 @@ worker:
 
 Notes:
 
-- Replace `<git-sha>` with an immutable source commit image tag.
+- Replace `sha-<short-sha>` with an immutable source commit image tag from the `Publish Images` workflow.
 - Confirm `helm-invenio` chart version against the current platform convention before PR.
 - Confirm the template override paths for Invenio-App-ILS before mounting any template ConfigMap.
 - Keep `terminal.replicas: 0` except during approved bootstrap.
