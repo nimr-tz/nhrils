@@ -148,6 +148,7 @@ Start here:
 - `docs/NHRILS_UX_DESIGN_SYSTEM_20260804.md`
 - `docs/NHRILS_DEVELOPMENT_ENVIRONMENT_20260804.md`
 - `docs/NHRILS_KUBERNETES_DEPLOYMENT_20260804.md`
+- `docs/NHRILS_GITOPS_SKELETON_20260805.md`
 - `README.rst` for upstream Invenio-App-ILS provenance.
 
 External references:
