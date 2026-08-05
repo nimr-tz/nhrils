@@ -41,7 +41,11 @@ def test_notifs_on_loan_checkout(client, app_with_notifs, users, testdata, loan_
         msg = outbox[0]
 
     doc = Document.get_record_by_pid(loan_data["document_pid"])
-    expected_subject = 'InvenioILS: loan started for "{0}"'.format(doc["title"])
+    site_name = current_app.config["THEME_SITENAME"]
+    expected_subject = '{site_name}: loan started for "{title}"'.format(
+        site_name=site_name,
+        title=doc["title"],
+    )
     assert msg.subject == expected_subject
 
     edition_year = " ({edition} - {year})".format(
@@ -70,11 +74,12 @@ The due date is {loan_end_date}.
 You can see your ongoing and past loans in your profile page <{profile_url}>.
 
 Kind regards,
-InvenioILS""".format(
+{site_name}""".format(
         doc_full_title=full_title,
         literature_url=literature_url,
         loan_end_date=loan_data["end_date"],
         profile_url=profile_url,
+        site_name=site_name,
     )
     assert msg.body == expected_body_plain
 
