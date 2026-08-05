@@ -5,7 +5,7 @@
 # invenio-app-ils is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-FROM node:12 AS react-build
+FROM node:22 AS react-build
 
 ENV WORKING_DIR=/code
 RUN mkdir -p ${WORKING_DIR}
@@ -17,11 +17,11 @@ ARG REACT_APP_INVENIO_REST_ENDPOINTS_BASE_URL=https://nhrils.apps.nimr.or.tz/api
 ARG REACT_APP_ENV_NAME=production
 
 # build React application
-RUN npm install
+RUN CYPRESS_INSTALL_BINARY=0 npm install --legacy-peer-deps
 RUN REACT_APP_INVENIO_UI_URL="${REACT_APP_INVENIO_UI_URL}" \
  REACT_APP_INVENIO_REST_ENDPOINTS_BASE_URL="${REACT_APP_INVENIO_REST_ENDPOINTS_BASE_URL}" \
  REACT_APP_ENV_NAME="${REACT_APP_ENV_NAME}" \
- npm run build
+ npm run lib-build
 
 FROM nginx:1.18
 
@@ -36,5 +36,5 @@ ENV REACT_ASSETS=/usr/share/nginx/html/react-assets
 RUN mkdir -p ${INVENIO_ASSETS}
 RUN mkdir -p ${REACT_ASSETS}
 
-COPY --from=react-build /code/build ${REACT_ASSETS}
+COPY --from=react-build /code/dist ${REACT_ASSETS}
 CMD ["nginx", "-g", "daemon off;"]
