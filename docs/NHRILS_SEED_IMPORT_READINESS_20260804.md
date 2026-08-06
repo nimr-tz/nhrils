@@ -75,6 +75,29 @@ The validator intentionally does not:
 - change permissions;
 - trigger circulation behavior.
 
+## Seed Review Report
+
+Before database import approval, generate a reviewer-friendly summary for NIMR library/documentation staff:
+
+```bash
+python3 scripts/render_seed_review.py
+```
+
+Harness shortcut:
+
+```bash
+./scripts/local-harness seed-review
+```
+
+Optional machine/review formats:
+
+```bash
+python3 scripts/render_seed_review.py --format csv --output /tmp/nhrils-seed-review.csv
+python3 scripts/render_seed_review.py --format json
+```
+
+The report is read-only. It validates the seed bundle, summarizes counts by document type/year, and marks each provisional record as `Needs NIMR review`. It does not initialize Invenio, connect to services, import records, upload files, rebuild indexes, or change permissions.
+
 ## Guarded Import Plan
 
 Command:
@@ -170,7 +193,8 @@ Completed for this readiness slice:
 
 - dry-run validator added;
 - guarded dry-run import planner added;
-- local harness shortcuts added for validation and import planning;
+- seed review renderer added;
+- local harness shortcuts added for validation, review reporting, and import planning;
 - seed-shape test updated to exercise the validator;
 - duplicate PID and import-plan tests added;
 - documentation added for mapping, gates, proposed order, and development-only import plan.

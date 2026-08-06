@@ -4,28 +4,15 @@
 <link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
 
 <main class="nhrils-page-shell" aria-labelledby="nhrils-catalogue-title">
-  <header class="nhrils-topbar" aria-label="NHRILS catalogue header">
-    <a class="nhrils-brand" href="/nhrils/catalogue" aria-label="NHRILS catalogue home">
-      <img src="{{ url_for('invenio_app_ils.static', filename='images/nimr.svg') }}" alt="NIMR">
-      <span>
-        <strong>NHRILS</strong>
-        <small>National Health Research Integrated Library System</small>
-      </span>
-    </a>
-    <nav class="nhrils-nav" aria-label="Catalogue navigation">
-      <a href="/nhrils/catalogue" aria-current="page">Catalogue</a>
-      <a href="/search">Advanced search</a>
-      <a href="/pages/search-guide">Search guide</a>
-      <a href="/api">API</a>
-    </nav>
-  </header>
+  {% set active_page = "catalogue" %}
+  {% include "invenio_app_ils/_catalogue_topbar.html" %}
 
   <section class="nhrils-hero" aria-labelledby="nhrils-catalogue-title">
     <div class="nhrils-hero-copy">
       <p class="nhrils-eyebrow">NIMR Library Catalogue</p>
       <h1 id="nhrils-catalogue-title">Find health research resources held by NIMR</h1>
       <p>
-        Search books, reports, guidelines, proceedings, journals, policy briefs, and digital resources that support health research in Tanzania.
+        Search NIMR publications, reports, journals, guidelines, proceedings, and digital health research resources from one catalogue entry point.
       </p>
       <dl class="nhrils-hero-stats" aria-label="Catalogue preview">
         <div>
@@ -42,99 +29,110 @@
         </div>
       </dl>
     </div>
-    <form class="nhrils-search-panel" action="/search" method="get" role="search" aria-label="Search catalogue">
+    <form class="nhrils-search-panel" action="/nhrils/catalogue/search" method="get" role="search" aria-label="Search catalogue">
       <label for="nhrils-search-query">Search the catalogue</label>
       <div class="nhrils-search-control">
         <input id="nhrils-search-query" name="q" type="search" placeholder="Title, author, subject, identifier, or year">
         <button class="nhrils-button nhrils-button-primary" type="submit">Search</button>
       </div>
       <div class="nhrils-search-examples" aria-label="Suggested searches">
-        <a href="/search?q=malaria">Malaria</a>
-        <a href="/search?q=public%20health">Public health</a>
-        <a href="/search?q=guidelines">Guidelines</a>
-        <a href="/search?q=publication_year:%5B2020%20TO%202026%5D">2020-2026</a>
+        <a href="/nhrils/catalogue/search?q=malaria">Malaria</a>
+        <a href="/nhrils/catalogue/search?q=public%20health">Public health</a>
+        <a href="/nhrils/catalogue/search?q=guidelines">Guidelines</a>
+        <a href="/nhrils/catalogue/search?year=2026">2026</a>
       </div>
-      <p class="nhrils-search-note">Use Advanced search when you need exact fields, identifiers, or publication-year ranges.</p>
+      <p class="nhrils-search-note">Use Advanced search for exact fields, identifiers, and publication-year ranges.</p>
     </form>
   </section>
 
+  <section class="nhrils-status-strip" aria-label="Catalogue service status">
+    <article>
+      <span class="nhrils-status-dot" aria-hidden="true"></span>
+      <div>
+        <strong>Catalogue discovery is available</strong>
+        <p>Search public metadata, browse collections, and open records to review access options.</p>
+      </div>
+    </article>
+    <a class="nhrils-inline-action" href="/nhrils/catalogue/search-guide">Open search guidance</a>
+  </section>
+
   <section class="nhrils-grid nhrils-grid-four" aria-label="Catalogue scope">
-    <article class="nhrils-card">
-      <span class="nhrils-card-icon">B</span>
-      <h2>Books and manuals</h2>
-      <p>Bibliographic records for physical and digital library holdings.</p>
+    <article class="nhrils-card nhrils-card-coverage">
+      <span class="nhrils-card-icon">25</span>
+      <h2>Peer reviewed papers</h2>
+      <p>Article-level records from the NIMR publication review seed.</p>
     </article>
-    <article class="nhrils-card">
-      <span class="nhrils-card-icon">R</span>
+    <article class="nhrils-card nhrils-card-coverage">
+      <span class="nhrils-card-icon">9</span>
       <h2>Reports and briefs</h2>
-      <p>Institutional and partner resources approved for discovery.</p>
+      <p>Annual reports, policy briefs, summaries, and standards.</p>
     </article>
-    <article class="nhrils-card">
-      <span class="nhrils-card-icon">J</span>
+    <article class="nhrils-card nhrils-card-coverage">
+      <span class="nhrils-card-icon">5</span>
       <h2>Journals and series</h2>
-      <p>Serials, proceedings, and recurring research publications.</p>
+      <p>Serial issues and recurring research publication sources.</p>
     </article>
-    <article class="nhrils-card">
-      <span class="nhrils-card-icon">E</span>
-      <h2>Electronic resources</h2>
-      <p>Digital links and access notes for public or restricted e-items.</p>
+    <article class="nhrils-card nhrils-card-coverage">
+      <span class="nhrils-card-icon">21</span>
+      <h2>Digital access</h2>
+      <p>Public DOI or source links for reviewable electronic items.</p>
     </article>
   </section>
 
-  <section class="nhrils-content-grid">
+  <section class="nhrils-content-grid nhrils-content-grid-review">
     <article class="nhrils-panel nhrils-panel-large">
       <div class="nhrils-panel-header">
         <div>
           <p class="nhrils-eyebrow">Featured records</p>
-          <h2>Representative NIMR publication records</h2>
+          <h2>Start with representative NIMR resources</h2>
         </div>
-        <a class="nhrils-inline-action" href="/search">View all results</a>
+        <a class="nhrils-inline-action" href="/nhrils/catalogue/search">View all results</a>
       </div>
       <div class="nhrils-record-list" aria-label="Featured catalogue records">
-        <article class="nhrils-record-card">
+        <article class="nhrils-record-card nhrils-record-card-rich">
           <div>
-            <span class="nhrils-record-type">Article</span>
+            <span class="nhrils-record-type">Article · Digital link</span>
             <h3>Artemisinin-resistant malaria in Africa demands urgent action</h3>
-            <p>Dhorda, Kaneko, Komatsu, Mshamu, Gesase, von Seidlein - 2026</p>
+            <p>Mehul Dhorda; Akira Kaneko; Ryuichi Komatsu; +3 more · 2026</p>
           </div>
-          <a href="/search?q=artemisinin-resistant%20malaria">Search</a>
+          <a href="/nhrils/catalogue/search?q=artemisinin-resistant%20malaria">Search</a>
         </article>
-        <article class="nhrils-record-card">
+        <article class="nhrils-record-card nhrils-record-card-rich">
           <div>
-            <span class="nhrils-record-type">Serial</span>
+            <span class="nhrils-record-type">Serial · Journal source</span>
             <h3>Tanzania Journal of Health Research</h3>
-            <p>National Institute for Medical Research - 2026</p>
+            <p>National Institute for Medical Research · 2026</p>
           </div>
-          <a href="/search?q=Tanzania%20Journal%20of%20Health%20Research">Search</a>
+          <a href="/nhrils/catalogue/search?q=Tanzania%20Journal%20of%20Health%20Research">Search</a>
         </article>
-        <article class="nhrils-record-card">
+        <article class="nhrils-record-card nhrils-record-card-rich">
           <div>
-            <span class="nhrils-record-type">Article</span>
+            <span class="nhrils-record-type">Article · Review record</span>
             <h3>Infection prevention and control of highly infectious pathogens</h3>
-            <p>Kinyenje, Hokororo, Ngowi, Kiremeji, Nagu - 2026</p>
+            <p>Erick Kinyenje; Joseph Hokororo; Ruth Ngowi; +2 more · 2026</p>
           </div>
-          <a href="/search?q=infection%20prevention%20Marburg">Search</a>
+          <a href="/nhrils/catalogue/search?q=infection%20prevention%20Marburg">Search</a>
         </article>
       </div>
     </article>
 
-    <aside class="nhrils-panel nhrils-panel-muted" aria-labelledby="nhrils-filter-title">
-      <div class="nhrils-panel-header">
-        <p class="nhrils-eyebrow">Refine results</p>
-        <h2 id="nhrils-filter-title">Catalogue filters</h2>
+    <aside class="nhrils-panel nhrils-panel-muted" aria-labelledby="nhrils-access-title">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
+        <p class="nhrils-eyebrow">Access options</p>
+        <h2 id="nhrils-access-title">Know how to obtain a resource</h2>
       </div>
-      <ul class="nhrils-filter-list">
-        <li><span>Material type</span><strong>Articles, books, standards</strong></li>
-        <li><span>Availability</span><strong>Physical or digital access</strong></li>
-        <li><span>Subject</span><strong>Malaria, public health, outbreaks</strong></li>
-        <li><span>Year</span><strong>Recent and historical holdings</strong></li>
+      <ul class="nhrils-filter-list nhrils-review-list">
+        <li><span>Online</span><strong>Open public DOI or source links where available</strong></li>
+        <li><span>Physical</span><strong>Use location and holding notes to plan a library request</strong></li>
+        <li><span>Restricted</span><strong>Contact the library when access requires staff confirmation</strong></li>
+        <li><span>Support</span><strong>Send the record PID when asking for help</strong></li>
       </ul>
     </aside>
   </section>
 
   <section class="nhrils-content-grid">
     <article class="nhrils-panel">
-      <div class="nhrils-panel-header">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
         <p class="nhrils-eyebrow">Discovery workflow</p>
         <h2>Search built around researcher tasks</h2>
       </div>
@@ -147,13 +145,38 @@
     </article>
 
     <aside class="nhrils-panel nhrils-panel-help" aria-labelledby="nhrils-help-title">
-      <div class="nhrils-panel-header">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
         <p class="nhrils-eyebrow">Need help?</p>
         <h2 id="nhrils-help-title">Search guidance</h2>
       </div>
       <p>Use quotes for exact phrases, field names for precise searches, and year ranges when you need recent resources.</p>
-      <a class="nhrils-button nhrils-button-secondary" href="/pages/search-guide">Open search guide</a>
+      <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/search-guide">Open search guide</a>
     </aside>
   </section>
+
+  <section class="nhrils-content-grid nhrils-content-grid-staff" aria-label="Catalogue support paths">
+    <article class="nhrils-panel">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
+        <p class="nhrils-eyebrow">Library staff</p>
+        <h2>Maintain the catalogue from backoffice tools</h2>
+      </div>
+      <p>
+        Librarians and documentation officers can use InvenioILS staff workflows to create documents, attach physical items, add e-items, and prepare records for indexed discovery.
+      </p>
+      <a class="nhrils-button nhrils-button-secondary" href="/backoffice">Open backoffice</a>
+    </article>
+
+    <article class="nhrils-panel">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
+        <p class="nhrils-eyebrow">Browse</p>
+        <h2>Explore collections before searching deeply</h2>
+      </div>
+      <p>
+        Browse by publication category when users need orientation before applying search terms and filters.
+      </p>
+      <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/collections">Open collections</a>
+    </article>
+  </section>
+  {% include "invenio_app_ils/_catalogue_footer.html" %}
 </main>
 {% endblock %}

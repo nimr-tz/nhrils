@@ -92,7 +92,9 @@ Future authenticated staff pages should use a denser app shell, but the public c
 | Route | Owner | Purpose |
 | --- | --- | --- |
 | `/nhrils/catalogue` | NHRILS shell | First branded public catalogue landing/search route |
-| `/search` | InvenioILS frontend/API integration | Search results and facets |
+| `/nhrils/catalogue/search` | NHRILS shell | Seed-backed review results, filters, and empty state before indexed import |
+| `/nhrils/catalogue/records/<pid>` | NHRILS shell | Seed-backed review record detail before native detail integration |
+| `/search` | InvenioILS frontend/API integration | Future indexed search results and facets |
 | `/pages/search-guide` | Static content | Search syntax help |
 | `/api` | Invenio REST API | Machine-readable access |
 | backoffice/admin routes | InvenioILS | Librarian and administrator workflows |
@@ -103,8 +105,11 @@ Do not duplicate the same page title in both shell and content. Route identity b
 
 ### Header
 
-- Logo appears once.
-- System short name appears near the logo.
+- Use the official NIMR logo from `invenio_app_ils/static/images/nimr.svg`.
+- Logo appears once in the header brand area.
+- System short label `NHRILS` appears near the logo.
+- Canonical site name is `National Health Research Integrated Library System`; use the full name for site/browser/email/footer identity surfaces.
+- Header and brand-link accessible labels use the full canonical site name.
 - Long system name may appear as supporting text.
 - Navigation labels must be short and task-based.
 
@@ -114,6 +119,29 @@ Do not duplicate the same page title in both shell and content. Route identity b
 - Use a visible label, not only placeholder text.
 - Search examples should be chips that execute real queries.
 - Advanced search links should be secondary.
+
+### Search Results
+
+- Result headers use user-facing catalogue language such as `catalogue records`.
+- Do not expose implementation source labels such as seed, review seed, database import, or indexing state on public results.
+- Result cards show title, authors, type, year, source, language, subject tags, access state, and a clear record-opening action.
+- Missing online links should be framed as `Access details to confirm`, not as an internal review workflow.
+
+### Record Detail
+
+- Record detail pages use `Catalogue record` and user-facing access states.
+- Do not expose implementation source labels such as seed, review seed, database import, or production import on public record detail pages.
+- Primary record content shows title, authors, type, year, source, language, abstract, identifiers, links, and subjects.
+- Access panels explain available digital links, request status, physical holding status, and library contact options without implying backend writes.
+- Citation/export controls may be shown as non-mutating placeholders until indexed catalogue records and approved export formats are available.
+
+### Request Preparation
+
+- Request preparation pages must be explicit when online submission is not active.
+- Disabled request controls must explain the library-contact fallback.
+- Public request pages must not use implementation labels such as MVP, preview, workflow shell, or approval queue.
+- The page may collect no data until patron identity, request queues, notifications, and circulation rules are approved.
+- Primary actions are back to record, contact library, and back to results.
 
 ### Cards
 

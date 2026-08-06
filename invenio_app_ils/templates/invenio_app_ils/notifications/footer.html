@@ -2,7 +2,7 @@
 You can see your ongoing and past loans in your profile page <{{ spa_routes.HOST }}{{ spa_routes.PATHS["profile"] }}>.
 
 Kind regards,
-NHRILS
+{{ config.THEME_SITENAME }}
 {% endblock %}
 
 {% block footer_html %}
@@ -10,5 +10,5 @@ NHRILS
 You can see your ongoing and past loans in your <a href="{{ spa_routes.HOST }}{{ spa_routes.PATHS['profile'] }}">profile page</a>.
 <br/><br/>
 Kind regards,<br/>
-NHRILS<br/>
+{{ config.THEME_SITENAME }}<br/>
 {% endblock %}

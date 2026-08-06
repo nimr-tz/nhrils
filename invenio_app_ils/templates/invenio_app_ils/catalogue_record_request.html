@@ -1,0 +1,100 @@
+{% extends config.THEME_BASE_TEMPLATE %}
+
+{% block page_body %}
+<link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
+
+<main class="nhrils-page-shell" aria-labelledby="nhrils-request-title">
+  {% set active_page = "" %}
+  {% include "invenio_app_ils/_catalogue_topbar.html" %}
+
+  <section class="nhrils-record-detail-layout">
+    <article class="nhrils-panel nhrils-record-detail-main">
+      <a class="nhrils-inline-action" href="{{ record_url }}">Back to record</a>
+      <p class="nhrils-eyebrow">Catalogue request · {{ record.document_type }} · {{ record.publication_year }}</p>
+      <h1 id="nhrils-request-title">Prepare a library request</h1>
+      <p>
+        Review the selected record, access status, and information the library will need before making a request.
+      </p>
+
+      <section class="nhrils-request-record" aria-labelledby="nhrils-request-record-title">
+        <p class="nhrils-eyebrow">Selected record</p>
+        <h2 id="nhrils-request-record-title">{{ record.title }}</h2>
+        {% if record.all_authors %}
+          <p>{{ record.all_authors|join("; ") }}</p>
+        {% endif %}
+        <dl class="nhrils-record-fact-grid" aria-label="Request record summary">
+          <div>
+            <dt>Local PID</dt>
+            <dd>{{ record.pid }}</dd>
+          </div>
+          <div>
+            <dt>Type</dt>
+            <dd>{{ record.document_type }}</dd>
+          </div>
+          <div>
+            <dt>Year</dt>
+            <dd>{{ record.publication_year }}</dd>
+          </div>
+          <div>
+            <dt>Access</dt>
+            <dd>{{ record.access.status.label }}</dd>
+          </div>
+          <div>
+            <dt>Holding</dt>
+            <dd>{{ record.access.physical_holding.label }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="nhrils-request-intent" aria-labelledby="nhrils-request-intent-title">
+        <div class="nhrils-panel-header nhrils-panel-header-stacked">
+          <p class="nhrils-eyebrow">Request details</p>
+          <h2 id="nhrils-request-intent-title">Information the library will need</h2>
+        </div>
+        <ol class="nhrils-request-prep-list" aria-label="Request preparation steps">
+          <li><strong>Confirm the record</strong><span>Use the local PID, title, year, and access state shown above.</span></li>
+          <li><strong>State the need</strong><span>Specify digital access, physical copy, metadata correction, or research support.</span></li>
+          <li><strong>Route for action</strong><span>The library will route enabled requests to the appropriate support queue.</span></li>
+        </ol>
+        <div class="nhrils-request-fields">
+          <label>
+            Request type
+            <select disabled aria-describedby="nhrils-request-disabled-note">
+              <option>Access or librarian support</option>
+            </select>
+          </label>
+          <label>
+            Reason for request
+            <textarea disabled aria-describedby="nhrils-request-disabled-note" placeholder="Describe online access, physical copy, metadata correction, or research support need."></textarea>
+          </label>
+        </div>
+        <p id="nhrils-request-disabled-note" class="nhrils-request-note">
+          Online request submission is not active yet. Contact the library for help with access, holdings, or metadata questions.
+        </p>
+      </section>
+    </article>
+
+    <aside class="nhrils-panel nhrils-record-summary" aria-labelledby="nhrils-request-status-title">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
+        <p class="nhrils-eyebrow">Request status</p>
+        <h2 id="nhrils-request-status-title">Online submission not active</h2>
+      </div>
+      <div class="nhrils-access-state nhrils-access-state-review">
+        <span class="nhrils-access-chip">No online submission</span>
+        <p>This page helps prepare the request information only. It does not create a request, loan, patron update, or circulation transaction.</p>
+      </div>
+      <ol class="nhrils-steps">
+        <li><strong>Check access</strong><span>Use the record access state to decide whether digital access or library help is needed.</span></li>
+        <li><strong>Prepare details</strong><span>Keep the local PID, title, year, and reason ready for library staff.</span></li>
+        <li><strong>Contact library</strong><span>Use the support page until online request submission is enabled.</span></li>
+      </ol>
+      <div class="nhrils-access-actions" aria-label="Request shell actions">
+        <a class="nhrils-button nhrils-button-primary" href="{{ record_url }}">Back to record</a>
+        <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/contact">Contact library</a>
+        <a class="nhrils-button nhrils-button-secondary" href="{{ return_to }}">Back to results</a>
+      </div>
+    </aside>
+  </section>
+  {% include "invenio_app_ils/_catalogue_footer.html" %}
+</main>
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends config.THEME_BASE_TEMPLATE %}
+
+{% block page_body %}
+<link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
+
+<main class="nhrils-page-shell" aria-labelledby="nhrils-record-title">
+  {% set active_page = "" %}
+  {% include "invenio_app_ils/_catalogue_topbar.html" %}
+
+  <section class="nhrils-record-detail-layout">
+    <article class="nhrils-panel nhrils-record-detail-main">
+      <a class="nhrils-inline-action" href="{{ return_to }}">Back to results</a>
+      <p class="nhrils-eyebrow">Catalogue record · {{ record.document_type }} · {{ record.publication_year }}</p>
+      <h1 id="nhrils-record-title">{{ record.title }}</h1>
+      {% if record.all_authors %}
+        <p class="nhrils-result-authors">{{ record.all_authors|join("; ") }}</p>
+      {% endif %}
+
+      <dl class="nhrils-record-fact-grid" aria-label="Record summary">
+        {% for item in record.summary_items %}
+          <div>
+            <dt>{{ item.label }}</dt>
+            <dd>{{ item.value }}</dd>
+          </div>
+        {% endfor %}
+      </dl>
+
+      <div class="nhrils-record-section">
+        <h2>Abstract</h2>
+        <p>{{ record.abstract }}</p>
+      </div>
+
+      {% if record.keywords %}
+        <section class="nhrils-record-section" aria-labelledby="nhrils-record-subjects">
+          <h2 id="nhrils-record-subjects">Subjects</h2>
+          <div class="nhrils-result-tags">
+            {% for keyword in record.keywords %}
+              <span>{{ keyword }}</span>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
+    </article>
+
+    <aside class="nhrils-panel nhrils-record-summary" aria-labelledby="nhrils-record-summary-title">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
+        <p class="nhrils-eyebrow">Access</p>
+        <h2 id="nhrils-record-summary-title">Availability and access</h2>
+      </div>
+      <div class="nhrils-access-state nhrils-access-state-{{ record.access.status.tone }}">
+        <span class="nhrils-access-chip{% if record.access.status.tone == 'online' %} nhrils-access-chip-online{% endif %}">
+          {{ record.access.status.label }}
+        </span>
+        <p>{{ record.access.status.summary }}</p>
+      </div>
+      <section class="nhrils-access-decision" aria-labelledby="nhrils-access-decision-title">
+        <h3 id="nhrils-access-decision-title">What you can do</h3>
+        <div class="nhrils-access-actions" aria-label="Record access actions">
+          {% if record.primary_link %}
+            <a class="nhrils-button nhrils-button-primary" href="{{ record.primary_link.href }}" target="_blank" rel="noopener noreferrer">Open digital source</a>
+          {% else %}
+            <span class="nhrils-button nhrils-button-disabled" aria-disabled="true">Digital source unavailable</span>
+          {% endif %}
+          <a class="nhrils-button nhrils-button-secondary" href="{{ record.detail_url }}/request">Prepare request</a>
+          <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/contact">Contact library</a>
+        </div>
+      </section>
+      <dl class="nhrils-access-checks">
+        <div>
+          <dt>Digital source</dt>
+          <dd>{{ record.primary_link.label if record.primary_link else "Not attached" }}</dd>
+        </div>
+        <div>
+          <dt>Physical holding</dt>
+          <dd>{{ record.access.physical_holding.label }}</dd>
+        </div>
+        <div>
+          <dt>Request status</dt>
+          <dd>{{ record.access.request.summary }}</dd>
+        </div>
+        <div>
+          <dt>Librarian support</dt>
+          <dd>{{ record.access.contact.summary }}</dd>
+        </div>
+      </dl>
+      <section class="nhrils-access-readiness" aria-labelledby="nhrils-access-readiness-title">
+        <h3 id="nhrils-access-readiness-title">Request options</h3>
+        <ul>
+          <li>Use Prepare request to review the intended library request.</li>
+          <li>Contact the library for access guidance while online requests are being configured.</li>
+          <li>Physical holding and circulation details will appear when available.</li>
+        </ul>
+      </section>
+    </aside>
+  </section>
+
+  <section class="nhrils-content-grid">
+    <article class="nhrils-panel">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
+        <p class="nhrils-eyebrow">Bibliographic metadata</p>
+        <h2>Identifiers and access links</h2>
+      </div>
+      <dl class="nhrils-metadata-list nhrils-metadata-list-wide">
+        {% if record.identifier_items %}
+          {% for identifier in record.identifier_items %}
+            <div>
+              <dt>{{ identifier.scheme }}</dt>
+              <dd>
+                {% if identifier.href %}
+                  <a href="{{ identifier.href }}" target="_blank" rel="noopener noreferrer">{{ identifier.value }}</a>
+                {% else %}
+                  {{ identifier.value }}
+                {% endif %}
+              </dd>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div>
+            <dt>Identifiers</dt>
+            <dd>Not recorded for this catalogue item.</dd>
+          </div>
+        {% endif %}
+
+        {% if record.link_items %}
+          {% for url in record.link_items %}
+            <div>
+              <dt>{{ url.label }}</dt>
+              <dd><a href="{{ url.href }}" target="_blank" rel="noopener noreferrer">{{ url.href }}</a></dd>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div>
+            <dt>Digital link</dt>
+            <dd>No public link is attached to this catalogue record.</dd>
+          </div>
+        {% endif %}
+      </dl>
+    </article>
+
+    <aside class="nhrils-panel nhrils-panel-muted">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
+        <p class="nhrils-eyebrow">Record tools</p>
+        <h2>Citation and export</h2>
+      </div>
+      <ol class="nhrils-steps">
+        <li><strong>Copy citation</strong><span>Use the title, authors, source, and year shown on this page.</span></li>
+        <li><strong>Export RIS</strong><span>Structured citation export will be enabled with indexed catalogue records.</span></li>
+        <li><strong>Export BibTeX</strong><span>BibTeX export will follow the approved citation metadata format.</span></li>
+      </ol>
+    </aside>
+  </section>
+  {% include "invenio_app_ils/_catalogue_footer.html" %}
+</main>
+{% endblock %}

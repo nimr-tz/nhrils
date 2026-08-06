@@ -51,7 +51,7 @@ For NHRILS, copy the product pattern, not the CERN domain:
 ### In Scope
 
 1. NIMR-branded public catalogue shell.
-2. Public search and browse for catalogue records.
+2. Public search and browse for catalogue records, beginning with a review-results shell backed by the provisional seed bundle.
 3. Faceted filtering for:
    - material type;
    - format;
@@ -59,7 +59,7 @@ For NHRILS, copy the product pattern, not the CERN domain:
    - language;
    - subject/tag;
    - publication year.
-4. Record detail page for documents.
+4. Record detail page for documents, beginning with a seed-backed preview shell for review metadata.
 5. Basic item/e-item visibility:
    - physical copy availability;
    - location/internal location;
@@ -161,7 +161,7 @@ As an administrator, I want the catalogue deployed with NIMR branding, productio
 
 | Requirement | Evidence | Implementation surface | Verification |
 | --- | --- | --- | --- |
-| Catalogue-first MVP | CERN catalogue home/search; NIMR documentation mandate | frontend shell, search route, record cards | Search and browse smoke test |
+| Catalogue-first MVP | CERN catalogue home/search; NIMR documentation mandate | frontend shell, seed-backed review search/detail routes, record cards | Search, browse, and detail smoke test |
 | Faceted discovery | CERN search facets | InvenioILS search UI/config/mappings | Facet results visible and usable |
 | Native ILS data model | InvenioILS data model docs | documents, items, eitems, locations | Seed records render with holdings |
 | NIMR branding | NIMR site and rollout plan | templates, static assets, config | Header/favicon/title inspection |

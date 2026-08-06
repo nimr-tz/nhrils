@@ -1,0 +1,235 @@
+{% extends config.THEME_BASE_TEMPLATE %}
+
+{% macro filter_link(label, name, value, count, selected_filters, query) -%}
+  {% set is_selected = selected_filters.get(name) == value %}
+  <a class="nhrils-facet-link{% if is_selected %} nhrils-facet-link-active{% endif %}"
+     href="/nhrils/catalogue/search?q={{ query|urlencode }}{% for key, selected in selected_filters.items() if key != name and selected %}&{{ key }}={{ selected|urlencode }}{% endfor %}{% if not is_selected %}&{{ name }}={{ value|urlencode }}{% endif %}">
+    <span>{{ label }}</span>
+    <strong>{{ count }}</strong>
+  </a>
+{%- endmacro %}
+
+{% macro page_link(label, page, pagination, selected_filters, query) -%}
+  {% if page %}
+    <a class="nhrils-page-link"
+       href="/nhrils/catalogue/search?q={{ query|urlencode }}{% for key, selected in selected_filters.items() if selected %}&{{ key }}={{ selected|urlencode }}{% endfor %}&page={{ page }}&size={{ pagination.size }}">
+      {{ label }}
+    </a>
+  {% else %}
+    <span class="nhrils-page-link nhrils-page-link-disabled" aria-disabled="true">{{ label }}</span>
+  {% endif %}
+{%- endmacro %}
+
+{% macro size_link(label, size, pagination, selected_filters, query) -%}
+  {% set is_selected = pagination.size == size %}
+  <a class="nhrils-size-link{% if is_selected %} nhrils-size-link-active{% endif %}"
+     href="/nhrils/catalogue/search?q={{ query|urlencode }}{% for key, selected in selected_filters.items() if selected %}&{{ key }}={{ selected|urlencode }}{% endfor %}&size={{ size }}"
+     {% if is_selected %}aria-current="true"{% endif %}>
+    {{ label }}
+  </a>
+{%- endmacro %}
+
+{% block page_body %}
+<link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
+
+<main class="nhrils-page-shell" aria-labelledby="nhrils-search-title">
+  {% set active_page = "results" %}
+  {% include "invenio_app_ils/_catalogue_topbar.html" %}
+
+  <section class="nhrils-search-header">
+    <div>
+      <p class="nhrils-eyebrow">{{ search_context.eyebrow }}</p>
+      <h1 id="nhrils-search-title">{{ search_context.title }}</h1>
+      <p>{{ search_context.lead }}</p>
+      {% if search_context.collection %}
+        <a class="nhrils-inline-action" href="{{ search_context.collection.back_href }}">{{ search_context.collection.back_label }}</a>
+      {% endif %}
+    </div>
+    <form class="nhrils-search-panel nhrils-search-panel-compact" action="/nhrils/catalogue/search" method="get" role="search" aria-label="Search catalogue results">
+      <label for="nhrils-results-query">Search terms</label>
+      {% for key, selected in selected_filters.items() if selected %}
+        <input type="hidden" name="{{ key }}" value="{{ selected }}">
+      {% endfor %}
+      <div class="nhrils-search-control">
+        <input id="nhrils-results-query" name="q" type="search" value="{{ query }}" placeholder="malaria, journal, guideline, DOI, or year">
+        <button class="nhrils-button nhrils-button-primary" type="submit">Search</button>
+      </div>
+    </form>
+  </section>
+
+  {% if search_context.active_filters or search_context.quick_filters %}
+    <section class="nhrils-filter-context" aria-label="Current search filters">
+      {% if search_context.active_filters %}
+        <div class="nhrils-active-filter-list" aria-label="Active filters">
+          <span>Active filters · {{ search_context.active_filters|length }}</span>
+          {% for filter in search_context.active_filters %}
+            <a href="{{ filter.href }}" aria-label="Remove {{ filter.label }} filter">
+              <small>{{ filter.name|replace("_", " ")|title }}</small>
+              {{ filter.label }}
+            </a>
+          {% endfor %}
+          <a class="nhrils-clear-chip" href="/nhrils/catalogue/search">Clear all</a>
+        </div>
+      {% endif %}
+      <div class="nhrils-quick-filter-list" aria-label="Quick filters">
+        <span>Common refinements</span>
+        {% for filter in search_context.quick_filters %}
+          <a class="{% if filter.selected %}nhrils-quick-filter-active{% endif %}" href="{{ filter.href }}">{{ filter.label }}</a>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  <section class="nhrils-results-layout" aria-label="Catalogue search results">
+    <aside class="nhrils-panel nhrils-results-filters" aria-label="Filter catalogue results">
+      <div class="nhrils-panel-header nhrils-panel-header-stacked">
+        <p class="nhrils-eyebrow">Filters</p>
+        <h2>Refine results</h2>
+      </div>
+
+      <section aria-labelledby="nhrils-access-filter">
+        <h3 id="nhrils-access-filter">Access</h3>
+        <div class="nhrils-facet-list">
+          {% for facet in facets.availability %}
+            {{ filter_link(facet.label, "availability", facet.value, facet.count, selected_filters, query) }}
+          {% endfor %}
+        </div>
+      </section>
+
+      <section aria-labelledby="nhrils-type-filter">
+        <h3 id="nhrils-type-filter">Material type</h3>
+        <div class="nhrils-facet-list">
+          {% for facet in facets.type %}
+            {{ filter_link(facet.label, "type", facet.value, facet.count, selected_filters, query) }}
+          {% endfor %}
+        </div>
+      </section>
+
+      <section aria-labelledby="nhrils-year-filter">
+        <h3 id="nhrils-year-filter">Year</h3>
+        <div class="nhrils-facet-list">
+          {% for facet in facets.year %}
+            {{ filter_link(facet.label, "year", facet.value, facet.count, selected_filters, query) }}
+          {% endfor %}
+        </div>
+      </section>
+
+      <section aria-labelledby="nhrils-source-filter">
+        <h3 id="nhrils-source-filter">Source</h3>
+        <div class="nhrils-facet-list">
+          {% for facet in facets.source %}
+            {{ filter_link(facet.label, "source", facet.value, facet.count, selected_filters, query) }}
+          {% endfor %}
+        </div>
+      </section>
+
+      <section aria-labelledby="nhrils-language-filter">
+        <h3 id="nhrils-language-filter">Language</h3>
+        <div class="nhrils-facet-list">
+          {% for facet in facets.language %}
+            {{ filter_link(facet.label, "language", facet.value, facet.count, selected_filters, query) }}
+          {% endfor %}
+        </div>
+      </section>
+
+      <section aria-labelledby="nhrils-subject-filter">
+        <h3 id="nhrils-subject-filter">Subject</h3>
+        <div class="nhrils-facet-list">
+          {% for facet in facets.subject %}
+            {{ filter_link(facet.label, "subject", facet.value, facet.count, selected_filters, query) }}
+          {% endfor %}
+        </div>
+      </section>
+
+      {% if selected_filters.availability or selected_filters.type or selected_filters.year or selected_filters.source or selected_filters.language or selected_filters.subject or query %}
+        <a class="nhrils-inline-action" href="/nhrils/catalogue/search">Clear filters</a>
+      {% endif %}
+    </aside>
+
+    <section class="nhrils-panel nhrils-results-panel" aria-live="polite">
+      <div class="nhrils-panel-header">
+        <div>
+          <p class="nhrils-eyebrow">Results</p>
+          <h2>{{ result_count }} catalogue record{% if result_count != 1 %}s{% endif %}</h2>
+          {% if result_count %}
+            <p>
+              Showing {{ pagination.first_item }}-{{ pagination.last_item }} of {{ result_count }} records
+              {% if query %}for "{{ query }}"{% endif %}
+              {% if search_context.active_filters %}with {{ search_context.active_filters|length }} active filter{% if search_context.active_filters|length != 1 %}s{% endif %}{% endif %}.
+            </p>
+          {% endif %}
+        </div>
+        <div class="nhrils-results-tools" aria-label="Search result tools">
+          <div class="nhrils-size-switcher" aria-label="Records per page">
+            <span>Per page</span>
+            {{ size_link("10", 10, pagination, selected_filters, query) }}
+            {{ size_link("25", 25, pagination, selected_filters, query) }}
+            {{ size_link("50", 50, pagination, selected_filters, query) }}
+          </div>
+          <a class="nhrils-inline-action" href="/nhrils/catalogue/search-guide">Search help</a>
+        </div>
+      </div>
+
+      {% if results %}
+        <div class="nhrils-search-result-list">
+          {% for result in results %}
+            <article class="nhrils-search-result">
+              <div class="nhrils-result-main">
+                <div class="nhrils-result-meta" aria-label="Record summary">
+                  <span>{{ result.document_type }}</span>
+                  <span>{{ result.publication_year }}</span>
+                  <span>{{ result.source }}</span>
+                  <span>{{ result.languages|join(", ") if result.languages else "Language not specified" }}</span>
+                </div>
+                <h3><a href="{{ result.detail_url }}?return_to={{ search_return_url|urlencode }}">{{ result.title }}</a></h3>
+                <p class="nhrils-result-authors">{{ result.authors }}</p>
+                <p>{{ result.abstract }}</p>
+                {% if result.keywords %}
+                  <div class="nhrils-result-tags" aria-label="Subjects">
+                    {% for keyword in result.keywords %}
+                      <span>{{ keyword }}</span>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+              <div class="nhrils-result-access">
+                <span class="nhrils-access-chip{% if result.access.tone == 'online' %} nhrils-access-chip-online{% endif %}">
+                  {{ result.access.label }}
+                </span>
+                <span class="nhrils-result-access-note">{{ result.access.summary }}</span>
+                <small>{{ result.pid }}</small>
+                <div class="nhrils-result-actions">
+                  <a class="nhrils-button nhrils-button-secondary" href="{{ result.detail_url }}?return_to={{ search_return_url|urlencode }}">Open record</a>
+                  {% if result.access.online_url %}
+                    <a class="nhrils-inline-action" href="{{ result.access.online_url.value }}">View online</a>
+                  {% endif %}
+                </div>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+        {% if pagination.total_pages > 1 %}
+          <nav class="nhrils-pagination" aria-label="Search results pages">
+            {{ page_link("Previous", pagination.previous_page, pagination, selected_filters, query) }}
+            <span>Page {{ pagination.page }} of {{ pagination.total_pages }}</span>
+            {{ page_link("Next", pagination.next_page, pagination, selected_filters, query) }}
+          </nav>
+        {% endif %}
+      {% else %}
+        <div class="nhrils-empty-state">
+          <h3>{{ search_context.empty_title }}</h3>
+          <p>{{ search_context.empty_lead }}</p>
+          <div class="nhrils-empty-actions" aria-label="No result recovery actions">
+            {% if search_context.collection %}
+              <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/collections">Back to Collections</a>
+            {% endif %}
+            <a class="nhrils-button nhrils-button-secondary" href="/nhrils/catalogue/search">Clear search</a>
+            <a class="nhrils-inline-action" href="/nhrils/catalogue/search-guide">Open search help</a>
+          </div>
+        </div>
+      {% endif %}
+    </section>
+  </section>
+  {% include "invenio_app_ils/_catalogue_footer.html" %}
+</main>
+{% endblock %}

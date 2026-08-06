@@ -30,6 +30,7 @@ RUN mkdir -p ${INVENIO_INSTANCE_PATH}
 RUN mkdir -p ${INVENIO_STATIC_FOLDER}
 
 RUN ./scripts/bootstrap
+RUN pip install --no-cache-dir uwsgi
 
 # Set folder permissions
 RUN chgrp -R 0 ${WORKING_DIR} && \
