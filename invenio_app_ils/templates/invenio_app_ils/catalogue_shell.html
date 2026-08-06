@@ -1,13 +1,18 @@
 {% extends config.THEME_BASE_TEMPLATE %}
 
+{% block page_header %}{% endblock page_header %}
+{% block page_footer %}{% endblock page_footer %}
+
 {% block page_body %}
-<link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
+<link rel="stylesheet" href="/invenio-assets/css/nhrils-catalogue.css?v=material-shell-20260806-001">
+<link rel="preload" as="image" href="/invenio-assets/images/nhrils-catalogue-hero.png">
 
 <main class="nhrils-page-shell" aria-labelledby="nhrils-catalogue-title">
   {% set active_page = "catalogue" %}
   {% include "invenio_app_ils/_catalogue_topbar.html" %}
 
   <section class="nhrils-hero" aria-labelledby="nhrils-catalogue-title">
+    <div class="nhrils-hero-media" aria-hidden="true"></div>
     <div class="nhrils-hero-copy">
       <p class="nhrils-eyebrow">NIMR Library Catalogue</p>
       <h1 id="nhrils-catalogue-title">Find health research resources held by NIMR</h1>
@@ -29,11 +34,11 @@
         </div>
       </dl>
     </div>
-    <form class="nhrils-search-panel" action="/nhrils/catalogue/search" method="get" role="search" aria-label="Search catalogue">
+    <form class="nhrils-search-panel nhrils-search-panel-hero" action="/nhrils/catalogue/search" method="get" role="search" aria-label="Search catalogue">
       <label for="nhrils-search-query">Search the catalogue</label>
       <div class="nhrils-search-control">
         <input id="nhrils-search-query" name="q" type="search" placeholder="Title, author, subject, identifier, or year">
-        <button class="nhrils-button nhrils-button-primary" type="submit">Search</button>
+        <button class="nhrils-button nhrils-button-primary nhrils-search-submit" type="submit" aria-label="Search catalogue">Search</button>
       </div>
       <div class="nhrils-search-examples" aria-label="Suggested searches">
         <a href="/nhrils/catalogue/search?q=malaria">Malaria</a>
@@ -43,6 +48,13 @@
       </div>
       <p class="nhrils-search-note">Use Advanced search for exact fields, identifiers, and publication-year ranges.</p>
     </form>
+  </section>
+
+  <section class="nhrils-collection-tabs" aria-label="Catalogue discovery shortcuts">
+    <a href="/nhrils/catalogue/search?type=BOOK">Books and e-books</a>
+    <a href="/nhrils/catalogue/search?type=SERIAL">Journals and series</a>
+    <a href="/nhrils/catalogue/search?type=STANDARD">Guidelines and standards</a>
+    <a href="/nhrils/catalogue/search?availability=online">Digital access</a>
   </section>
 
   <section class="nhrils-status-strip" aria-label="Catalogue service status">
