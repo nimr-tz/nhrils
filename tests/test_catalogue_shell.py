@@ -22,6 +22,14 @@ from invenio_app_ils.catalogue.search_service import (
 )
 
 
+def test_root_redirects_to_catalogue_shell(client):
+    """Test the NHRILS site root opens the public catalogue entry point."""
+    res = client.get("/")
+
+    assert res.status_code == 302
+    assert res.headers["Location"].endswith("/nhrils/catalogue")
+
+
 def test_catalogue_shell_renders(client):
     """Test the NHRILS public catalogue shell route."""
     res = client.get(url_for("nhrils_catalogue_shell.catalogue_shell_view"))

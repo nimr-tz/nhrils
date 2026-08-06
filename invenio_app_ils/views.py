@@ -7,7 +7,7 @@
 
 """Invenio App ILS views."""
 
-from flask import Blueprint, abort, g, jsonify, render_template, request
+from flask import Blueprint, abort, g, jsonify, redirect, render_template, request
 from invenio_accounts.views.rest import UserInfoView, default_user_payload
 from invenio_userprofiles import UserProfile
 
@@ -47,6 +47,10 @@ class UserInfoResource(UserInfoView):
 def create_catalogue_shell_blueprint(app):
     """Create NHRILS catalogue shell blueprint."""
     blueprint = Blueprint("nhrils_catalogue_shell", __name__)
+    blueprint.add_url_rule(
+        "/",
+        view_func=catalogue_root_redirect_view,
+    )
     blueprint.add_url_rule(
         "/nhrils/catalogue",
         view_func=catalogue_shell_view,
@@ -274,6 +278,11 @@ CATALOGUE_HELP_PAGES = {
 def catalogue_shell_view():
     """Render the first NHRILS catalogue shell."""
     return render_template("invenio_app_ils/catalogue_shell.html")
+
+
+def catalogue_root_redirect_view():
+    """Redirect the site root to the active NHRILS catalogue shell."""
+    return redirect("/nhrils/catalogue", code=302)
 
 
 def catalogue_search_view():
