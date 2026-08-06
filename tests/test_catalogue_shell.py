@@ -22,6 +22,35 @@ from invenio_app_ils.catalogue.search_service import (
 )
 
 
+def test_catalogue_material_shell_static_contract():
+    """Test the landing shell uses the agreed collected assets and layout markers."""
+    template = Path(
+        "invenio_app_ils/templates/invenio_app_ils/catalogue_shell.html"
+    ).read_text()
+    topbar = Path(
+        "invenio_app_ils/templates/invenio_app_ils/_catalogue_topbar.html"
+    ).read_text()
+    css = Path("invenio_app_ils/static/css/nhrils-catalogue.css").read_text()
+
+    assert "{% block page_header %}{% endblock page_header %}" in template
+    assert "{% block page_footer %}{% endblock page_footer %}" in template
+    assert "/invenio-assets/css/nhrils-catalogue.css" in template
+    assert "/invenio-assets/images/nhrils-catalogue-hero.png" in template
+    assert "/invenio-assets/images/nimr.svg" in topbar
+    assert "url_for('invenio_app_ils.static'" not in template
+    assert "url_for('invenio_app_ils.static'" not in topbar
+    assert "nhrils-hero-media" in template
+    assert "nhrils-search-panel-hero" in template
+    assert "nhrils-collection-tabs" in template
+    assert "Books and e-books" in template
+    assert "Journals and series" in template
+    assert "Guidelines and standards" in template
+    assert "--nhrils-hero-image" in css
+    assert "nhrils-catalogue-hero.png" in css
+    assert ".nhrils-search-panel-hero" in css
+    assert ".nhrils-collection-tabs" in css
+
+
 def test_root_redirects_to_catalogue_shell(client):
     """Test the NHRILS site root opens the public catalogue entry point."""
     res = client.get("/")
@@ -38,12 +67,24 @@ def test_catalogue_shell_renders(client):
     assert b"NHRILS" in res.data
     assert b"National Health Research Integrated Library System" in res.data
     assert b"Search the catalogue" in res.data
+    assert b"/invenio-assets/css/nhrils-catalogue.css" in res.data
+    assert b"/invenio-assets/images/nimr.svg" in res.data
+    assert b"/invenio-assets/images/nhrils-catalogue-hero.png" in res.data
+    assert b"/static/css/nhrils-catalogue.css" not in res.data
+    assert b"/static/images/nimr.svg" not in res.data
+    assert b'class="theme header"' not in res.data
     assert b"/nhrils/catalogue/search" in res.data
     assert b"/nhrils/catalogue/search-guide" in res.data
     assert b"/nhrils/catalogue/about" in res.data
     assert b"/nhrils/catalogue/contact" in res.data
     assert b"/api" not in res.data
     assert b"nimr.svg" in res.data
+    assert b"nhrils-hero-media" in res.data
+    assert b"nhrils-search-panel-hero" in res.data
+    assert b"nhrils-collection-tabs" in res.data
+    assert b"Books and e-books" in res.data
+    assert b"Journals and series" in res.data
+    assert b"Guidelines and standards" in res.data
     assert b"42" in res.data
     assert b"seed records" in res.data
     assert b"Featured records" in res.data

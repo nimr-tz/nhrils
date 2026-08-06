@@ -107,6 +107,8 @@ Do not duplicate the same page title in both shell and content. Route identity b
 
 - Use the official NIMR logo from `invenio_app_ils/static/images/nimr.svg`.
 - Logo appears once in the header brand area.
+- Public catalogue pages own their first viewport and must suppress the default Invenio theme header/footer blocks to avoid duplicate chrome.
+- Server-rendered catalogue templates must reference collected runtime assets under `/invenio-assets/...`, not blueprint `/static/...` URLs, because deployed Invenio serves collected package assets from `INVENIO_STATIC_URL_PATH`.
 - System short label `NHRILS` appears near the logo.
 - Canonical site name is `National Health Research Integrated Library System`; use the full name for site/browser/email/footer identity surfaces.
 - Header and brand-link accessible labels use the full canonical site name.

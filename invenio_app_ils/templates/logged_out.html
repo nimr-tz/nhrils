@@ -1,11 +1,11 @@
 {% extends config.THEME_BASE_TEMPLATE %}
 
 {% block page_body %}
-<link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
+<link rel="stylesheet" href="/invenio-assets/css/nhrils-catalogue.css?v=material-shell-20260806-001">
 
 <div class="nhrils-page-shell nhrils-auth-state" aria-labelledby="nhrils-logout-title">
   <div class="nhrils-auth-card">
-    <img class="nhrils-auth-logo" src="{{ url_for('invenio_app_ils.static', filename='images/nimr.svg') }}" alt="NIMR">
+    <img class="nhrils-auth-logo" src="/invenio-assets/images/nimr.svg" alt="NIMR">
     <p class="nhrils-eyebrow">National Health Research Integrated Library System</p>
     <h1 id="nhrils-logout-title">You have signed out</h1>
     <p>

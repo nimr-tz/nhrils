@@ -1,5 +1,8 @@
 {% extends config.THEME_BASE_TEMPLATE %}
 
+{% block page_header %}{% endblock page_header %}
+{% block page_footer %}{% endblock page_footer %}
+
 {% macro filter_link(label, name, value, count, selected_filters, query) -%}
   {% set is_selected = selected_filters.get(name) == value %}
   <a class="nhrils-facet-link{% if is_selected %} nhrils-facet-link-active{% endif %}"
@@ -30,7 +33,7 @@
 {%- endmacro %}
 
 {% block page_body %}
-<link rel="stylesheet" href="{{ url_for('invenio_app_ils.static', filename='css/nhrils-catalogue.css') }}">
+<link rel="stylesheet" href="/invenio-assets/css/nhrils-catalogue.css?v=material-shell-20260806-001">
 
 <main class="nhrils-page-shell" aria-labelledby="nhrils-search-title">
   {% set active_page = "results" %}
